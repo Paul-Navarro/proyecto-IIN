@@ -13,7 +13,7 @@
         <h1>{% block header_title %}Bienvenido, Administrador{% endblock %}</h1>
         <nav>
             <ul>
-                <li><a href="#">Gestionar Usuarios</a></li>
+                <li><a href="{% url 'user_list' %}">Gestionar Usuarios</a></li>
                 <li><a href="#">Gestionar Contenido</a></li>
                 <li><a href="#">Configuraciones</a></li>
                 <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
