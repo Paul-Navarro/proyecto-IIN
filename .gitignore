@@ -38,8 +38,8 @@ var/
 .idea/
 
 # Archivos de migraciones
-**/migrations/*
-!**/migrations/__init__.py
+#**/migrations/*
+#!**/migrations/__init__.py
 
 # Archivos estáticos y multimedia
 staticfiles/
