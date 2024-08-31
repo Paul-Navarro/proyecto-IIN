@@ -1,33 +1,30 @@
-"""
-URL configuration for proyecto project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path
-
-from django.contrib import admin
-from django.urls import path, include
-
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from users.views import (
+    role_based_redirect,
+    admin_dashboard,
+    editor_dashboard,
+    publicador_dashboard,
+    suscriptor_dashboard,
+    create_user,  # Vista para crear un usuario
+    edit_user,    # Vista para editar un usuario
+    delete_user,  # Vista para eliminar un usuario
+    user_list     # Vista para listar los usuarios
+)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
-    path('', lambda request: redirect('accounts/login/', permanent=False)),  # Redirige a la página de login
+    path('', lambda request: redirect('account_login'), name='home'),  # Redirige a la página de login
+    path('dashboard/', role_based_redirect, name='role_based_redirect'),
+    path('admin/dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('editor/dashboard/', editor_dashboard, name='editor_dashboard'),
+    path('publicador/dashboard/', publicador_dashboard, name='publicador_dashboard'),
+    path('suscriptor/dashboard/', suscriptor_dashboard, name='suscriptor_dashboard'),
+    path('accounts/', include('allauth.urls')),  # Incluye las rutas de Django Allauth
+
+    # Rutas para la gestión de usuarios por parte del administrador
+    path('users/', user_list, name='user_list'),  # Lista de usuarios
+    path('users/create/', create_user, name='create_user'),  # Crear un nuevo usuario
+    path('users/edit/<int:user_id>/', edit_user, name='edit_user'),  # Editar un usuario existente
+    path('users/delete/<int:user_id>/', delete_user, name='delete_user'),  # Eliminar un usuario existente
 ]
-
-

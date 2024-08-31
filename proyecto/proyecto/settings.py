@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bd_equipo5',
+        'NAME': 'bd',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
@@ -116,9 +116,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'  # Permite iniciar sesión con nombre de usuario o email
 ACCOUNT_EMAIL_REQUIRED = True  # El correo electrónico es obligatorio
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Verificación de email obligatoria
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Verificación de email obligatoria
 ACCOUNT_USERNAME_REQUIRED = True  # El nombre de usuario también es obligatorio
-LOGIN_REDIRECT_URL = '/'  # Redirige a la página principal después de iniciar sesión
+# Redirige después del login según el rol del usuario
+LOGIN_REDIRECT_URL = '/dashboard/'
+  # Redirige a la página principal después de iniciar sesión
 LOGOUT_REDIRECT_URL = '/'  # Redirige a la página principal después de cerrar sesión
 ACCOUNT_SIGNUP_FORM_CLASS = None  # Si deseas utilizar un formulario de registro personalizado
 

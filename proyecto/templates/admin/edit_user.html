@@ -1,0 +1,15 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Editar Usuario{% endblock %}
+
+{% block header_title %}Editar Usuario{% endblock %}
+
+{% block content %}
+    <h1>Editar Usuario</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    <a href="{% url 'user_list' %}">Volver a la lista de usuarios</a>
+{% endblock %}

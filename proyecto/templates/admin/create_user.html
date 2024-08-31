@@ -1,0 +1,15 @@
+{% extends 'dashboard.html' %}
+
+{% block title %}Crear Usuario{% endblock %}
+
+{% block header_title %}Crear Usuario{% endblock %}
+
+{% block content %}
+    <h1>Crear Usuario</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Crear Usuario</button>
+    </form>
+    <a href="{% url 'user_list' %}">Volver a la lista de usuarios</a>
+{% endblock %}

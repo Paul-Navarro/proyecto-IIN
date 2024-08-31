@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Suscriptor</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/suscriptor_dashboard.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Bienvenido, Suscriptor</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Ver Contenido</a></li>
+                <li><a href="#">Perfil</a></li>
+                <li><a href="#">Soporte</a></li>
+                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
+         
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Contenido Exclusivo</h2>
+            <p>Accede a todo el contenido exclusivo disponible para ti como suscriptor.</p>
+        </section>
+    </main>
+</body>
+</html>
