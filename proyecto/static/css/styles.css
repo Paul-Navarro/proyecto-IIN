@@ -1,3 +1,174 @@
+/* static/css/styles.css */
+
+/* Estilos generales */
 body {
-    background-color: yellow;
+    font-family: 'Arial', sans-serif;
+    background: radial-gradient(circle at center, #00aaff, #0044cc);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
+
+.menu__li{
+    display: flex;
+    justify-content: space-around;
+}
+
+.li_menu:first-child{
+    margin-right: 30px;
+}
+
+a{
+    color:#fff;
+}
+
+
+/* Contenedor del contenido principal */
+.container {
+    background-color: #0004;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Estilos del título */
+h1 {
+    margin-bottom: 20px;
+}
+
+/* Estilos de los mensajes */
+.messages {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    color: #856404;
+    text-align: left;
+}
+
+/* Estilos del menú */
+.menu {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.menu strong {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+.menu ul li {
+    margin-bottom: 10px;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.menu ul li a:hover {
+    color: #0056b3;
+}
+
+/* Botón de acción */
+button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Enlaces adicionales */
+a {
+    text-decoration: none;
+    transition: color 0.3s;
+    margin: 0;
+}
+
+a:hover {
+    color: #000;
+    background-color: #fffa;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.menu__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.titulo_inicio{
+    font-family: sans-serif;
+}
+
+
+.subtitulo_registro{
+    padding: 5px;
+}
+
+.subtitulo_registro a:hover{
+    color: #000;
+    background-color: #fffa;
+    padding: 4px;
+    border-radius: 5px;
+}
+
+.button,secondaryAction{
+    margin-right: 40px;
+}
+
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    display: inline-flex;
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 4px;     /* Bordes redondeados */
+    padding: 8px;           /* Espaciado interno */
+    font-size: 16px;        /* Tamaño de fuente */
+    width: 100%;            /* Ancho completo del contenedor */
+    box-sizing: border-box; /* Incluye el padding en el ancho total */
+    margin-bottom: 10px;    /* Espaciado inferior */
+    transition: border-color 0.3s ease; /* Transición suave en el color del borde */
+}
+
+/* Estilo para inputs de tipo email, password, y text cuando están enfocados */
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus {
+    border-color: #007bff;  /* Color de borde cuando está enfocado */
+    outline: none;          /* Elimina el contorno por defecto del navegador */
+}
+
+label{
+    display: inline-block;
+}
+
+
