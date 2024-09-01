@@ -5,23 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Panel de Administración{% endblock %}</title>
     
-    {% load static %}  <!-- Cargar archivos estáticos -->
-    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">  <!-- Enlace al archivo CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Íconos FontAwesome -->
 </head>
 <body>
-    <header>
-        <h1>{% block header_title %}Bienvenido, Administrador{% endblock %}</h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'user_list' %}">Gestionar Usuarios</a></li>
-                <li><a href="#">Gestionar Contenido</a></li>
-                <li><a href="#">Configuraciones</a></li>
-                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
-            </ul>
-        </nav>
+    <header class="header">
+        <div class="container header__container">
+            <h1 class="header__title">{% block header_title %}Bienvenido, Administrador{% endblock %}</h1>
+            <nav class="header__nav">
+                <ul class="menu__list">
+                    <li class="menu__item">
+                        <a href="{% url 'user_list' %}" class="menu__link"><i class="fas fa-users"></i> Gestionar Usuarios</a>
+                    </li>
+                    <li class="menu__item">
+                        <a href="#" class="menu__link"><i class="fas fa-file-alt"></i> Gestionar Contenido</a>
+                    </li>
+
+                    <li class="menu__item">
+                        <a href="{% url 'account_logout' %}" class="menu__link menu__link--logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+
+
 </body>
 </html>

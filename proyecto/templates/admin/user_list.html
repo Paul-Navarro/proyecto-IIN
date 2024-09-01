@@ -1,19 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuarios</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/user_list.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Íconos FontAwesome -->
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">Gestionar Usuarios</h1>
+            <div class="header__actions">
+                <a href="{% url 'create_user' %}" class="btn btn-primary">Crear Usuario</a>
+                <a href="{% url 'account_logout' %}" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </header>
 
-
-{% block title %}Lista de Usuarios{% endblock %}
-
-{% block header_title %}Gestionar Usuarios{% endblock %}
-
-{% block content %}
-    <h1>Lista de Usuarios</h1>
-    <a href="{% url 'create_user' %}">Crear Usuario</a>
-    <ul>
-        {% for user in users %}
-        <li>
-            {{ user.username }} - {{ user.email }} 
-            <a href="{% url 'edit_user' user.id %}">Editar</a>
-            <a href="{% url 'delete_user' user.id %}">Eliminar</a>
-        </li>
-        {% endfor %}
-    </ul>
-{% endblock %}
+    <main class="main-content">
+        <div class="container">
+            <h2 class="content-title">Lista de Usuarios</h2>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre de Usuario</th>
+                        <th>Correo Electrónico</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td class="user-table__actions">
+                            <a href="{% url 'edit_user' user.id %}" class="btn btn-secondary">Editar</a>
+                            <a href="{% url 'delete_user' user.id %}" class="btn btn-danger">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

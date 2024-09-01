@@ -1,15 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Crear Usuario{% endblock %}</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/create_user.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">{% block header_title %}Crear Usuario{% endblock %}</h1>
+            <a href="{% url 'user_list' %}" class="btn btn-secondary">Volver a la lista de usuarios</a>
+        </div>
+    </header>
 
-
-{% block title %}Crear Usuario{% endblock %}
-
-{% block header_title %}Crear Usuario{% endblock %}
-
-{% block content %}
-    <h1>Crear Usuario</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Crear Usuario</button>
-    </form>
-    <a href="{% url 'user_list' %}">Volver a la lista de usuarios</a>
-{% endblock %}
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+                <h2 class="form-title">Formulario de Creación</h2>
+                <form method="post" class="user-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                </form>
+            {% endblock %}
+        </div>
+    </main>
+</body>
+</html>

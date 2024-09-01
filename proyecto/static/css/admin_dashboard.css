@@ -1,120 +1,110 @@
-/* Estilo general */
+/* Estilos generales */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    background: linear-gradient(135deg, #00aaff, #0044cc);
+    color: #fff;
     margin: 0;
     padding: 0;
-    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* Estilo del encabezado */
-header {
-    background-color: #2c3e50;
-    color: white;
-    padding: 20px;
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-header h1 {
-    margin: 0;
+/* Título */
+.header__title {
     font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #fff;
 }
 
-nav ul {
+/* Lista de menú */
+.menu__list {
+    display: flex;
+    justify-content: space-between; /* Más espacio entre botones */
     list-style: none;
     padding: 0;
-    margin: 20px 0 0 0;
-    text-align: center;
+    margin: 0;
 }
 
-nav ul li {
-    display: inline;
-    margin-right: 20px;
+/* Elementos de menú */
+.menu__item {
+    margin: 0 15px; /* Más separación entre los botones */
+    flex: 1; /* Hace que todos los botones tengan el mismo ancho */
 }
 
-nav ul li a {
-    color: white;
+/* Enlaces de menú */
+.menu__link {
+    color: #fff;
     text-decoration: none;
     font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-nav ul li a:hover {
-    background-color: #34495e;
-}
-
-/* Estilo del contenedor principal */
-main {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 15px 20px;
     border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo de las secciones */
-section {
-    margin-bottom: 30px;
-}
-
-section h2 {
-    color: #2c3e50;
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-section p {
-    font-size: 1.1rem;
-    line-height: 1.8;
-}
-
-/* Estilo de los botones */
-button, a.button {
-    background-color: #2980b9;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover, a.button:hover {
-    background-color: #1c5980;
-}
-
-/* Estilo de las tarjetas de información */
-.info-card {
-    background-color: #ecf0f1;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.info-card h3 {
-    margin-top: 0;
+.menu__link i {
+    margin-right: 10px;
     font-size: 1.5rem;
-    color: #2980b9;
 }
 
-.info-card p {
-    margin: 10px 0 0;
-    font-size: 1.1rem;
+/* Hover en enlaces de menú */
+.menu__link:hover {
+    background-color: #fff;
+    color: #0044cc;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px); /* Efecto de "flotar" al pasar el mouse */
 }
 
-/* Estilo del pie de página */
-footer {
-    text-align: center;
-    padding: 10px;
-    background-color: #2c3e50;
-    color: white;
-    margin-top: 40px;
-    border-radius: 0 0 10px 10px;
+/* Estilo especial para el botón de cerrar sesión */
+.menu__link--logout {
+    background-color: #ff4444;
+}
+
+.menu__link--logout:hover {
+    background-color: #cc0000;
+    color: #fff;
+}
+
+/* Estilos adicionales para la sección de contenido */
+.main-content {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Media Queries para dispositivos móviles */
+@media (max-width: 768px) {
+    .menu__list {
+        flex-direction: column;
+    }
+    
+    .menu__item {
+        margin: 10px 0; /* Más separación entre botones en pantallas pequeñas */
+    }
+    
+    .header__title {
+        font-size: 2rem;
+    }
 }
