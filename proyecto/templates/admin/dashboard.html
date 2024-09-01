@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel de Administración{% endblock %}</title>
+    
+    {% load static %}  <!-- Cargar archivos estáticos -->
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">  <!-- Enlace al archivo CSS -->
+</head>
+<body>
+    <header>
+        <h1>{% block header_title %}Bienvenido, Administrador{% endblock %}</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'user_list' %}">Gestionar Usuarios</a></li>
+                <li><a href="#">Gestionar Contenido</a></li>
+                <li><a href="#">Configuraciones</a></li>
+                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

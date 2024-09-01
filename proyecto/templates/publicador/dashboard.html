@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Publicador</title>
+    
+    {% load static %}  <!-- Cargar archivos estáticos -->
+    <link rel="stylesheet" href="{% static 'css/publicador_dashboard.css' %}">  <!-- Enlace al archivo CSS -->
+</head>
+<body>
+    <header>
+        <h1>Bienvenido, Publicador</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Revisar Contenido Pendiente</a></li>
+                <li><a href="#">Publicar Contenido</a></li>
+                <li><a href="#">Gestionar Publicaciones</a></li>
+                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Panel de Publicación</h2>
+            <p>Desde aquí puedes revisar, aprobar, y publicar contenido en la plataforma.</p>
+        </section>
+        <section>
+            <h2>Estadísticas de Publicación</h2>
+            <p>Consulta las métricas de rendimiento de tus publicaciones y optimiza tu contenido.</p>
+        </section>
+    </main>
+</body>
+</html>

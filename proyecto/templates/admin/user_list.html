@@ -1,0 +1,19 @@
+
+
+{% block title %}Lista de Usuarios{% endblock %}
+
+{% block header_title %}Gestionar Usuarios{% endblock %}
+
+{% block content %}
+    <h1>Lista de Usuarios</h1>
+    <a href="{% url 'create_user' %}">Crear Usuario</a>
+    <ul>
+        {% for user in users %}
+        <li>
+            {{ user.username }} - {{ user.email }} 
+            <a href="{% url 'edit_user' user.id %}">Editar</a>
+            <a href="{% url 'delete_user' user.id %}">Eliminar</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

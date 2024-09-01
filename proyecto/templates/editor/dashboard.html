@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Editor</title>
+    
+    {% load static %}  <!-- Cargar archivos estáticos -->
+    <link rel="stylesheet" href="{% static 'css/editor_dashboard.css' %}">  <!-- Enlace al archivo CSS -->
+</head>
+<body>
+    <header>
+        <h1>Bienvenido, Editor</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Crear Nuevo Contenido</a></li>
+                <li><a href="#">Gestionar Contenido Existente</a></li>
+                <li><a href="#">Revisar Comentarios</a></li>
+                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Herramientas de Edición</h2>
+            <p>Aquí puedes gestionar el contenido de la plataforma, crear nuevos artículos, y revisar los comentarios de los usuarios.</p>
+        </section>
+        <section>
+            <h2>Últimos Artículos Publicados</h2>
+            <p>Revisa los artículos más recientes y realiza ediciones si es necesario.</p>
+        </section>
+    </main>
+</body>
+</html>
