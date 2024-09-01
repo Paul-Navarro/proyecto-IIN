@@ -16,10 +16,9 @@
       <!-- Mensajes -->
       {% if messages %}
       <div class="messages">
-        <strong>Messages:</strong>
+        
         <ul>
-          {% for message in messages %}
-          <li>{{ message }}</li>
+          {% for message in messages %}{{ message }}
           {% endfor %}
         </ul>
       </div>

@@ -166,9 +166,19 @@ input[type="text"]:focus {
     border-color: #007bff;  /* Color de borde cuando está enfocado */
     outline: none;          /* Elimina el contorno por defecto del navegador */
 }
-
-label{
+input[type="checkbox"] {
+    margin: 0;
+    vertical-align: middle;
+}
+label[for="id_remember"] {
     display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+label{
+    display: flex;
+    text-align: left;
+    
 }
 
 
