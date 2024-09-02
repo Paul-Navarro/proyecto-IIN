@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo_block %}Home{% endblock %}</title>
+    
+    {% load static %}  <!-- Cargar archivos estáticos -->
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">  <!-- Enlace al archivo CSS -->
+    <!--Link para icono de lupa-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!--Carga de las funciones js-->
+    <script src="{% static 'js/home.js' %}"></script>
+
+    <!-- ENCABEZADO DE LA PAGINA-->
+    <div class="titulos_padres">
+        <div class="titulos_hijos">
+            <!--caja de relleno. No posee nada-->
+        </div>
+        <div class="titulos_hijos">
+            <h2>{% block header_title %}Sistema de Gestión de Contenidos{% endblock %}</h2>
+        </div>
+        <!-- sección de login-->
+        <div class="titulos_hijos divLogin">
+            <div>
+                <div>Accede o crea una cuenta</div>
+                <div class="botonesLogeo">
+                    <button type="button" >Log in</button>
+                    <button type="button" >Sign up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BARRA DE NAVEGACION DEBAJO DEL ENCABEZADO-->
+    <div class="barraNavegacion">
+        <div class="elementosBarra">¿Quiénes somos?</div>
+        <div class="elementosBarra">Inicio</div>
+        <div class="elementosBarra">Contacto</div>
+    </div>
+
+    <!-- Area de lateral izquierdo, contenidos y lateral derecho-->
+    <div class="cuerpo">
+        <!--Listado lateral izquierdo-->
+        <div class="lateral_izq">
+            <ul>
+                <li><strong>Categorías</strong></li>
+                <ul>
+                    <li><a href="#pago">Pago</a></li>
+                    <li><a href="#publico">Público</a></li>
+                </ul>
+                <li><strong>Preferencias</strong></li>
+                <ul>
+                    <li><a href="#idioma">Idioma</a></li>
+                    <li><a href="#notificaciones">Notificaciones</a></li>
+                </ul>
+                <li><strong>Gestión de Contenido</strong></li>
+                <ul>
+                    <li><a href="#crear">Crear Nuevo Contenido</a></li>
+                    <li><a href="#editar">Editar Contenido</a></li>
+                </ul>
+                <li><strong>Configuración</strong></li>
+                <ul>
+                    <li><a href="#general">Configuración General</a></li>
+                    <li><a href="#seguridad">Seguridad</a></li>
+                    <li><a href="#integraciones">Integraciones</a></li>
+                </ul>
+            </ul>
+        </div>
+        <!--Area de contenidos-->
+        <main id="mainID">
+            <div class="cajaBusqueda">
+                <input type="text" class="busqueda" placeholder="¿Qué estás buscando?"></input>
+                <button type="button" class="btnBuscar">
+                    <i class="fas fa-search"></i> 
+                </button>
+                <div class="filter-container">
+                    <button class="filter-button" onclick="toggleFilters()">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <div class="filter-options" id="filters">
+                        <label><input type="checkbox" value="option1"> Categoría 1</label>
+                        <label><input type="checkbox" value="option2"> Categoría 2</label>
+                        <label><input type="checkbox" value="option3"> Categoría 3</label>
+                        <label><input type="checkbox" value="option4"> Categoría 4</label>
+                        <label><input type="checkbox" value="option5"> Categoría 5</label>
+                    </div>
+                </div>
+            </div>
+            <!-- Cada contenido a mostrarse acá, tiene que tener su propio div-->
+            <div class="cajaContenidos" id="cajaContenidos">
+                <div class="contenidoRelleno" >
+                    Contenido de relleno
+                </div>
+                <div class="contenidoRelleno">
+                    Contenido de relleno
+                </div>
+                <div class="contenidoRelleno">
+                    Contenido de relleno
+                </div>
+                <div class="contenidoRelleno">
+                    Contenido de relleno
+                </div>
+                <!--{% block content %}Este es el main{% endblock %}-->
+            </div>
+        </main>
+        <!-- Listado lateral derecho -->
+        <div class="lateral_der">
+            <h3>Información Útil</h3>
+            <ul>
+                <li><strong><a href="#registrarme">¿Cómo registrarme?</a></strong></li>
+                <p>Guía paso a paso para registrarte en nuestra plataforma y comenzar a usar todas las funcionalidades.</p>
+                
+                <li><strong><a href="#recuperar">¿Olvidaste tu contraseña?</a></strong></li>
+                <p>Instrucciones para recuperar el acceso a tu cuenta si olvidaste tu contraseña.</p>
+                
+                <li><strong><a href="#primerospasos">Primeros pasos</a></strong></li>
+                <p>Consejos y recomendaciones para familiarizarte con nuestra plataforma.</p>
+                
+                <li><strong><a href="#privacidad">Política de Privacidad</a></strong></li>
+                <p>Detalles sobre cómo manejamos tu información y tus derechos sobre tus datos.</p>
+                
+                <li><strong><a href="#soporte">Soporte Técnico</a></strong></li>
+                <p>Cómo contactar a nuestro equipo de soporte si necesitas ayuda.</p>
+                
+                <li><strong><a href="#preguntas">Preguntas Frecuentes (FAQ)</a></strong></li>
+                <p>Respuestas a las preguntas más comunes sobre el uso de la plataforma.</p>
+                
+                <li><strong><a href="#actualizaciones">Actualizaciones del Sistema</a></strong></li>
+                <p>Información sobre las últimas actualizaciones, mejoras y nuevas características.</p>
+                
+                <li><strong><a href="#contacto">Contáctanos</a></strong></li>
+                <p>Formulario y opciones para ponerte en contacto con nosotros.</p>
+            </ul>
+        </div>
+    </div>
+    
+</body>
+</html>

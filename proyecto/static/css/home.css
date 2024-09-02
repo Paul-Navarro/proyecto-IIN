@@ -1,0 +1,275 @@
+/* Estilo general */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Estilo del encabezado 
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+*/
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+    text-align: center;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+nav ul li a:hover {
+    background-color: #34495e;
+}
+
+
+
+/* Estilo de las secciones */
+section {
+    margin-bottom: 30px;
+}
+
+section h2 {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+section p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* Estilo de los botones */
+button, a.button {
+    background-color: #2980b9;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover, a.button:hover {
+    background-color: #1c5980;
+}
+
+/* Estilo de las tarjetas de información */
+.info-card {
+    background-color: #ecf0f1;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.info-card h3 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: #2980b9;
+}
+
+.info-card p {
+    margin: 10px 0 0;
+    font-size: 1.1rem;
+}
+
+/* Estilo del pie de página */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #2c3e50;
+    color: white;
+    margin-top: 40px;
+    border-radius: 0 0 10px 10px;
+}
+
+.titulos_hijos {
+    width: 33.3%;
+}
+.titulos_padres{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2c3e50;
+    color: white;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    height: 15%;
+}
+.divLogin{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.botonesLogeo{
+    display: flex;
+    justify-content: space-between;
+}
+.botonLog{
+    display: flex;
+    justify-content: flex-start;
+}
+.botonSign{
+    display: flex;
+    justify-content: flex-end;
+}
+.cuerpo{
+    display: flex;
+    justify-content: space-between;
+    max-height: 80%;
+}
+
+/* Estilo del contenedor principal */
+main {
+    max-width: 1200px;
+    margin-top: 40px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom:10px ;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 75%;
+    max-height: 75vh;
+    /*overflow-y: auto;*/
+}
+
+.lateral_izq{
+    margin-top: 40px;
+    margin-left: 40px;
+    background: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 12%;
+    max-height: 500px;
+    padding: 10px;
+}
+.lateral_der{
+    margin-top: 40px;
+    margin-right: 40px;
+    background: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 12%;
+    max-height: 500px;
+    padding: 10px;
+    overflow-y: auto;
+}
+.busqueda{
+    margin-right: 5px;
+    width: 80%;
+    height: 30px;
+    font-size: 15px;
+    text-align: center;
+    
+}
+.cajaBusqueda{
+    display: flex;
+    justify-content: center;
+}
+
+.barraNavegacion{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    background-color: rgb(95, 105, 129);
+    color: white;
+}
+.elementosBarra{
+    margin:5px;
+}
+.btnBuscar{
+    margin-right: 5px;
+}
+/*
+    CSS PARA FILTRO DE BUSQUEDAS
+*/
+.filter-options{
+    position: fixed;
+    background-color: white;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    min-width: 160px;
+    max-width: 170px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    display: none;
+    padding: 5px 10px; /* Reducido para mejor ajuste */
+    border-radius: 5px;
+    font-size: 14px; /* Tamaño de fuente reducido */
+    width: 100%; /* Ajusta el ancho al contenedor */
+    box-sizing: border-box; /* Asegura que el padding esté incluido en el ancho total */
+}
+
+/* Opciones individuales dentro del desplegable */
+.filter-options label {
+    display: block;
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+
+/* Estilo del contenedor para evitar que el contenido suba al expandir */
+.filter-container {
+    position: relative;
+    display: inline-block;
+}
+
+.contenidoRelleno{
+    width: 90.5%;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    border-radius: 15px;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #f0f2f5;
+    margin: 10px;
+}
+.cajaContenidos{
+    display: flex;
+    /*justify-content: center;  Centra el div hijo horizontalmente */
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    margin-top:30px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
