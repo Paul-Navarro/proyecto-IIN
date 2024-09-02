@@ -1,6 +1,13 @@
 from django.db import models
 
 class Categoria(models.Model):
+    """
+    @class Categoria
+    @extends models.Model
+    @description Modelo que representa una categoría en el sistema.
+    Este modelo define una categoría con atributos como nombre, estado de moderación, estado de pago, accesibilidad para suscriptores, y un código único.
+    También maneja la autogeneración del código si no se proporciona uno.
+    """
     nombre = models.CharField(max_length=100)
     es_moderada = models.BooleanField(default=False)
     es_pagada = models.BooleanField(default=False)

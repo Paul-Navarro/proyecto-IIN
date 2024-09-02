@@ -4,6 +4,12 @@ from .models import Categoria
 
 
 class CategoriaViewsTest(TestCase):
+    """
+    @class CategoriaViewsTest
+    @extends TestCase
+    @description Conjunto de pruebas para las vistas relacionadas con el modelo Categoria.
+    Esta clase contiene pruebas para las operaciones de listar, crear, editar y eliminar categorías.
+    """
     def setUp(self):
         # Crear algunas categorías para probar
         Categoria.objects.create(nombre="Categoría 1")

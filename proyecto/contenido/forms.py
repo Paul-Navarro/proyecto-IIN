@@ -3,6 +3,11 @@ from .models import Contenido
 from django.utils import timezone
 
 class ContenidoForm(forms.ModelForm):
+    '''
+    @class ContenidoForm
+    @extends forms.ModelForm
+    @description Formulario para el modelo 'Contenido'. Gestiona los campos y etiquetas del contenido, estableciendo por defecto la fecha actual.
+    '''
     class Meta:
         model = Contenido
         fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'estado_conte', 'fecha_conte']
@@ -14,6 +19,6 @@ class ContenidoForm(forms.ModelForm):
             'fecha_conte': 'Fecha del Contenido',
         }
     
-    def __init__(self, *args, **kwargs):
-        super(ContenidoForm, self).__init__(*args, **kwargs)
-        self.fields['fecha_conte'].initial = timezone.now().date()  # Establecer la fecha actual
+    def _init_(self, *args, **kwargs):
+        super(ContenidoForm, self)._init_(*args, **kwargs)
+        self.fields['fecha_conte'].initial = timezone.now().date()  # Establecer la fecha actual

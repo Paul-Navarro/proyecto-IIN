@@ -5,6 +5,11 @@ from .models import Contenido
 
 # NO FUNCIONA AUN ESTE TEST, ESPERAR A QUE SE TERMINE DE MODIFICAR LA APP "contenido"
 class ContenidoViewsTest(TestCase):
+    '''
+    @class ContenidoViewsTest
+    @extends TestCase
+    @description Pruebas para las vistas relacionadas con el modelo 'Contenido'. Incluye pruebas para listar, crear, actualizar y eliminar contenido. Algunas pruebas están desactivadas temporalmente mientras se modifican las vistas correspondientes.
+    '''
     def setUp(self):
         # Crear algunos contenidos para probar
         Contenido.objects.create(
