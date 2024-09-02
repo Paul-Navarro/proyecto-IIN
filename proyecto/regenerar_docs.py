@@ -58,7 +58,7 @@ import os
 import sys
 import django
 
-sys.path.insert(0, os.path.abspath(r'C:\\Users\\HOME\\Desktop\\ProyectoIs2\\proyecto-IIN\\proyecto'))
+sys.path.insert(0, os.path.abspath(r'C:\Users\Paul Estigarribia\Desktop\Proyecto Equipo 5\proyecto'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'proyecto.settings'
 django.setup()
 """
