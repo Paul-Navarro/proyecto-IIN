@@ -15,6 +15,7 @@ header {
     padding: 20px;
     text-align: center;
     margin-bottom: 20px;
+    position: relative; /* Para posicionar elementos de manera absoluta dentro del header */
 }
 
 header h1 {
@@ -22,11 +23,13 @@ header h1 {
     font-size: 2.5rem;
 }
 
+/* Estilo de la navegación */
 nav ul {
     list-style: none;
     padding: 0;
     margin: 10px 0 0;
     text-align: center;
+    position: relative;
 }
 
 nav ul li {
@@ -42,6 +45,20 @@ nav ul li a {
 
 nav ul li a:hover {
     text-decoration: underline;
+}
+
+/* Estilo del botón de Inicio */
+.menu__link--home {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #2980b9; /* Azul para el botón de Inicio */
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+.menu__link--home:hover {
+    background-color: #3498db; /* Azul más claro al pasar el mouse */
 }
 
 /* Estilo del contenido principal */

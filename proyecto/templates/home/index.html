@@ -11,24 +11,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!--Carga de las funciones js-->
+    <!-- Carga de las funciones JS -->
     <script src="{% static 'js/home.js' %}"></script>
 
-    <!-- ENCABEZADO DE LA PAGINA-->
+    <!-- ENCABEZADO DE LA PAGINA -->
     <header class="titulos_padres">
         <div class="titulos_hijos">
-            <!--caja de relleno. No posee nada-->
+            <!-- caja de relleno. No posee nada -->
         </div>
         <div class="titulos_hijos">
             <h2>{% block header_title %}Sistema de Gestión de Contenidos{% endblock %}</h2>
         </div>
-        <!-- sección de login-->
+        <!-- sección de login -->
         <div class="titulos_hijos divLogin">
             <div>
-                <div>Accede o crea una cuenta</div>
+                
                 <div class="botonesLogeo">
-                    <button onclick="redirigirLogin()" type="button">Log in</button>
-                    <button onclick="redirigirRegistro()" type="button">Sign up</button>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'account_logout' %}" class="menu__link menu__link--logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                    {% else %}
+                    <div>Accede o crea una cuenta</div>
+                        <button onclick="redirigirLogin()" type="button">Log in</button>
+                        <button onclick="redirigirRegistro()" type="button">Sign up</button>
+                    {% endif %}
                 </div>
             </div>
         </div>

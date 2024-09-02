@@ -15,6 +15,7 @@ header {
     padding: 20px;
     text-align: center;
     margin-bottom: 20px;
+    position: relative;
 }
 
 header h1 {
@@ -34,6 +35,19 @@ header h1 {
 
 .header__actions .btn:last-child {
     margin-right: 0;
+}
+
+/* Botón de Inicio */
+.btn-home {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #2980b9; /* Azul para el botón de Inicio */
+}
+
+.btn-home:hover {
+    background-color: #3498db; /* Azul más claro al pasar el mouse */
+    color: white; /* Blanco para el texto */
 }
 
 /* Estilo del contenido principal */
@@ -162,5 +176,11 @@ header h1 {
 
     .content-table__actions .btn:last-child {
         margin-bottom: 0;
+    }
+
+    /* Asegura que el botón de inicio se vea bien en pantallas pequeñas */
+    .btn-home {
+        top: 10px;
+        right: 10px;
     }
 }

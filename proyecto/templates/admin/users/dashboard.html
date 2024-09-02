@@ -16,12 +16,14 @@
             <nav class="header__nav">
                 <ul class="menu__list">
                     <li class="menu__item">
+                        <a href="{% url 'home' %}" class="menu__link menu__link--home"><i class="fas fa-home"></i> Inicio</a>
+                    </li>
+                    <li class="menu__item">
                         <a href="{% url 'user_list' %}" class="menu__link"><i class="fas fa-users"></i> Gestionar Usuarios</a>
                     </li>
                     <li class="menu__item">
                         <a href="{% url 'listar_categorias' %}" class="menu__link"><i class="fas fa-file-alt"></i> Gestionar Categorías</a>
                     </li>
-
                     <li class="menu__item">
                         <a href="{% url 'account_logout' %}" class="menu__link menu__link--logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
                     </li>
@@ -29,7 +31,5 @@
             </nav>
         </div>
     </header>
-
-
 </body>
 </html>

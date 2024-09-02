@@ -21,6 +21,7 @@ body {
     border-radius: 15px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
     text-align: center;
+    position: relative; /* Asegura que los elementos posicionados se relacionen con este contenedor */
 }
 
 /* Título */
@@ -85,6 +86,19 @@ body {
     color: white; /* Blanco para el texto */
 }
 
+/* Botón de Inicio */
+.menu__link--home {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #2980b9; /* Azul para el botón de Inicio */
+}
+
+.menu__link--home:hover {
+    background-color: #3498db; /* Azul más claro al pasar el mouse */
+    color: white; /* Blanco para el texto */
+}
+
 /* Estilos adicionales para la sección de contenido */
 .main-content {
     margin-top: 30px;
@@ -106,5 +120,10 @@ body {
     
     .header__title {
         font-size: 2rem;
+    }
+
+    .menu__link--home {
+        top: 10px;
+        right: 10px;
     }
 }

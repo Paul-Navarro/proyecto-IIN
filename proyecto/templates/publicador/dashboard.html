@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Autor</title>
+    <title>Panel de Publicador</title>
     
     {% load static %}  <!-- Cargar archivos estáticos -->
-    <link rel="stylesheet" href="{% static 'css/autor_dashboard.css' %}">  <!-- Enlace al archivo CSS específico para Autor -->
+    <link rel="stylesheet" href="{% static 'css/autor_dashboard.css' %}">  <!-- Enlace al archivo CSS específico para Publicador -->
 </head>
 <body>
     <header>
-        <h1>Bienvenido Autor!</h1>
+        <h1>Bienvenido Publicador!</h1>
         <nav>
             <ul>
                 <li><a href="{% url 'home' %}" class="menu__link menu__link--home">Inicio</a></li>
-                <li><a href="{% url 'contenido_create' %}">Crear Nuevo Contenido</a></li>
-                <li><a href="{% url 'contenido_list' %}">Gestionar tus Contenidos</a></li>
+                <li><a href="#">Aprobar Contenidos</a></li>
+                <li><a href="#">Gestionar Contenidos</a></li>
                 <li><a href="#">Ver Comentarios</a></li>
                 <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
             </ul>
@@ -23,12 +23,12 @@
     </header>
     <main>
         <section>
-            <h2>Panel de Creación</h2>
-            <p>Desde aquí puedes crear y gestionar tus propios contenidos en la plataforma.</p>
+            <h2>Panel de Publicación</h2>
+            <p>Desde aquí puedes aprobar y gestionar los contenidos para su publicación en la plataforma.</p>
         </section>
         <section>
-            <h2>Estadísticas de tus Contenidos</h2>
-            <p>Consulta las métricas de rendimiento de tus publicaciones y optimiza tu contenido.</p>
+            <h2>Estadísticas de Publicaciones</h2>
+            <p>Consulta las métricas de rendimiento de los contenidos publicados y optimiza su visibilidad.</p>
         </section>
     </main>
 </body>
