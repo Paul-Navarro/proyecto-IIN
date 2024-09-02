@@ -1,110 +1,93 @@
-/* Estilos generales */
+/* Estilo general */
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: #fff;
+    background-color: #eef2f3;
+    color: #333;
     margin: 0;
     padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    line-height: 1.6;
 }
 
-/* Contenedor principal */
-.container {
-    max-width: 1400px;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-    margin: 30px auto;
+/* Estilo del encabezado */
+.header {
+    background-color: #16a085;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-/* Header */
+.header__title {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
 .header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 30px;
 }
 
-.header__title {
-    font-size: 3.5rem;
-    color: #fff;
+.header__actions {
+    display: flex;
+    gap: 10px;
 }
 
 .header__actions .btn {
-    margin: 10px;
-    display: inline-flex;
-    align-items: center;
-    padding: 15px 30px;
-    font-size: 20px;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.btn-primary {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-}
-
-.btn-primary:hover {
-    background-color: #218838;
-}
-
-.btn-logout {
-    background-color: #ffc107;
-    color: #333;
-}
-
-.btn-logout:hover {
-    background-color: #e0a800;
-}
-
-.btn-back {
+    padding: 10px 20px;
     background-color: #6c757d;
-    color: #fff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
-.btn-back:hover {
+.header__actions .btn:hover {
     background-color: #5a6268;
 }
 
-.btn i {
-    margin-right: 10px;
-}
-
-/* Botones de acciones */
-.btn-edit {
+.header__actions .btn-primary {
     background-color: #28a745;
-    color: #fff;
-    padding: 15px 25px;
-    font-size: 18px;
-    border-radius: 8px;
 }
 
-.btn-edit:hover {
+.header__actions .btn-primary:hover {
     background-color: #218838;
 }
 
-.btn-delete {
+.header__actions .btn-logout {
     background-color: #dc3545;
-    color: #fff;
-    padding: 12px 18px;
-    font-size: 16px;
-    border-radius: 8px;
 }
 
-.btn-delete:hover {
+.header__actions .btn-logout:hover {
     background-color: #c82333;
 }
 
-/* Tabla */
+.header__actions .btn-back {
+    background-color: #007bff;
+}
+
+.header__actions .btn-back:hover {
+    background-color: #0069d9;
+}
+
+/* Contenedor principal */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.content-title {
+    color: #16a085;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Tabla de Categorías */
 .table-responsive {
     overflow-x: auto;
 }
@@ -112,102 +95,93 @@ body {
 .category-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 30px;
-    background-color: #212529;
-    color: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #444;
+    margin-bottom: 20px;
 }
 
 .category-table th,
 .category-table td {
-    padding: 15px; /* Aumenta el padding para más espacio */
+    padding: 12px 15px;
+    border: 1px solid #ddd;
     text-align: left;
-    border-right: 2px solid #444;
 }
 
 .category-table th {
-    background-color: #343a40;
-    color: #00c0ff; /* Títulos de las columnas en azul claro */
-    text-transform: uppercase;
+    background-color: #16a085;
+    color: white;
     font-weight: bold;
-    padding: 20px; /* Aumenta el padding en los encabezados */
 }
 
-.category-table td {
-    margin-bottom: 10px; /* Agrega espacio entre las filas */
-}
-
-.category-table td:last-child {
-    border-right: none;
+.category-table tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
 
 .category-table__actions {
     display: flex;
-    gap: 15px;
+    gap: 10px;
 }
 
-.table-cell {
-    display: inline-block;
-    padding: 15px 25px;
-    background-color: #343a40;
-    border-radius: 8px;
-    text-align: center;
-    transition: background-color 0.3s, transform 0.2s;
-    cursor: pointer;
+.category-table__actions .btn {
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    text-decoration: none;
+    color: white;
+    background-color: #16a085;
+    transition: background-color 0.3s ease;
 }
 
-.table-cell:hover {
-    background-color: #495057;
-    transform: scale(1.05);
+.category-table__actions .btn-edit {
+    background-color: #3498db;
 }
 
-.table-cell-id {
-    font-weight: bold;
-    color: #ffdd57; /* Diferente color para los IDs */
-    border: 2px solid #ffdd57;
-    box-shadow: 0 0 10px rgba(255, 221, 87, 0.5);
+.category-table__actions .btn-edit:hover {
+    background-color: #2980b9;
 }
 
-.category-table td.descripcion .table-cell {
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.category-table__actions .btn-delete {
+    background-color: #e74c3c;
 }
 
-.category-table td.descripcion .table-cell:hover {
-    white-space: normal;
-    word-wrap: break-word;
-    background-color: #495057;
+.category-table__actions .btn-delete:hover {
+    background-color: #c0392b;
 }
 
-/* Media Queries */
+.category-table__actions .btn i {
+    margin-right: 5px;
+}
+
+/* Media Queries para dispositivos móviles */
 @media (max-width: 768px) {
     .header-container {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
     }
 
-    .btn {
-        width: 100%;
-        text-align: center;
-        margin-top: 10px;
+    .header__title {
+        margin-bottom: 15px;
+        font-size: 2rem;
+    }
+
+    .header__actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .category-table th,
+    .category-table td {
+        font-size: 14px;
+        padding: 10px 8px;
     }
 
     .category-table__actions {
         flex-direction: column;
     }
 
-    .btn {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 10px;
+    .category-table__actions .btn {
+        margin-bottom: 5px;
     }
 
-    .category-table td.descripcion .table-cell {
-        max-width: 100%;
-        white-space: normal;
+    .category-table__actions .btn:last-child {
+        margin-bottom: 0;
     }
 }

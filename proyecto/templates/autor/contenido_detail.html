@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ contenido.titulo_conte }}</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/contenido_detail.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">{{ contenido.titulo_conte }}</h1>
+            <a href="{% url 'home' %}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Volver al Inicio
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h2 class="content-title">Detalles del Contenido</h2>
+            <div class="content-body">
+                <p>{{ contenido.texto_conte }}</p>
+            </div>
+            <div class="content-meta">
+                <p><strong>Tipo de Contenido:</strong> {{ contenido.tipo_conte }}</p>
+                <p><strong>Estado:</strong> {{ contenido.estado_conte }}</p>
+                <p><strong>Fecha:</strong> {{ contenido.fecha_conte }}</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

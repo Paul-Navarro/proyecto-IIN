@@ -36,3 +36,11 @@ window.onload = function(event){
         }
     });
 }
+
+const redirigirLogin=()=>{
+    window.location.href = "./accounts/login/";
+}
+const redirigirRegistro=()=>{
+    window.location.href = "./accounts/signup/";
+}
+

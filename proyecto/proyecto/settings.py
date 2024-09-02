@@ -49,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+   
+    
 ]
 
 ROOT_URLCONF = 'proyecto.urls'
@@ -83,7 +85,7 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hhh',
+        'NAME': 'leticia',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',

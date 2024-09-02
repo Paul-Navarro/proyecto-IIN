@@ -1,10 +1,8 @@
-/* static/css/styles.css */
-
 /* Estilos generales */
 body {
     font-family: 'Arial', sans-serif;
-    background: radial-gradient(circle at center, #00aaff, #0044cc);
-    color: #fff;
+    background: radial-gradient(circle at center, #d6eae3, #b0cec5); /* Gradiente suave basado en tonos verdes */
+    color: #333; /* Color de texto más oscuro para mejor legibilidad */
     margin: 0;
     padding: 0;
     display: flex;
@@ -13,23 +11,22 @@ body {
     height: 100vh;
 }
 
-.menu__li{
+.menu__li {
     display: flex;
     justify-content: space-around;
 }
 
-.li_menu:first-child{
+.li_menu:first-child {
     margin-right: 30px;
 }
 
-a{
-    color:#fff;
+a {
+    color: #333; /* Color del enlace en un tono más oscuro */
 }
-
 
 /* Contenedor del contenido principal */
 .container {
-    background-color: #0004;
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente en blanco */
     box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
     padding: 30px;
     border-radius: 10px;
@@ -42,16 +39,17 @@ a{
 /* Estilos del título */
 h1 {
     margin-bottom: 20px;
+    color: #12746b; /* Color verde oscuro para el título */
 }
 
 /* Estilos de los mensajes */
 .messages {
-    background-color: #fff3cd;
-    border: 1px solid #ffeeba;
+    background-color: #e0f4f1; /* Fondo verde claro */
+    border: 1px solid #b0cec5; /* Borde verde suave */
     padding: 10px;
     margin-bottom: 20px;
     border-radius: 5px;
-    color: #856404;
+    color: #12746b; /* Texto en verde oscuro */
     text-align: left;
 }
 
@@ -79,15 +77,16 @@ h1 {
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s;
+    color: #12746b; /* Color verde oscuro para los enlaces del menú */
 }
 
 .menu ul li a:hover {
-    color: #0056b3;
+    color: #0e5b5b; /* Color verde más oscuro al pasar el ratón */
 }
 
 /* Botón de acción */
 button[type="submit"] {
-    background-color: #007bff;
+    background-color: #12746b; /* Verde oscuro */
     color: white;
     padding: 10px 20px;
     border: none;
@@ -99,7 +98,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #0056b3;
+    background-color: #0e5b5b; /* Verde más oscuro al pasar el ratón */
 }
 
 /* Enlaces adicionales */
@@ -110,12 +109,13 @@ a {
 }
 
 a:hover {
-    color: #000;
-    background-color: #fffa;
+    color: #0e5b5b; /* Verde más oscuro al pasar el ratón */
+    background-color: #d6eae3; /* Fondo verde claro */
     padding: 10px;
     border-radius: 5px;
 }
 
+/* Lista del menú */
 .menu__list {
     list-style: none;
     padding: 0;
@@ -124,38 +124,39 @@ a:hover {
     justify-content: space-around;
 }
 
-.titulo_inicio{
+.titulo_inicio {
     font-family: sans-serif;
+    color: #12746b; /* Verde oscuro */
 }
 
-
-.subtitulo_registro{
+.subtitulo_registro {
     padding: 5px;
+    color: #12746b; /* Verde oscuro */
 }
 
-.subtitulo_registro a:hover{
-    color: #000;
-    background-color: #fffa;
+.subtitulo_registro a:hover {
+    color: #0e5b5b; /* Verde más oscuro al pasar el ratón */
+    background-color: #d6eae3; /* Fondo verde claro */
     padding: 4px;
     border-radius: 5px;
 }
 
-.button,secondaryAction{
+.button.secondaryAction {
     margin-right: 40px;
 }
 
-
+/* Estilos para inputs */
 input[type="email"],
 input[type="password"],
 input[type="text"] {
     display: inline-flex;
     border: 1px solid #ccc; /* Borde gris claro */
-    border-radius: 4px;     /* Bordes redondeados */
-    padding: 8px;           /* Espaciado interno */
-    font-size: 16px;        /* Tamaño de fuente */
-    width: 100%;            /* Ancho completo del contenedor */
+    border-radius: 4px; /* Bordes redondeados */
+    padding: 8px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
+    width: 100%; /* Ancho completo del contenedor */
     box-sizing: border-box; /* Incluye el padding en el ancho total */
-    margin-bottom: 10px;    /* Espaciado inferior */
+    margin-bottom: 10px; /* Espaciado inferior */
     transition: border-color 0.3s ease; /* Transición suave en el color del borde */
 }
 
@@ -163,22 +164,24 @@ input[type="text"] {
 input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="text"]:focus {
-    border-color: #007bff;  /* Color de borde cuando está enfocado */
-    outline: none;          /* Elimina el contorno por defecto del navegador */
+    border-color: #12746b; /* Color de borde verde oscuro cuando está enfocado */
+    outline: none; /* Elimina el contorno por defecto del navegador */
 }
+
 input[type="checkbox"] {
     margin: 0;
     vertical-align: middle;
 }
+
 label[for="id_remember"] {
     display: inline-block;
     vertical-align: middle;
     margin-left: 5px;
+    color: #12746b; /* Color verde oscuro para el texto del label */
 }
-label{
+
+label {
     display: flex;
     text-align: left;
-    
+    color: #12746b; /* Color verde oscuro para los labels */
 }
-
-

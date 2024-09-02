@@ -9,7 +9,7 @@ body {
 }
 
 /* Estilo del encabezado */
-.header {
+header {
     background-color: #16a085;
     color: white;
     padding: 20px;
@@ -17,34 +17,36 @@ body {
     margin-bottom: 20px;
 }
 
-.header__title {
+header h1 {
     margin: 0;
     font-size: 2.5rem;
 }
 
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    text-align: center;
 }
 
-.header-container .btn {
-    padding: 10px 20px;
-    background-color: #6c757d;
+nav ul li {
+    display: inline;
+    margin-right: 15px;
+}
+
+nav ul li a {
     color: white;
     text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
-.header-container .btn:hover {
-    background-color: #5a6268;
+nav ul li a:hover {
+    text-decoration: underline;
 }
 
-/* Contenedor principal */
+/* Estilo del contenido principal */
 .main-content {
-    max-width: 600px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     background: white;
@@ -52,24 +54,27 @@ body {
     border-radius: 10px;
 }
 
-/* Título del formulario */
-.form-title {
+.main-content h2 {
     color: #16a085;
     font-size: 2rem;
     margin-bottom: 20px;
-    text-align: center;
+}
+
+.main-content p {
+    font-size: 1.2rem;
+    line-height: 1.8;
 }
 
 /* Estilo del formulario */
-.category-form {
+.content-form {
     width: 100%;
 }
 
-.category-form p {
+.content-form p {
     margin-bottom: 15px;
 }
 
-.category-form label {
+.content-form label {
     display: block;
     text-align: left;
     margin-bottom: 8px;
@@ -77,9 +82,10 @@ body {
     font-weight: bold;
 }
 
-.category-form input[type="text"],
-.category-form select,
-.category-form textarea {
+.content-form input[type="text"],
+.content-form select,
+.content-form textarea,
+.content-form input[type="date"] {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
@@ -92,7 +98,7 @@ body {
     color: #333;
 }
 
-.category-form textarea {
+.content-form textarea {
     resize: vertical;
     height: 150px; /* Altura inicial del textarea */
 }
@@ -141,6 +147,7 @@ body {
     .header-container {
         flex-direction: column;
         align-items: center;
+        text-align: center;
     }
 
     .header__title {

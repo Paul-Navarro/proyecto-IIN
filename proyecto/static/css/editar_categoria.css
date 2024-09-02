@@ -1,0 +1,138 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background: radial-gradient(circle at center, #d6eae3, #b0cec5); /* Gradiente suave basado en tonos verdes */
+    color: #333; /* Color de texto más oscuro para mejor legibilidad */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Estilos del encabezado */
+.header {
+    background-color: #12746b; /* Verde oscuro */
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.header-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__title {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.btn {
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+.btn-secondary {
+    background-color: #0e5b5b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #0a3f3f;
+}
+
+.btn-primary {
+    background-color: #12746b;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0e5b5b;
+}
+
+/* Contenido principal */
+.main-content {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+}
+
+.form-title {
+    font-size: 1.5rem;
+    color: #12746b; /* Verde oscuro */
+    margin-bottom: 20px;
+}
+
+/* Estilos del formulario */
+.user-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-form input[type="text"],
+.user-form input[type="email"],
+.user-form input[type="password"],
+.user-form textarea {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.user-form input[type="text"]:focus,
+.user-form input[type="email"]:focus,
+.user-form input[type="password"]:focus,
+.user-form textarea:focus {
+    border-color: #12746b; /* Verde oscuro */
+    outline: none;
+}
+
+.user-form button[type="submit"] {
+    background-color: #12746b;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    align-self: flex-end;
+}
+
+.user-form button[type="submit"]:hover {
+    background-color: #0e5b5b; /* Verde más oscuro al pasar el ratón */
+}
+
+/* Estilos adicionales */
+h2 {
+    margin-top: 0;
+    color: #12746b;
+}
+
+p {
+    margin-bottom: 10px;
+}

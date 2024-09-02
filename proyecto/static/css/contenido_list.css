@@ -9,7 +9,7 @@ body {
 }
 
 /* Estilo del encabezado */
-.header {
+header {
     background-color: #16a085;
     color: white;
     padding: 20px;
@@ -17,59 +17,28 @@ body {
     margin-bottom: 20px;
 }
 
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header__title {
+header h1 {
     margin: 0;
     font-size: 2.5rem;
 }
 
 .header__actions {
+    margin-top: 15px;
     display: flex;
-    gap: 10px;
+    justify-content: space-between;
 }
 
 .header__actions .btn {
-    padding: 10px 20px;
-    background-color: #6c757d;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    margin-right: 10px;
 }
 
-.header__actions .btn-primary {
-    background-color: #28a745;
+.header__actions .btn:last-child {
+    margin-right: 0;
 }
 
-.header__actions .btn-primary:hover {
-    background-color: #218838;
-}
-
-.header__actions .btn-logout {
-    background-color: #dc3545;
-}
-
-.header__actions .btn-logout:hover {
-    background-color: #c82333;
-}
-
-.header__actions .btn-back {
-    background-color: #007bff;
-}
-
-.header__actions .btn-back:hover {
-    background-color: #0069d9;
-}
-
-/* Contenedor principal */
+/* Estilo del contenido principal */
 .main-content {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     background: white;
@@ -77,42 +46,46 @@ body {
     border-radius: 10px;
 }
 
-.content-title {
+.main-content h2 {
     color: #16a085;
     font-size: 2rem;
     margin-bottom: 20px;
 }
 
-/* Tabla de Usuarios */
-.user-table {
+/* Tabla de Contenidos */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.content-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
 
-.user-table th,
-.user-table td {
+.content-table th,
+.content-table td {
     padding: 12px 15px;
     border: 1px solid #ddd;
     text-align: left;
 }
 
-.user-table th {
+.content-table th {
     background-color: #16a085;
     color: white;
     font-weight: bold;
 }
 
-.user-table tr:nth-child(even) {
+.content-table tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-.user-table__actions {
+.content-table__actions {
     display: flex;
     gap: 10px;
 }
 
-.user-table__actions .btn {
+.content-table__actions .btn {
     padding: 8px 12px;
     border-radius: 5px;
     font-size: 14px;
@@ -122,54 +95,72 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.user-table__actions .btn-secondary {
+.content-table__actions .btn-edit {
     background-color: #3498db;
 }
 
-.user-table__actions .btn-secondary:hover {
+.content-table__actions .btn-edit:hover {
     background-color: #2980b9;
 }
 
-.user-table__actions .btn-danger {
+.content-table__actions .btn-delete {
     background-color: #e74c3c;
 }
 
-.user-table__actions .btn-danger:hover {
+.content-table__actions .btn-delete:hover {
     background-color: #c0392b;
+}
+
+.content-table__actions .btn i {
+    margin-right: 5px;
+}
+
+/* Estilo de los enlaces y botones */
+.btn {
+    background-color: #16a085;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #12876a;
 }
 
 /* Media Queries para dispositivos móviles */
 @media (max-width: 768px) {
-    .header-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .header__title {
-        margin-bottom: 15px;
-        font-size: 2rem;
-    }
-
     .header__actions {
         flex-direction: column;
-        gap: 10px;
+        align-items: stretch;
     }
 
-    .user-table th,
-    .user-table td {
+    .header__actions .btn {
+        margin-bottom: 10px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .header__actions .btn:last-child {
+        margin-bottom: 0;
+    }
+
+    .content-table th,
+    .content-table td {
         font-size: 14px;
         padding: 10px 8px;
     }
 
-    .user-table__actions {
+    .content-table__actions {
         flex-direction: column;
     }
 
-    .user-table__actions .btn {
+    .content-table__actions .btn {
         margin-bottom: 5px;
     }
 
-    .user-table__actions .btn:last-child {
+    .content-table__actions .btn:last-child {
         margin-bottom: 0;
     }
 }

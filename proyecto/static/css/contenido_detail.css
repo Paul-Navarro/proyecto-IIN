@@ -1,0 +1,107 @@
+/* Estilo general */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #eef2f3;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Estilo del encabezado */
+.header {
+    background-color: #16a085;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__title {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.header-container .btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.header-container .btn:hover {
+    background-color: #0069d9;
+}
+
+/* Contenedor principal */
+.main-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.content-title {
+    color: #16a085;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Cuerpo del contenido */
+.content-body {
+    margin-bottom: 20px;
+}
+
+.content-body p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+/* Metadatos del contenido */
+.content-meta p {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.content-meta p strong {
+    color: #16a085;
+}
+
+/* Media Queries para dispositivos móviles */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header__title {
+        margin-bottom: 15px;
+        font-size: 2rem;
+    }
+
+    .header-container .btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .content-title {
+        font-size: 1.5rem;
+    }
+
+    .content-body p {
+        font-size: 1rem;
+    }
+}

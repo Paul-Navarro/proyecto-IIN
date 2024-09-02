@@ -11,6 +11,7 @@ def create_roles_and_assign_permissions(apps, schema_editor):
     editor_role, _ = Role.objects.get_or_create(name='Editor')
     publicador_role, _ = Role.objects.get_or_create(name='Publicador')
     admin_role, _ = Role.objects.get_or_create(name='Admin')
+    autor_role, _ = Role.objects.get_or_create(name='Autor') 
 
     # Obtener permisos de contenido
     content_permissions = Permission.objects.filter(codename__in=[
@@ -30,12 +31,16 @@ def create_roles_and_assign_permissions(apps, schema_editor):
     publicador_role.permissions.set(list(content_permissions) + list(user_permissions.filter(codename='view_user')))
 
     admin_role.permissions.set(list(content_permissions) + list(user_permissions))
+    
+    # Asignar permisos al rol Autor
+    autor_role.permissions.set(content_permissions.filter(codename__in=['view_content', 'add_content']))
 
     # Guardar cambios
     suscriptor_role.save()
     editor_role.save()
     publicador_role.save()
     admin_role.save()
+    autor_role.save()
 
 class Migration(migrations.Migration):
 

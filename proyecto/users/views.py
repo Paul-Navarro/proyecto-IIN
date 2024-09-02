@@ -5,6 +5,15 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib import messages
+from contenido.models import Contenido
+
+
+
+from django.shortcuts import render
+
+def home(request):
+    contenidos = Contenido.objects.all()
+    return render(request, 'home/index.html', {'contenidos': contenidos})
 
 
 @login_required
@@ -21,6 +30,8 @@ def role_based_redirect(request):
         return redirect('publicador_dashboard')
     elif user.has_role('Suscriptor'):
         return redirect('suscriptor_dashboard')
+    elif user.has_role('Autor'):
+        return redirect('autor_dashboard')
     else:
         return redirect('home')  # Redirige a la página por defecto si no tiene un rol específico
 
@@ -40,6 +51,10 @@ def publicador_dashboard(request):
 @login_required
 def suscriptor_dashboard(request):
     return render(request, '../templates/suscriptor/dashboard.html')
+
+@login_required
+def autor_dashboard(request):
+    return render(request, '../templates/autor/dashboard.html')
 
 
 User = get_user_model()

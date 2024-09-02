@@ -1,8 +1,8 @@
 /* Estilos generales */
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #00aaff, #0044cc);
-    color: #fff;
+    background: linear-gradient(135deg, #eef2f3, #d6eae3); /* Gradiente con un verde suave al fondo */
+    color: #333;
     margin: 0;
     padding: 0;
     display: flex;
@@ -27,13 +27,13 @@ body {
 .header__title {
     font-size: 2.5rem;
     margin-bottom: 30px;
-    color: #fff;
+    color: white; /* Conserva el color blanco para el título */
 }
 
 /* Lista de menú */
 .menu__list {
     display: flex;
-    justify-content: space-between; /* Más espacio entre botones */
+    justify-content: space-around; /* Más espacio entre botones */
     list-style: none;
     padding: 0;
     margin: 0;
@@ -41,18 +41,18 @@ body {
 
 /* Elementos de menú */
 .menu__item {
-    margin: 0 15px; /* Más separación entre los botones */
+    margin: 0 30px; /* Más separación entre los botones */
     flex: 1; /* Hace que todos los botones tengan el mismo ancho */
 }
 
 /* Enlaces de menú */
 .menu__link {
-    color: #fff;
+    color: white; /* Blanco para el texto */
     text-decoration: none;
     font-weight: bold;
     padding: 15px 20px;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(22, 160, 133, 0.7); /* Basado en el color #16a085 */
     transition: all 0.3s;
     display: flex;
     align-items: center;
@@ -69,20 +69,20 @@ body {
 
 /* Hover en enlaces de menú */
 .menu__link:hover {
-    background-color: #fff;
-    color: #0044cc;
+    background-color: white; /* Cambia el fondo a blanco al pasar el mouse */
+    color: #16a085; /* Cambia el texto al color verde original */
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
     transform: translateY(-3px); /* Efecto de "flotar" al pasar el mouse */
 }
 
 /* Estilo especial para el botón de cerrar sesión */
 .menu__link--logout {
-    background-color: #ff4444;
+    background-color: #e74c3c; /* Rojo para el botón de cerrar sesión */
 }
 
 .menu__link--logout:hover {
-    background-color: #cc0000;
-    color: #fff;
+    background-color: #c0392b; /* Rojo más oscuro al pasar el mouse */
+    color: white; /* Blanco para el texto */
 }
 
 /* Estilos adicionales para la sección de contenido */
