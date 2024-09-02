@@ -1,0 +1,213 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 1400px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+    margin: 30px auto;
+}
+
+/* Header */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.header__title {
+    font-size: 3.5rem;
+    color: #fff;
+}
+
+.header__actions .btn {
+    margin: 10px;
+    display: inline-flex;
+    align-items: center;
+    padding: 15px 30px;
+    font-size: 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-primary {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #218838;
+}
+
+.btn-logout {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn-logout:hover {
+    background-color: #e0a800;
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+}
+
+.btn i {
+    margin-right: 10px;
+}
+
+/* Botones de acciones */
+.btn-edit {
+    background-color: #28a745;
+    color: #fff;
+    padding: 15px 25px;
+    font-size: 18px;
+    border-radius: 8px;
+}
+
+.btn-edit:hover {
+    background-color: #218838;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* Tabla */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.category-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+    background-color: #212529;
+    color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #444;
+}
+
+.category-table th,
+.category-table td {
+    padding: 15px; /* Aumenta el padding para más espacio */
+    text-align: left;
+    border-right: 2px solid #444;
+}
+
+.category-table th {
+    background-color: #343a40;
+    color: #00c0ff; /* Títulos de las columnas en azul claro */
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 20px; /* Aumenta el padding en los encabezados */
+}
+
+.category-table td {
+    margin-bottom: 10px; /* Agrega espacio entre las filas */
+}
+
+.category-table td:last-child {
+    border-right: none;
+}
+
+.category-table__actions {
+    display: flex;
+    gap: 15px;
+}
+
+.table-cell {
+    display: inline-block;
+    padding: 15px 25px;
+    background-color: #343a40;
+    border-radius: 8px;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.2s;
+    cursor: pointer;
+}
+
+.table-cell:hover {
+    background-color: #495057;
+    transform: scale(1.05);
+}
+
+.table-cell-id {
+    font-weight: bold;
+    color: #ffdd57; /* Diferente color para los IDs */
+    border: 2px solid #ffdd57;
+    box-shadow: 0 0 10px rgba(255, 221, 87, 0.5);
+}
+
+.category-table td.descripcion .table-cell {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.category-table td.descripcion .table-cell:hover {
+    white-space: normal;
+    word-wrap: break-word;
+    background-color: #495057;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .category-table__actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .category-table td.descripcion .table-cell {
+        max-width: 100%;
+        white-space: normal;
+    }
+}

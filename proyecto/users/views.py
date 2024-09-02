@@ -26,7 +26,7 @@ def role_based_redirect(request):
 
 @login_required
 def admin_dashboard(request):
-    return render(request, '../templates/admin/dashboard.html')
+    return render(request, '../templates/admin/users/dashboard.html')
 
 @login_required
 def editor_dashboard(request):
@@ -54,7 +54,7 @@ def create_user(request):
             return redirect('user_list')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'admin/create_user.html', {'form': form})
+    return render(request, 'admin/users/create_user.html', {'form': form})
 
 @login_required
 def edit_user(request, user_id):
@@ -67,7 +67,7 @@ def edit_user(request, user_id):
             return redirect('user_list')
     else:
         form = CustomUserChangeForm(instance=user)
-    return render(request, 'admin/edit_user.html', {'form': form, 'user': user})
+    return render(request, 'admin/users/edit_user.html', {'form': form, 'user': user})
 
 
 @login_required
@@ -77,10 +77,10 @@ def delete_user(request, user_id):
         user.delete()
         messages.success(request, 'Usuario eliminado exitosamente.')
         return redirect('user_list')
-    return render(request, 'admin/delete_user.html', {'user': user})
+    return render(request, 'admin/users/delete_user.html', {'user': user})
 
 @login_required
 def user_list(request):
     users = User.objects.all()
-    return render(request, 'admin/user_list.html', {'users': users})
+    return render(request, 'admin/users/user_list.html', {'users': users})
 

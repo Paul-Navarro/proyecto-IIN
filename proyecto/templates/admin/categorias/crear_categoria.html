@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Crear Categoría{% endblock %}</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/crear_categoria.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">{% block header_title %}Crear Categoría{% endblock %}</h1>
+            <a href="{% url 'listar_categorias' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a la lista de categorías
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+                <h2 class="form-title">Formulario de Creación</h2>
+                <form method="post" class="category-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Crear Categoría
+                    </button>
+                </form>
+            {% endblock %}
+        </div>
+    </main>
+</body>
+</html>

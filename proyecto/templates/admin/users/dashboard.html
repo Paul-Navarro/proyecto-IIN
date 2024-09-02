@@ -12,14 +12,14 @@
 <body>
     <header class="header">
         <div class="container header__container">
-            <h1 class="header__title">{% block header_title %}Bienvenido, Administrador{% endblock %}</h1>
+            <h1 class="header__title">{% block header_title %}Bienvenido Administrador!{% endblock %}</h1>
             <nav class="header__nav">
                 <ul class="menu__list">
                     <li class="menu__item">
                         <a href="{% url 'user_list' %}" class="menu__link"><i class="fas fa-users"></i> Gestionar Usuarios</a>
                     </li>
                     <li class="menu__item">
-                        <a href="#" class="menu__link"><i class="fas fa-file-alt"></i> Gestionar Contenido</a>
+                        <a href="{% url 'listar_categorias' %}" class="menu__link"><i class="fas fa-file-alt"></i> Gestionar Categorías</a>
                     </li>
 
                     <li class="menu__item">

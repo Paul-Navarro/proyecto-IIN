@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Eliminar Categoría{% endblock %}</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/delete_category.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">{% block header_title %}Eliminar Categoría{% endblock %}</h1>
+            <a href="{% url 'listar_categorias' %}" class="btn btn-secondary">Volver a la lista de categorías</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+                <h2 class="warning-title">Confirmar Eliminación</h2>
+                <p class="warning-text">¿Estás seguro de que deseas eliminar la categoría <strong>{{ categoria.nombre }}</strong>?</p>
+                <form method="post" class="delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar Categoría</button>
+                </form>
+            {% endblock %}
+        </div>
+    </main>
+</body>
+</html>

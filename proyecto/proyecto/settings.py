@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     
     'users', # Agregamos el app "users"
     'contenido', # Agregamos el app "contenido"
+    'categorias', # Agregamos el app "categorias"
 ]
 
 # Especifica el ID del sitio, necesario para django-allauth

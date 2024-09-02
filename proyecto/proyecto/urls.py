@@ -27,4 +27,5 @@ urlpatterns = [
     path('users/create/', create_user, name='create_user'),  # Crear un nuevo usuario
     path('users/edit/<int:user_id>/', edit_user, name='edit_user'),  # Editar un usuario existente
     path('users/delete/<int:user_id>/', delete_user, name='delete_user'),  # Eliminar un usuario existente
+    path('categorias/', include('categorias.urls')),  # Aquí incluyes las URLs de la app categorías
 ]

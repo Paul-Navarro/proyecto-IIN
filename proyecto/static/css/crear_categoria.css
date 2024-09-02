@@ -1,0 +1,144 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #007bff, #6610f2);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 500px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+}
+
+/* Header container */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header__title {
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+/* Título del formulario */
+.form-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    color: #f8f9fa;
+    text-align: center;
+}
+
+/* Estilo del formulario */
+.category-form {
+    width: 100%;
+}
+
+.category-form p {
+    margin-bottom: 15px;
+}
+
+.category-form label {
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    color: #ddd;
+    font-weight: bold;
+}
+
+.category-form input[type="text"],
+.category-form input[type="email"],
+.category-form input[type="password"],
+.category-form select,
+.category-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: #222;
+    color: #fff;
+}
+
+.category-form textarea {
+    resize: vertical;
+}
+
+/* Botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #218838;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+/* Media Queries para dispositivos móviles */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .header__title {
+        margin-bottom: 15px;
+        font-size: 2rem;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+    }
+}
