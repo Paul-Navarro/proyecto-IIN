@@ -61,7 +61,7 @@
                             <td><div class="table-cell">{{ contenido.cant_visualiz_conte }}</div></td>
                             <td><div class="table-cell">{{ contenido.cant_coment_conte }}</div></td>
                             <td class="content-table__actions">
-                                <a href="#" class="btn btn-edit">
+                                <a href="{% url 'contenido_update' contenido.id_conte %}" class="btn btn-edit">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
                                 <a href="{% url 'contenido_delete' contenido.id_conte %}" class="btn btn-delete">

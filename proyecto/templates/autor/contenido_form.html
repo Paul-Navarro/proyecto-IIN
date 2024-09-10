@@ -6,15 +6,23 @@
     <title>{% block title %}Crear Contenido{% endblock %}</title>
     
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/contenido_form.css' %}">  <!-- Enlace a un archivo CSS específico para Contenido -->
+    <link rel="stylesheet" href="{% static 'css/contenido_form.css' %}">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <script>
+        function mostrarCategorias(tipo) {
+            document.querySelectorAll('.categorias').forEach(function (element) {
+                element.style.display = 'none'; // Ocultar todas las categorías
+            });
+            document.getElementById(tipo).style.display = 'block'; // Mostrar las categorías del tipo seleccionado
+        }
+    </script>
 </head>
 <body>
     <header class="header">
         <div class="container header-container">
-            <h1 class="header__title">{% block header_title %}Crear Contenido{% endblock %}</h1>
+            <h1 class="header__title">Crear Contenido</h1>
             <a href="{% url 'autor_dashboard' %}" class="btn btn-back">
                 <i class="fas fa-arrow-left"></i> Atrás
             </a>
@@ -23,17 +31,90 @@
 
     <main class="main-content">
         <div class="container">
-            {% block content %}
-                <h2 class="form-title">Formulario de Creación de Contenido</h2>
+            <h2 class="form-title">Formulario de Creación de Contenido</h2>
+            
+            <form method="post" enctype="multipart/form-data" class="content-form">
+                {% csrf_token %}
                 
-                <form method="post" enctype="multipart/form-data" class="content-form">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Crear Contenido
-                    </button>
-                </form>
-            {% endblock %}
+                <!-- Campos del formulario de contenido -->
+                <div>
+                    <label for="titulo_conte">{{ form.titulo_conte.label }}</label>
+                    {{ form.titulo_conte }}
+                </div>
+
+                <div>
+                    <label for="tipo_conte">{{ form.tipo_conte.label }}</label>
+                    {{ form.tipo_conte }}
+                </div>
+
+                <div>
+                    <label for="texto_conte">{{ form.texto_conte.label }}</label>
+                    {{ form.texto_conte }}
+                </div>
+
+                <div>
+                    <label for="estado_conte">{{ form.estado_conte.label }}</label>
+                    {{ form.estado_conte }}
+                </div>
+
+                <div>
+                    <label for="fecha_conte">{{ form.fecha_conte.label }}</label>
+                    {{ form.fecha_conte }}
+                </div>
+
+                <div>
+                    <label for="imagen_conte">{{ form.imagen_conte.label }}</label>
+                    {{ form.imagen_conte }}
+                </div>
+
+                <!-- Botones para mostrar los tipos de categorías -->
+                <h3>Selecciona una categoría:</h3>
+                <button type="button" onclick="mostrarCategorias('categorias_no_moderadas')">No Moderadas</button>
+                <button type="button" onclick="mostrarCategorias('categorias_moderadas')">Moderadas</button>
+                <button type="button" onclick="mostrarCategorias('categorias_pagadas')">Pagadas</button>
+                <button type="button" onclick="mostrarCategorias('categorias_suscriptores')">Para Suscriptores</button>
+
+                <!-- Contenedores de categorías -->
+                <div id="categorias_no_moderadas" class="categorias" style="display: block;">
+                    <h4>Categorías No Moderadas</h4>
+                    <select name="categoria">
+                        {% for categoria in categorias_no_moderadas %}
+                        <option value="{{ categoria.id }}" {% if categoria == form.initial.categoria %}selected{% endif %}>{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="categorias_moderadas" class="categorias" style="display: none;">
+                    <h4>Categorías Moderadas</h4>
+                    <select name="categoria">
+                        {% for categoria in categorias_moderadas %}
+                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="categorias_pagadas" class="categorias" style="display: none;">
+                    <h4>Categorías Pagadas</h4>
+                    <select name="categoria">
+                        {% for categoria in categorias_pagadas %}
+                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="categorias_suscriptores" class="categorias" style="display: none;">
+                    <h4>Categorías Para Suscriptores</h4>
+                    <select name="categoria">
+                        {% for categoria in categorias_suscriptores %}
+                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Crear Contenido
+                </button>
+            </form>
         </div>
     </main>
 </body>

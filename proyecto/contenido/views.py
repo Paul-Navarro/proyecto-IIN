@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Contenido
 from .forms import ContenidoForm
+from categorias.models import Categoria
 
 def contenido_list(request):
     '''
@@ -31,14 +32,30 @@ def contenido_create(request):
     @param {HttpRequest} request - El objeto de solicitud HTTP.
     @returns {HttpResponse} Redirige a la lista de contenidos después de crear uno nuevo o muestra el formulario con errores.
     '''
+    # Obtener las categorías agrupadas
+    categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
+    categorias_moderadas = Categoria.objects.filter(es_moderada=True)
+    categorias_pagadas = Categoria.objects.filter(es_pagada=True)
+    categorias_suscriptores = Categoria.objects.filter(para_suscriptores=True)
+
+    # Primera categoría no moderada como predeterminada
+    primera_categoria_no_moderada = categorias_no_moderadas.first()
+
     if request.method == 'POST':
         form = ContenidoForm(request.POST, request.FILES)  # Se añade request.FILES para manejar archivos
         if form.is_valid():
             form.save()
             return redirect('contenido_list')
     else:
-        form = ContenidoForm()
-    return render(request, 'autor/contenido_form.html', {'form': form})
+        form = ContenidoForm(initial={'categoria': primera_categoria_no_moderada})  # Inicializar con categoría no moderada
+
+    return render(request, 'autor/contenido_form.html', {
+        'form': form,
+        'categorias_no_moderadas': categorias_no_moderadas,
+        'categorias_moderadas': categorias_moderadas,
+        'categorias_pagadas': categorias_pagadas,
+        'categorias_suscriptores': categorias_suscriptores,
+    })
 
 def contenido_update(request, pk):
     '''
@@ -49,6 +66,13 @@ def contenido_update(request, pk):
     @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
+    
+    # Obtener las categorías agrupadas
+    categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
+    categorias_moderadas = Categoria.objects.filter(es_moderada=True)
+    categorias_pagadas = Categoria.objects.filter(es_pagada=True)
+    categorias_suscriptores = Categoria.objects.filter(para_suscriptores=True)
+
     if request.method == 'POST':
         form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Se añade request.FILES
         if form.is_valid():
@@ -56,7 +80,14 @@ def contenido_update(request, pk):
             return redirect('contenido_list')
     else:
         form = ContenidoForm(instance=contenido)
-    return render(request, 'autor/contenido_form.html', {'form': form})
+
+    return render(request, 'autor/contenido_update.html', {
+        'form': form,
+        'categorias_no_moderadas': categorias_no_moderadas,
+        'categorias_moderadas': categorias_moderadas,
+        'categorias_pagadas': categorias_pagadas,
+        'categorias_suscriptores': categorias_suscriptores,
+    })
 
 def contenido_delete(request, pk):
     '''

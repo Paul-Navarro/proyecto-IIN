@@ -5,20 +5,35 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib import messages
-from contenido.models import Contenido
+from contenido.models import Contenido, Categoria
 
 
 
 from django.shortcuts import render
 
 def home(request):
-    """
-    @function home
-    @description Renderiza la página de inicio mostrando todos los contenidos disponibles.
-    """
+    # Filtrar las categorías basadas en los parámetros recibidos en el request GET
+    categorias = Categoria.objects.all()
     contenidos = Contenido.objects.all()
-    return render(request, 'home/index.html', {'contenidos': contenidos})
 
+    # Verificamos si los filtros están aplicados
+    if 'moderadas' in request.GET:
+        categorias = categorias.filter(es_moderada=True)
+    if 'no_moderadas' in request.GET:
+        categorias = categorias.filter(es_moderada=False)
+    if 'pagadas' in request.GET:
+        categorias = categorias.filter(es_pagada=True)
+    if 'suscriptores' in request.GET:
+        categorias = categorias.filter(para_suscriptores=True)
+
+    # Filtrar los contenidos según las categorías filtradas
+    contenidos = contenidos.filter(categoria__in=categorias)
+
+    context = {
+        'contenidos': contenidos,
+        'categorias': categorias,
+    }
+    return render(request, 'home/index.html', context)
 
 @login_required
 def role_based_redirect(request):
