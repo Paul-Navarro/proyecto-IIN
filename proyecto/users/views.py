@@ -23,28 +23,46 @@ def home(request):
 @login_required
 def role_based_redirect(request):
     """
-    @function role_based_redirect
-    @description Redirige al usuario a una página específica basada en su rol.
-    
-    Verifica el rol del usuario y redirige a la página correspondiente basada en el rol. 
-    Si el rol no coincide con ninguno de los roles definidos, se redirige a la página de inicio.
-    """
+    Si el usuario tiene un solo rol, redirige directamente al panel correspondiente.
+    Si tiene múltiples roles, ofrece una página para seleccionar el rol.
+    """
     user = request.user
-
-    # Verificar si el correo está verificado
+    roles = user.roles.all()  # Obtiene todos los roles del usuario
     
-    if user.has_role('Admin'):
+    if roles.count() == 1 or roles.count() == 0:
+        # Si solo tiene un rol, redirige automáticamente
+        return redirect_based_on_role(roles.first().name)
+    
+    elif roles.count() > 1:
+        # Si tiene múltiples roles, redirige a una página para que elija
+        return render(request, '../templates/others/select_role.html', {'roles': roles})
+    
+    return redirect('home')  # Redirige a una página por defecto si no tiene roles
+
+
+def redirect_based_on_role(role_name):
+    """
+    Redirige a la página correspondiente según el rol.
+    """
+    if role_name == 'Admin':
         return redirect('admin_dashboard')
-    elif user.has_role('Editor'):
+    elif role_name == 'Editor':
         return redirect('editor_dashboard')
-    elif user.has_role('Publicador'):
+    elif role_name == 'Publicador':
         return redirect('publicador_dashboard')
-    elif user.has_role('Suscriptor'):
-        return redirect('suscriptor_dashboard')
-    elif user.has_role('Autor'):
+    elif role_name == 'Autor':
         return redirect('autor_dashboard')
-    else:
-        return redirect('home')  # Redirige a la página por defecto si no tiene un rol específico
+    elif role_name == 'Suscriptor':
+        return redirect('suscriptor_dashboard')
+
+    return redirect('home')
+
+@login_required
+def role_based_redirect_choice(request, role_name):
+    """
+    Redirige al panel correspondiente basado en el rol seleccionado.
+    """
+    return redirect_based_on_role(role_name)
 
 @login_required
 def admin_dashboard(request):

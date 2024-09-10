@@ -34,6 +34,7 @@
                         <th>ID</th>
                         <th>Nombre de Usuario</th>
                         <th>Correo Electrónico</th>
+                        <th>Roles</th> <!-- Añadimos una columna para Roles -->
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -43,6 +44,13 @@
                         <td>{{ user.id }}</td>
                         <td>{{ user.username }}</td>
                         <td>{{ user.email }}</td>
+                        <td>
+                            {% for role in user.roles.all %} <!-- Recorre los roles del usuario -->
+                                {{ role.name }}{% if not forloop.last %}, {% endif %} <!-- Muestra los roles separados por comas -->
+                            {% empty %}
+                                Sin roles <!-- Muestra esto si el usuario no tiene roles asignados -->
+                            {% endfor %}
+                        </td>
                         <td class="user-table__actions">
                             <a href="{% url 'edit_user' user.id %}" class="btn btn-secondary">Editar</a>
                             <a href="{% url 'delete_user' user.id %}" class="btn btn-danger">Eliminar</a>

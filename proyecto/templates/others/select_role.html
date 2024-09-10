@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleccionar Rol</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/select_role.css' %}">
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #eef2f3, #d6eae3); /* Gradiente con un verde suave al fondo */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        /* Título */
+        .header__title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: white; /* Conserva el color blanco para el título */
+        }
+
+        /* Mensaje de bienvenida */
+        .welcome-message {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #d6eae3;
+        }
+
+        /* Lista de menú */
+        .menu__list {
+            display: flex;
+            justify-content: space-around; /* Más espacio entre botones */
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Elementos de menú */
+        .menu__item {
+            margin: 0 30px; /* Más separación entre los botones */
+            flex: 1; /* Hace que todos los botones tengan el mismo ancho */
+        }
+
+        /* Enlaces de menú */
+        .menu__link {
+            color: white; /* Blanco para el texto */
+            text-decoration: none;
+            font-weight: bold;
+            padding: 15px 20px;
+            border-radius: 10px;
+            background-color: rgba(22, 160, 133, 0.7); /* Basado en el color #16a085 */
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hover en enlaces de menú */
+        .menu__link:hover {
+            background-color: white; /* Cambia el fondo a blanco al pasar el mouse */
+            color: #16a085; /* Cambia el texto al color verde original */
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px); /* Efecto de "flotar" al pasar el mouse */
+        }
+
+        /* Media Queries para dispositivos móviles */
+        @media (max-width: 768px) {
+            .menu__list {
+                flex-direction: column;
+            }
+
+            .menu__item {
+                margin: 10px 0; /* Más separación entre botones en pantallas pequeñas */
+            }
+
+            .header__title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="welcome-message">¡Bienvenido de vuelta {{ user.username }}!</h2>
+        <h2 class="header__title">Selecciona tu Rol</h2>
+        <ul class="menu__list">
+            {% for role in roles %}
+            <li class="menu__item">
+                <a href="{% url 'role_based_redirect_choice' role.name %}" class="menu__link">
+                    {{ role.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
