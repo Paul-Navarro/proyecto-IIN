@@ -25,7 +25,8 @@
         <div class="container">
             {% block content %}
                 <h2 class="form-title">Formulario de Creación de Contenido</h2>
-                <form method="post" class="content-form">
+                
+                <form method="post" enctype="multipart/form-data" class="content-form">
                     {% csrf_token %}
                     {{ form.as_p }}
                     <button type="submit" class="btn btn-primary">

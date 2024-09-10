@@ -32,7 +32,7 @@ def contenido_create(request):
     @returns {HttpResponse} Redirige a la lista de contenidos después de crear uno nuevo o muestra el formulario con errores.
     '''
     if request.method == 'POST':
-        form = ContenidoForm(request.POST)
+        form = ContenidoForm(request.POST, request.FILES)  # Se añade request.FILES para manejar archivos
         if form.is_valid():
             form.save()
             return redirect('contenido_list')
@@ -50,7 +50,7 @@ def contenido_update(request, pk):
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
     if request.method == 'POST':
-        form = ContenidoForm(request.POST, instance=contenido)
+        form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Se añade request.FILES
         if form.is_valid():
             form.save()
             return redirect('contenido_list')
@@ -70,4 +70,4 @@ def contenido_delete(request, pk):
     if request.method == 'POST':
         contenido.delete()
         return redirect('contenido_list')
-    return render(request, 'autor/contenido_confirm_delete.html', {'contenido':contenido})
+    return render(request, 'autor/contenido_delete.html', {'contenido': contenido})

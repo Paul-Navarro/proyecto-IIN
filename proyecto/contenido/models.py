@@ -4,7 +4,7 @@ class Contenido(models.Model):
     '''
     @class Contenido
     @extends models.Model
-    @description Modelo que representa el contenido en la aplicación. Incluye atributos como título, tipo, texto, estado, fecha, cantidad de visualizaciones y cantidad de comentarios.
+    @description Modelo que representa el contenido en la aplicación. Incluye atributos como título, tipo, texto, estado, fecha, cantidad de visualizaciones, cantidad de comentarios y una imagen opcional.
     '''
     id_conte = models.AutoField(primary_key=True)
     titulo_conte = models.CharField(max_length=255)
@@ -14,6 +14,7 @@ class Contenido(models.Model):
     fecha_conte = models.DateField()
     cant_visualiz_conte = models.IntegerField(default=0)
     cant_coment_conte = models.IntegerField(default=0)
+    imagen_conte = models.ImageField(upload_to='imagenes_contenido/', null=True, blank=True)  # Campo para la imagen
 
-    def _str_(self):
+    def __str__(self):
         return self.titulo_conte
