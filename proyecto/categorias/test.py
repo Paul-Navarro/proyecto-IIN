@@ -67,3 +67,5 @@ class CategoriaViewsTest(TestCase):
         response = self.client.post(reverse('eliminar_categoria', args=[categoria.pk]))
         self.assertEqual(response.status_code, 302)  # Redirección después de eliminar
         self.assertFalse(Categoria.objects.filter(pk=categoria.pk).exists())
+        
+        

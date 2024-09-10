@@ -58,7 +58,7 @@ import os
 import sys
 import django
 
-sys.path.insert(0, os.path.abspath(r'C:\Users\Paul Estigarribia\Desktop\Proyecto Equipo 5\proyecto'))
+sys.path.insert(0, os.path.abspath(r'C:\\Users\\Paul Estigarribia\\Desktop\\Proyecto Equipo 5\\proyecto'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'proyecto.settings'
 django.setup()
 """
@@ -70,19 +70,32 @@ with open(conf_py_path, 'r+') as conf_file:
     conf_file.write(django_config + '\n' + content)
     print("Configuración de Django añadida a conf.py.")
 
-# 7. Agregar módulos a index.rst
-modules_to_add = """
+# 7. Modificar el archivo index.rst para asegurar que los módulos se incluyan correctamente
+index_content = """
+Welcome to CMS_grupo05's documentation!
+========================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
    modules/categorias
    modules/contenido
    modules/users
    modules/proyecto
    modules/manage
    modules/modules
+
+Indices and tables
+==================
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 """
 
-with open(index_rst_path, 'a') as index_file:
-    index_file.write("\n" + modules_to_add)
-    print("Módulos añadidos a index.rst.")
+with open(index_rst_path, 'w') as index_file:
+    index_file.write(index_content)
+    print("Contenido de index.rst modificado correctamente.")
 
 # 8. Construir la documentación en HTML usando make.bat
 subprocess.run(['make.bat', 'html'])

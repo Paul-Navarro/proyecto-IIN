@@ -66,6 +66,7 @@ class UserViewsTest(TestCase):
         if response.status_code != 302:
             print(response.content.decode())  # Imprime el contenido de la respuesta para depuración
         self.assertTrue(User.objects.filter(username='newuser').exists())  # Verifica que el usuario fue creado
+        
 
 
     def test_edit_user_view(self):
