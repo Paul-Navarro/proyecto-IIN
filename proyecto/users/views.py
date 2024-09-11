@@ -43,6 +43,12 @@ def role_based_redirect(request):
     user = request.user
     roles = user.roles.all()  # Obtiene todos los roles del usuario
     
+    if roles.count() == 0:
+        # Asigna un rol predeterminado o redirige a una página por defecto
+        # Aquí puedes asignar un rol por defecto o manejar de otra manera
+        default_role_name = 'Suscriptor'  # Definir el rol predeterminado si es necesario
+        return redirect_based_on_role(default_role_name)
+    
     if roles.count() == 1 or roles.count() == 0:
         # Si solo tiene un rol, redirige automáticamente
         return redirect_based_on_role(roles.first().name)
@@ -67,7 +73,7 @@ def redirect_based_on_role(role_name):
     elif role_name == 'Autor':
         return redirect('autor_dashboard')
     elif role_name == 'Suscriptor':
-        return redirect('suscriptor_dashboard')
+        return redirect('home') # Al ser un suscriptor se lo redirige a la pagina home
 
     return redirect('home')
 
