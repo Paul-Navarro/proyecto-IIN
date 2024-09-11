@@ -15,9 +15,8 @@ body {
     align-items: center;
     background-color: #16a085;
     color: white;
-    padding: 30px; /* Aumenta el padding */
+    padding: 5px; /* Aumenta el padding */
     text-align: center;
-    margin-bottom: 30px; /* Aumenta el margen inferior */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -56,16 +55,16 @@ body {
 .barraNavegacion {
     background-color: #333;
     color: white;
-    padding: 20px; /* Aumenta el padding */
+    padding: 5px; /* Aumenta el padding */
     display: flex;
     justify-content: center;
-    margin-bottom: 30px; /* Aumenta el margen inferior */
+    margin-bottom: 20px; /* Aumenta el margen inferior */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .elementosBarra {
     margin: 0 20px; /* Aumenta el margen entre los elementos */
-    font-size: 1.5rem; /* Aumenta el tamaño de la fuente */
+    font-size: 1.1rem; /* Aumenta el tamaño de la fuente */
     cursor: pointer;
     transition: color 0.3s ease, transform 0.3s ease;
 }
@@ -78,35 +77,49 @@ body {
 /* Cuerpo de la página */
 .cuerpo {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     margin: 0 auto;
-    max-width: 1400px; /* Aumenta el ancho máximo */
-    padding: 30px; /* Aumenta el padding */
+    max-width: 100%; /* Aumenta el ancho máximo */
+    padding-left: 30px; /* Aumenta el padding */
+    padding-right: 30px; /* Aumenta el padding */
 }
 
 /* Listado lateral izquierdo */
 .lateral_izq {
-    width: 25%; /* Aumenta el ancho del lateral */
+   /* width: 25%;  Aumenta el ancho del lateral 
     background-color: #ffffff;
-    padding: 30px; /* Aumenta el padding */
+    
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+
+    margin-top: 40px;
+    margin-left: 40px;*/
+    background: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 15%;
+    max-height: 67vh;
+    padding: 30px;
+    overflow-y: auto;
 }
 
 .lateral_izq ul {
     list-style-type: none;
     padding: 0;
+    margin-bottom: 30px;
 }
 
 .lateral_izq li {
-    margin-bottom: 15px; /* Aumenta el margen inferior */
-    font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
+    margin-bottom: 5px; /* Aumenta el margen inferior */
+    font-size: 1.0rem; /* Aumenta el tamaño de la fuente */
+
 }
 
 .lateral_izq a {
     color: #16a085;
     text-decoration: none;
     font-weight: bold;
+    padding-left: 15px;
 }
 
 .lateral_izq a:hover {
@@ -115,32 +128,38 @@ body {
 
 /* Área de contenido principal */
 .main-content {
-    flex-grow: 1;
-    margin: 0 30px; /* Aumenta el margen lateral */
+    /* flex-grow: 1;
+    margin: 0 30px; Aumenta el margen lateral */
+    width: 55%;
+    margin-left: 5vh;
+    margin-right: 5vh;
+    
 }
 
 .cajaBusqueda {
     display: flex;
     align-items: center;
-    margin-bottom: 30px; /* Aumenta el margen inferior */
+    margin-bottom: 10px; /* Aumenta el margen inferior */
     background-color: #ffffff;
-    padding: 20px; /* Aumenta el padding */
+    padding: 10px; /* Aumenta el padding */
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .busqueda {
     width: 80%;
-    padding: 15px; /* Aumenta el padding */
+    min-height: 4vh;
     border: 2px solid #ccc; /* Aumenta el grosor del borde */
     border-radius: 10px; /* Bordes más redondeados */
-    font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
+    font-size: 1.0rem; /* Aumenta el tamaño de la fuente */
+    text-align: center;
 }
 
 .btnBuscar {
     background-color: #16a085;
     color: white;
-    padding: 15px 30px; /* Aumenta el tamaño del botón */
+    width: 10%;
+    min-height: 4vh;
     font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
     border: none;
     border-radius: 10px;
@@ -159,37 +178,28 @@ body {
     position: relative;
 }
 
-.filter-button {
-    background-color: #16a085;
-    color: white;
-    padding: 15px; /* Aumenta el tamaño del botón */
-    font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
 
+/*
 .filter-button:hover {
     background-color: #12876a;
-    transform: scale(1.1); /* Incrementa el efecto de "flotar" */
+    transform: scale(1.1); 
 }
-
+*/
 .filter-options {
     display: none;
     position: absolute;
     background-color: white;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    padding: 20px; /* Aumenta el padding */
-    margin-top: 10px; /* Aumenta el margen superior */
+    padding: 20px; 
+    margin-top: 10px; 
     z-index: 1;
 }
 
 .filter-options label {
     display: block;
-    margin-bottom: 10px; /* Aumenta el margen inferior */
-    font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
+    margin-bottom: 10px; 
+    font-size: 1.2rem; 
     color: #333;
 }
 
@@ -198,39 +208,37 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 30px; /* Aumenta el espacio entre los contenidos */
+    overflow-y: auto;
+    max-height: 70vh;
 }
 
-.contenidoRelleno {
-    background-color: #ffffff;
-    padding: 30px; /* Aumenta el padding */
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    flex: 1 1 45%; /* 2 elementos por fila */
-    font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
-}
+
 
 /* Listado lateral derecho */
 .lateral_der {
-    width: 25%; /* Aumenta el ancho del lateral */
+    width: 15%;
     background-color: #ffffff;
     padding: 30px; /* Aumenta el padding */
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    max-height: 67vh;
+    overflow-y: auto;
 }
 
-.lateral_der h3 {
+.lateral_der h2 {
     color: #16a085;
-    margin-bottom: 20px; /* Aumenta el margen inferior */
     font-size: 1.5rem; /* Aumenta el tamaño de la fuente */
+    margin: 0px;
 }
 
 .lateral_der ul {
     list-style-type: none;
     padding: 0;
+    margin: 0px;
 }
 
 .lateral_der li {
-    margin-bottom: 15px; /* Aumenta el margen inferior */
+    margin-bottom: 5px; /* Aumenta el margen inferior */
     font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
 }
 
@@ -242,6 +250,10 @@ body {
 
 .lateral_der a:hover {
     text-decoration: underline;
+}
+.pLateralDer{
+    padding-left: 15px;
+    margin:0px;
 }
 
 /* Media Queries para dispositivos móviles */
@@ -287,12 +299,12 @@ body {
 .contenidoRelleno {
     position: relative;
     background-color: #ffffff;
-    padding: 30px;
+    padding-left: 30px;
+    padding-right: 30px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     flex: 1 1 45%;
     font-size: 1.2rem;
-    margin-bottom: 20px; /* Añade espacio entre los elementos de contenido */
 }
 
 
@@ -361,13 +373,14 @@ body {
 .filter-button {
     background-color: #16a085;
     color: white;
-    padding: 15px;
+    width: 8%;
+    min-height: 4vh;
     font-size: 1.2rem;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    margin-bottom: 10px;
+    margin-left: 5px;
 }
 
 .filter-button:hover {
@@ -396,4 +409,21 @@ body {
 
 .btn-primary:hover {
     background-color: #12876a;
+}
+
+.imagenContenido{
+    max-width: 50vh;
+    min-width: 30vh;
+    max-height: 30vh;
+    box-shadow: -8px 7px 40px rgba(0, 0, 0, 0.95);
+}
+.divImagenContenido{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #16a085;
+    border-radius: 10px;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2)
 }

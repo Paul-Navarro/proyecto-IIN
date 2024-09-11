@@ -51,29 +51,37 @@
     <div class="cuerpo">
         <!-- Listado lateral izquierdo -->
         <aside class="lateral_izq">
+
             <ul>
                 <li><strong>Categorías</strong></li>
+            
                 <ul>
                     <li><a href="#pago">Pago</a></li>
                     <li><a href="#publico">Público</a></li>
                 </ul>
+                
                 <li><strong>Preferencias</strong></li>
                 <ul>
                     <li><a href="#idioma">Idioma</a></li>
                     <li><a href="#notificaciones">Notificaciones</a></li>
                 </ul>
+            
                 <li><strong>Gestión de Contenido</strong></li>
+            
                 <ul>
                     <li><a href="#crear">Crear Nuevo Contenido</a></li>
                     <li><a href="#editar">Editar Contenido</a></li>
                 </ul>
+            
                 <li><strong>Configuración</strong></li>
+            
                 <ul>
                     <li><a href="#general">Configuración General</a></li>
                     <li><a href="#seguridad">Seguridad</a></li>
                     <li><a href="#integraciones">Integraciones</a></li>
                 </ul>
             </ul>
+            
         </aside>
         <!-- Área de contenidos -->
         <main class="main-content" id="mainID">
@@ -82,10 +90,10 @@
                 <button type="button" class="btnBuscar">
                     <i class="fas fa-search"></i>
                 </button>
+                <button class="filter-button" onclick="toggleFilters()">
+                    <i class="fas fa-filter"></i>
+                </button>
                 <div class="filter-container">
-                    <button class="filter-button" onclick="toggleFilters()">
-                        <i class="fas fa-filter"></i> Filtros
-                    </button>
                     <div class="filter-options" id="filters">
                         <form method="GET" action="">
                             <div class="filter-group">
@@ -115,54 +123,52 @@
             <!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
             <div class="cajaContenidos" id="cajaContenidos">
                 {% for contenido in contenidos %}
-                <div class="contenidoRelleno">
-                    <div class="codigoConte">
-                        <span>Código: {{ contenido.id_conte }}</span>
-                    </div>
-                    <h3>Título: {{ contenido.titulo_conte }}</h3>
+                    <div class="contenidoRelleno">
+                        <div class="codigoConte">
+                            <span>Código: {{ contenido.id_conte }}</span>
+                        </div>
+                        <h3>{{ contenido.titulo_conte }}</h3>
 
-                    <!-- Mostrar la imagen solo si existe -->
-                    {% if contenido.imagen_conte %}
-                    <div class="imagenContenido">
-                        <img src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+                        <!-- Mostrar la imagen solo si existe -->
+                        {% if contenido.imagen_conte %}
+                        <div class="divImagenContenido">
+                            <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+                        </div>
+                        {% endif %}
+                        <p>{{ contenido.texto_conte|truncatewords:50 }}</p>
+                        <a href="#" class="btn btn-primary">Leer más</a>
                     </div>
-                    {% endif %}
-
-                    <h4>Descripción:</h4>
-                    <p>{{ contenido.texto_conte|truncatewords:50 }}</p>
-                    <a href="#" class="btn btn-primary">Leer más</a>
-                </div>
                 {% endfor %}
             </div>
         </main>
 
         <!-- Listado lateral derecho -->
         <aside class="lateral_der">
-            <h3>Información Útil</h3>
+            <h2>Información Útil</h2>
             <ul>
                 <li><strong><a href="#registrarme">¿Cómo registrarme?</a></strong></li>
-                <p>Guía paso a paso para registrarte en nuestra plataforma y comenzar a usar todas las funcionalidades.</p>
+                <p class="pLateralDer">Guía paso a paso para registrarte en nuestra plataforma y comenzar a usar todas las funcionalidades.</p>
 
                 <li><strong><a href="#recuperar">¿Olvidaste tu contraseña?</a></strong></li>
-                <p>Instrucciones para recuperar el acceso a tu cuenta si olvidaste tu contraseña.</p>
+                <p class="pLateralDer">Instrucciones para recuperar el acceso a tu cuenta si olvidaste tu contraseña.</p>
 
                 <li><strong><a href="#primerospasos">Primeros pasos</a></strong></li>
-                <p>Consejos y recomendaciones para familiarizarte con nuestra plataforma.</p>
+                <p class="pLateralDer">Consejos y recomendaciones para familiarizarte con nuestra plataforma.</p>
 
                 <li><strong><a href="#privacidad">Política de Privacidad</a></strong></li>
-                <p>Detalles sobre cómo manejamos tu información y tus derechos sobre tus datos.</p>
+                <p class="pLateralDer">Detalles sobre cómo manejamos tu información y tus derechos sobre tus datos.</p>
 
                 <li><strong><a href="#soporte">Soporte Técnico</a></strong></li>
-                <p>Cómo contactar a nuestro equipo de soporte si necesitas ayuda.</p>
+                <p class="pLateralDer">Cómo contactar a nuestro equipo de soporte si necesitas ayuda.</p>
 
                 <li><strong><a href="#preguntas">Preguntas Frecuentes (FAQ)</a></strong></li>
-                <p>Respuestas a las preguntas más comunes sobre el uso de la plataforma.</p>
+                <p class="pLateralDer">Respuestas a las preguntas más comunes sobre el uso de la plataforma.</p>
 
                 <li><strong><a href="#actualizaciones">Actualizaciones del Sistema</a></strong></li>
-                <p>Información sobre las últimas actualizaciones, mejoras y nuevas características.</p>
+                <p class="pLateralDer">Información sobre las últimas actualizaciones, mejoras y nuevas características.</p>
 
                 <li><strong><a href="#contacto">Contáctanos</a></strong></li>
-                <p>Formulario y opciones para ponerte en contacto con nosotros.</p>
+                <p class="pLateralDer">Formulario y opciones para ponerte en contacto con nosotros.</p>
             </ul>
         </aside>
     </div>

@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'leticia',
+        'NAME': 'dbcon',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
