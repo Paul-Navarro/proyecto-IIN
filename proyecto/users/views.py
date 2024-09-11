@@ -8,7 +8,6 @@ from django.contrib import messages
 from contenido.models import Contenido, Categoria
 
 
-
 from django.shortcuts import render
 
 def home(request):

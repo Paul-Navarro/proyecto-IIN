@@ -25,6 +25,10 @@ def contenido_detail(request, pk):
     contenido = get_object_or_404(Contenido, pk=pk)
     return render(request, 'autor/contenido_detail.html', {'contenido': contenido})
 
+from django.shortcuts import render, redirect
+from .forms import ContenidoForm
+from categorias.models import Categoria
+
 def contenido_create(request):
     '''
     @function contenido_create
@@ -42,9 +46,19 @@ def contenido_create(request):
     primera_categoria_no_moderada = categorias_no_moderadas.first()
 
     if request.method == 'POST':
-        form = ContenidoForm(request.POST, request.FILES)  # Se añade request.FILES para manejar archivos
+        form = ContenidoForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            # No guardar el formulario inmediatamente
+            contenido = form.save(commit=False)
+
+            # Verificar si la categoría seleccionada es no moderada
+            if contenido.categoria and not contenido.categoria.es_moderada:
+                contenido.estado_conte = 'PUBLICADO'
+                print("ENTRE AQUI")
+            else:
+                contenido.estado_conte = 'EN_REVISION'
+
+            contenido.save()  # Guardar el contenido con el estado ajustado
             return redirect('contenido_list')
     else:
         form = ContenidoForm(initial={'categoria': primera_categoria_no_moderada})  # Inicializar con categoría no moderada
@@ -56,6 +70,7 @@ def contenido_create(request):
         'categorias_pagadas': categorias_pagadas,
         'categorias_suscriptores': categorias_suscriptores,
     })
+
 
 def contenido_update(request, pk):
     '''
@@ -76,6 +91,11 @@ def contenido_update(request, pk):
     if request.method == 'POST':
         form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Se añade request.FILES
         if form.is_valid():
+            # Si el campo clear_image está marcado, eliminar la imagen
+            if form.cleaned_data.get('clear_image'):
+                contenido.imagen_conte.delete()  # Eliminar la imagen del campo
+
+            # Guardar los cambios en el contenido
             form.save()
             return redirect('contenido_list')
     else:
@@ -88,6 +108,7 @@ def contenido_update(request, pk):
         'categorias_pagadas': categorias_pagadas,
         'categorias_suscriptores': categorias_suscriptores,
     })
+
 
 def contenido_delete(request, pk):
     '''

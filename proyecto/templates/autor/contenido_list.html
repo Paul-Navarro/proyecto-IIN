@@ -45,6 +45,7 @@
                             <th>Tipo</th>
                             <th>Estado</th>
                             <th>Fecha</th>
+                            <th>Categoría</th> <!-- Nueva columna -->
                             <th>Visualizaciones</th>
                             <th>Comentarios</th>
                             <th>Acciones</th>
@@ -58,6 +59,7 @@
                             <td><div class="table-cell">{{ contenido.tipo_conte }}</div></td>
                             <td><div class="table-cell">{{ contenido.estado_conte }}</div></td>
                             <td><div class="table-cell">{{ contenido.fecha_conte }}</div></td>
+                            <td><div class="table-cell">{{ contenido.categoria.nombre }}</div></td> <!-- Mostrar la categoría -->
                             <td><div class="table-cell">{{ contenido.cant_visualiz_conte }}</div></td>
                             <td><div class="table-cell">{{ contenido.cant_coment_conte }}</div></td>
                             <td class="content-table__actions">

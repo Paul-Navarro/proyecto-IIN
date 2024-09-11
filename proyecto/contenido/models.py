@@ -7,7 +7,14 @@ class Contenido(models.Model):
     @class Contenido
     @extends models.Model
     @description Modelo que representa el contenido en la aplicación. Incluye atributos como título, tipo, texto, estado, fecha, cantidad de visualizaciones, cantidad de comentarios y una imagen opcional.
-    '''  
+    '''
+    
+    ESTADOS = [
+        ('EN_REVISION', 'En Revisión'),
+        ('PUBLICADO', 'Publicado'),
+        ('RECHAZADO', 'Rechazado'),
+    ]
+    
     id_conte = models.AutoField(primary_key=True)
     titulo_conte = models.CharField(max_length=255)
     tipo_conte = models.CharField(max_length=50)

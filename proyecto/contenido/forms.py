@@ -9,7 +9,7 @@ class ContenidoForm(forms.ModelForm):
     @extends forms.ModelForm
     @description Formulario para el modelo 'Contenido'. Gestiona los campos y etiquetas del contenido, incluyendo un campo opcional para la imagen y la categoría.
     '''
-    
+
     # Crear un campo de categoría
     categoria = forms.ModelChoiceField(
         queryset=Categoria.objects.all(),  # Mostrar todas las categorías por defecto
@@ -17,14 +17,20 @@ class ContenidoForm(forms.ModelForm):
         label='Categoría'
     )
 
+    # Campo para eliminar la imagen actual
+    clear_image = forms.BooleanField(
+        required=False,
+        label="Eliminar la imagen actual",
+        widget=forms.CheckboxInput()
+    )
+
     class Meta:
         model = Contenido
-        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'estado_conte', 'fecha_conte', 'imagen_conte', 'categoria']  # Incluimos el campo de categoría
+        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria']  # Remover 'estado_conte'
         labels = {
             'titulo_conte': 'Título del Contenido',
             'tipo_conte': 'Tipo de Contenido',
             'texto_conte': 'Texto del Contenido',
-            'estado_conte': 'Estado del Contenido',
             'fecha_conte': 'Fecha del Contenido',
             'imagen_conte': 'Imagen del Contenido (opcional)',
             'categoria': 'Categoría',
@@ -32,16 +38,16 @@ class ContenidoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ContenidoForm, self).__init__(*args, **kwargs)
-        
+
         # Obtener la primera categoría no moderada para asignarla como valor por defecto
         primera_categoria_no_moderada = Categoria.objects.filter(es_moderada=False).first()
-        
+
         # Establecer la categoría por defecto como la primera categoría no moderada si existe
         if primera_categoria_no_moderada:
             self.fields['categoria'].initial = primera_categoria_no_moderada
-        
+
         # Personalizar el queryset del campo categoría
         self.fields['categoria'].queryset = Categoria.objects.all()
-        
+
         # Establecer la fecha actual como fecha por defecto para el contenido
         self.fields['fecha_conte'].initial = timezone.now().date()

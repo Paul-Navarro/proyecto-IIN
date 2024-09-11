@@ -10,14 +10,6 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <script>
-        function mostrarCategorias(tipo) {
-            document.querySelectorAll('.categorias').forEach(function (element) {
-                element.style.display = 'none'; // Ocultar todas las categorías
-            });
-            document.getElementById(tipo).style.display = 'block'; // Mostrar las categorías del tipo seleccionado
-        }
-    </script>
 </head>
 <body>
     <header class="header">
@@ -67,47 +59,34 @@
                     {{ form.imagen_conte }}
                 </div>
 
-                <!-- Botones para mostrar los tipos de categorías -->
+                <!-- Único select para todas las categorías agrupadas -->
                 <h3>Selecciona una categoría:</h3>
-                <button type="button" onclick="mostrarCategorias('categorias_no_moderadas')">No Moderadas</button>
-                <button type="button" onclick="mostrarCategorias('categorias_moderadas')">Moderadas</button>
-                <button type="button" onclick="mostrarCategorias('categorias_pagadas')">Pagadas</button>
-                <button type="button" onclick="mostrarCategorias('categorias_suscriptores')">Para Suscriptores</button>
-
-                <!-- Contenedores de categorías -->
-                <div id="categorias_no_moderadas" class="categorias" style="display: block;">
-                    <h4>Categorías No Moderadas</h4>
+                <div>
+                    <label for="categoria">{{ form.categoria.label }}</label>
                     <select name="categoria">
-                        {% for categoria in categorias_no_moderadas %}
-                        <option value="{{ categoria.id }}" {% if categoria == form.initial.categoria %}selected{% endif %}>{{ categoria.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div id="categorias_moderadas" class="categorias" style="display: none;">
-                    <h4>Categorías Moderadas</h4>
-                    <select name="categoria">
-                        {% for categoria in categorias_moderadas %}
-                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div id="categorias_pagadas" class="categorias" style="display: none;">
-                    <h4>Categorías Pagadas</h4>
-                    <select name="categoria">
-                        {% for categoria in categorias_pagadas %}
-                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div id="categorias_suscriptores" class="categorias" style="display: none;">
-                    <h4>Categorías Para Suscriptores</h4>
-                    <select name="categoria">
-                        {% for categoria in categorias_suscriptores %}
-                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
-                        {% endfor %}
+                        <optgroup label="No Moderadas">
+                            {% for categoria in categorias_no_moderadas %}
+                            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Moderadas">
+                            {% for categoria in categorias_moderadas %}
+                            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Pagadas">
+                            {% for categoria in categorias_pagadas %}
+                            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Para Suscriptores">
+                            {% for categoria in categorias_suscriptores %}
+                            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
                     </select>
                 </div>
 
@@ -117,5 +96,6 @@
             </form>
         </div>
     </main>
+    
 </body>
 </html>
