@@ -32,7 +32,7 @@ class ContenidoForm(forms.ModelForm):
             'tipo_conte': 'Tipo de Contenido',
             'texto_conte': 'Texto del Contenido',
             'fecha_conte': 'Fecha del Contenido',
-            'imagen_conte': 'Imagen del Contenido (opcional)',
+            'imagen_conte': 'Imagen de Portada (opcional)',
             'categoria': 'Categoría',
         }
 

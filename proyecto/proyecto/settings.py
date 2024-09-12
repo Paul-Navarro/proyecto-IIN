@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'ckeditor',
         
     'django.contrib.sites',  # Necesario para allauth
     'allauth',
@@ -37,6 +39,8 @@ INSTALLED_APPS = [
     'contenido', # Agregamos el app "contenido"
     'categorias', # Agregamos el app "categorias"
 ]
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
 
 # Especifica el ID del sitio, necesario para django-allauth
 SITE_ID = 1

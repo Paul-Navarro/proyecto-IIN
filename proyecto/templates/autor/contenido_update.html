@@ -8,8 +8,10 @@
 
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/contenido_form.css' %}">  <!-- Enlace a un archivo CSS específico para Contenido -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Incluir los archivos necesarios para CKEditor -->
+    {{ form.media }}
 </head>
 
 <body>
@@ -42,7 +44,7 @@
 
                 <div>
                     <label for="texto_conte">{{ form.texto_conte.label }}</label>
-                    {{ form.texto_conte }}
+                    {{ form.texto_conte }}  <!-- CKEditor debería funcionar aquí -->
                 </div>
 
                 <div>
@@ -89,6 +91,10 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Guardar Cambios
                 </button>
+
+                <!-- Incluir archivos de CKEditor justo antes de cerrar el formulario -->
+                {{ form.media }}
+
             </form>
         </div>
     </main>

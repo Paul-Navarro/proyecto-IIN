@@ -40,15 +40,16 @@
                 </thead>
                 <tbody>
                     {% for user in users %}
+                    {% if user.username != 'adminuser' %}
                     <tr>
                         <td>{{ user.id }}</td>
                         <td>{{ user.username }}</td>
                         <td>{{ user.email }}</td>
                         <td>
-                            {% for role in user.roles.all %} <!-- Recorre los roles del usuario -->
-                                {{ role.name }}{% if not forloop.last %}, {% endif %} <!-- Muestra los roles separados por comas -->
+                            {% for role in user.roles.all %}
+                                {{ role.name }}{% if not forloop.last %}, {% endif %}
                             {% empty %}
-                                Sin roles <!-- Muestra esto si el usuario no tiene roles asignados -->
+                                Sin roles
                             {% endfor %}
                         </td>
                         <td class="user-table__actions">
@@ -56,8 +57,10 @@
                             <a href="{% url 'delete_user' user.id %}" class="btn btn-danger">Eliminar</a>
                         </td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
+                
             </table>
         </div>
     </main>
