@@ -53,15 +53,25 @@ subprocess.run(['sphinx-apidoc', '-o', modules_dir, '..'])
 eliminar_docs_duplicado()
 
 # 6. Modificar conf.py para integrar Django
+# Obtener la ruta del archivo actual
+ruta_actual = os.path.abspath(__file__)
+# Obtener el directorio donde está el archivo
+directorio_actual = os.path.dirname(ruta_actual)
+# Reemplazar las barras invertidas simples por dobles
+directorio_escapado = directorio_actual.replace('\\', '\\\\')
+
+# Ahora insertamos directorio_escapado en la configuración de Django
 django_config = """
 import os
 import sys
 import django
 
-sys.path.insert(0, os.path.abspath(r'C:\\Users\\Paul Estigarribia\\Desktop\\Proyecto Equipo 5\\proyecto'))
+# Insertar la ruta del directorio en sys.path
+sys.path.insert(0, r'{}')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'proyecto.settings'
 django.setup()
-"""
+""".format(directorio_escapado)  # Aquí insertamos la ruta escapada correctamente
+
 
 # Insertar las configuraciones de Django al inicio de conf.py
 with open(conf_py_path, 'r+') as conf_file:
