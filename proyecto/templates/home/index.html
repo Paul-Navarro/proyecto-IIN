@@ -53,7 +53,9 @@
         <aside class="lateral_izq">
 
             <ul>
+                {% if  has_multiple_roles or has_single_role %}
                 <li><strong>Acciones</strong></li>
+                {% endif %}
             
                 <ul>
                     <!-- Panel Gestiones: Se muestra si el usuario tiene más de un rol -->
@@ -75,8 +77,6 @@
                     <li><a href="{% url 'publicador_dashboard' %}">Panel de Publicador</a></li>
                     {% endif %}
                 </ul>
-                
-                
                 
                 <li><strong>Preferencias</strong></li>
                 <ul>
