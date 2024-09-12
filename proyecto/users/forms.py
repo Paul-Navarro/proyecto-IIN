@@ -13,7 +13,7 @@ class CustomUserCreationForm(UserCreationForm):
     roles = forms.ModelMultipleChoiceField(
         queryset=Role.objects.all(),  # Lista de todos los roles disponibles
         widget=forms.CheckboxSelectMultiple,  # Cambia a Checkbox para facilitar la selección múltiple
-        required=True  # Define si el campo de roles es obligatorio
+        required=False  # Define si el campo de roles es obligatorio
     )
 
     class Meta:
@@ -22,6 +22,15 @@ class CustomUserCreationForm(UserCreationForm):
         """
         model = CustomUser
         fields = ('username', 'email', 'roles')  # Incluye los campos que deseas utilizar
+
+    def clean_roles(self):
+        """
+        Validación para asegurar que se seleccione al menos un rol.
+        """
+        roles = self.cleaned_data.get('roles')
+        if not roles:  # Si no se selecciona ningún rol, lanzamos un error
+            raise forms.ValidationError("Debes seleccionar al menos un rol.")
+        return roles
 
 
 class CustomUserChangeForm(UserChangeForm):
@@ -35,7 +44,7 @@ class CustomUserChangeForm(UserChangeForm):
     roles = forms.ModelMultipleChoiceField(
         queryset=Role.objects.all(),  # Lista de todos los roles disponibles
         widget=forms.CheckboxSelectMultiple,  # Cambia a Checkbox para facilitar la selección múltiple
-        required=True  # Define si el campo de roles es obligatorio
+        required=False  # Define si el campo de roles es obligatorio
     )
 
     class Meta:
@@ -44,3 +53,12 @@ class CustomUserChangeForm(UserChangeForm):
         """
         model = CustomUser
         fields = ('username', 'email', 'roles', 'is_active', 'is_staff')  # Incluye los campos que deseas modificar
+
+    def clean_roles(self):
+        """
+        Validación para asegurar que se seleccione al menos un rol.
+        """
+        roles = self.cleaned_data.get('roles')
+        if not roles:
+            raise forms.ValidationError("Debes seleccionar al menos un rol.")
+        return roles

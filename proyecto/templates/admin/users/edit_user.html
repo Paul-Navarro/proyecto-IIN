@@ -22,22 +22,54 @@
                 <h2 class="form-title">Formulario de Edición</h2>
                 <form method="post" class="user-form">
                     {% csrf_token %}
+
+                    <!-- Mostrar errores generales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Campo Nombre de Usuario -->
                     <div class="form-group">
                         <label for="id_username">Nombre de Usuario:</label>
                         {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="error">
+                                {{ form.username.errors }}
+                            </div>
+                        {% endif %}
                     </div>
+
+                    <!-- Campo Correo Electrónico -->
                     <div class="form-group">
                         <label for="id_email">Correo Electrónico:</label>
                         {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="error">
+                                {{ form.email.errors }}
+                            </div>
+                        {% endif %}
                     </div>
+
+                    <!-- Campo Roles -->
                     <div class="form-group">
                         <label for="id_roles">Roles:</label>
                         {{ form.roles }}
+                        {% if form.roles.errors %}
+                            <div class="error">
+                                {{ form.roles.errors }}
+                            </div>
+                        {% endif %}
                     </div>
+
+                    <!-- Campo Activo -->
                     <div class="form-group">
                         <label for="id_is_active">Activo:</label>
                         {{ form.is_active }}
                     </div>
+
+                    <!-- Botón para guardar los cambios -->
                     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                 </form>
             {% endblock %}
