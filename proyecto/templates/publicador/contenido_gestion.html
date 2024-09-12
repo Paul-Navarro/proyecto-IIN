@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Contenidos</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/contenido_list.css' %}">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Íconos FontAwesome -->
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">Gestionar Contenidos</h1>
+            <div class="header__actions">
+                <a href="{% url 'home' %}" class="btn btn-home">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                <a href="{% url 'contenido_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Crear Contenido
+                </a>
+                <a href="{% url 'account_logout' %}" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+                <a href="{% url 'publicador_dashboard' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Atrás
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h2 class="content-title">Lista de Contenidos</h2>
+            <div class="table-responsive">
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Categoría</th> <!-- Nueva columna -->
+                            <th>Visualizaciones</th>
+                            <th>Comentarios</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contenido in contenidos %}
+                        <tr>
+                            <td><div class="table-cell table-cell-id">{{ contenido.id_conte }}</div></td>
+                            <td><div class="table-cell">{{ contenido.titulo_conte }}</div></td>
+                            <td><div class="table-cell">{{ contenido.tipo_conte }}</div></td>
+                            <td><div class="table-cell">{{ contenido.estado_conte }}</div></td>
+                            <td><div class="table-cell">{{ contenido.fecha_conte }}</div></td>
+                            <td><div class="table-cell">{{ contenido.categoria.nombre }}</div></td> <!-- Mostrar la categoría -->
+                            <td><div class="table-cell">{{ contenido.cant_visualiz_conte }}</div></td>
+                            <td><div class="table-cell">{{ contenido.cant_coment_conte }}</div></td>
+                            <td class="content-table__actions">
+                                   
+                                <!-- Formulario para cambiar estado -->
+                                <form method="post" action="{% url 'contenido_cambiar_estado' contenido.id_conte %}">
+                                    {% csrf_token %}
+                                    <div class="estado-options">
+                                        <select name="nuevo_estado">
+                                            <option value="PUBLICADO" {% if contenido.estado_conte == 'PUBLICADO' %}selected{% endif %}>Publicar</option>
+                                            <option value="RECHAZADO" {% if contenido.estado_conte == 'RECHAZADO' %}selected{% endif %}>Rechazar</option>
+                                            <option value="EN_REVISION" {% if contenido.estado_conte == 'EN_REVISION' %}selected{% endif %}>En Revisión</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary">Actualizar Estado</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

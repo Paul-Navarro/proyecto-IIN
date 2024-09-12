@@ -2,6 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Contenido
 from .forms import ContenidoForm
 from categorias.models import Categoria
+from django.shortcuts import render, redirect
+from .forms import ContenidoForm
+from categorias.models import Categoria
+from django.contrib import messages
 
 def contenido_list(request):
     '''
@@ -25,9 +29,6 @@ def contenido_detail(request, pk):
     contenido = get_object_or_404(Contenido, pk=pk)
     return render(request, 'autor/contenido_detail.html', {'contenido': contenido})
 
-from django.shortcuts import render, redirect
-from .forms import ContenidoForm
-from categorias.models import Categoria
 
 def contenido_create(request):
     '''
@@ -125,3 +126,31 @@ def contenido_delete(request, pk):
         contenido.delete()
         return redirect('contenido_list')
     return render(request, 'autor/contenido_delete.html', {'contenido': contenido})
+
+def contenido_cambiar_estado(request, id_conte):
+    # Obtener el contenido por su ID
+    contenido = get_object_or_404(Contenido, id_conte=id_conte)
+
+    if request.method == 'POST':
+        # Obtener el nuevo estado desde el formulario
+        nuevo_estado = request.POST.get('nuevo_estado')
+
+        if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION']:
+            # Actualizar el estado del contenido
+            contenido.estado_conte = nuevo_estado
+            contenido.save()
+            messages.success(request, f"El estado del contenido '{contenido.titulo_conte}' se ha actualizado a '{nuevo_estado}'.")
+        else:
+            messages.error(request, "Estado no válido.")
+
+    return redirect('gestionar_contenido')  # Redirigir a la lista de contenidos
+
+def gestionar_contenido(request):
+    """
+    @function gestionar_contenido
+    @description Redirige a la página de gestión de contenidos para el publicador.
+    @param {HttpRequest} request - La solicitud HTTP.
+    @returns {HttpResponse} Renderiza la plantilla 'publicador/contenido_gestion.html'.
+    """
+    contenidos = Contenido.objects.all()
+    return render(request, 'publicador/contenido_gestion.html', {'contenidos': contenidos})

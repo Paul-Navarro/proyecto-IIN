@@ -13,7 +13,7 @@ from django.shortcuts import render
 def home(request):
     # Filtrar las categorías basadas en los parámetros recibidos en el request GET
     categorias = Categoria.objects.all()
-    contenidos = Contenido.objects.all()
+    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')  # Filtrar solo los contenidos publicados
 
     # Verificamos si los filtros están aplicados
     if 'moderadas' in request.GET:
@@ -25,7 +25,7 @@ def home(request):
     if 'suscriptores' in request.GET:
         categorias = categorias.filter(para_suscriptores=True)
 
-    # Filtrar los contenidos según las categorías filtradas
+    # Filtrar los contenidos según las categorías filtradas y estado 'PUBLICADO'
     contenidos = contenidos.filter(categoria__in=categorias)
 
     # Obtener el usuario y sus roles
@@ -45,6 +45,7 @@ def home(request):
     }
 
     return render(request, 'home/index.html', context)
+
 
 
 @login_required
