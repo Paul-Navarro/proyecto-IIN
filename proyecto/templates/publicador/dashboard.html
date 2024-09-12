@@ -14,8 +14,7 @@
         <nav>
             <ul>
                 <li><a href="{% url 'home' %}" class="menu__link menu__link--home">Inicio</a></li>
-                <li><a href="#">Aprobar Contenidos</a></li>
-                <li><a href="#">Gestionar Contenidos</a></li>
+                <li><a href="{% url 'gestionar_contenido'%}">Gestionar Contenidos</a></li>
                 <li><a href="#">Ver Comentarios</a></li>
                 <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
             </ul>
