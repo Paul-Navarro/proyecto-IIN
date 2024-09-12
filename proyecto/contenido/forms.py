@@ -26,7 +26,7 @@ class ContenidoForm(forms.ModelForm):
 
     class Meta:
         model = Contenido
-        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria']  # Remover 'estado_conte'
+        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria']
         labels = {
             'titulo_conte': 'Título del Contenido',
             'tipo_conte': 'Tipo de Contenido',
@@ -42,12 +42,12 @@ class ContenidoForm(forms.ModelForm):
         # Obtener la primera categoría no moderada para asignarla como valor por defecto
         primera_categoria_no_moderada = Categoria.objects.filter(es_moderada=False).first()
 
-        # Establecer la categoría por defecto como la primera categoría no moderada si existe
         if primera_categoria_no_moderada:
             self.fields['categoria'].initial = primera_categoria_no_moderada
 
         # Personalizar el queryset del campo categoría
         self.fields['categoria'].queryset = Categoria.objects.all()
 
-        # Establecer la fecha actual como fecha por defecto para el contenido
+        # Establecer la fecha actual como fecha por defecto para el contenido, y hacer el campo readonly
         self.fields['fecha_conte'].initial = timezone.now().date()
+        self.fields['fecha_conte'].widget.attrs['readonly'] = True  # Campo de solo lectura

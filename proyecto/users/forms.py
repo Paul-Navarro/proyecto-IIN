@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import CustomUser, Role
+from allauth.account.forms import SignupForm
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -62,3 +63,14 @@ class CustomUserChangeForm(UserChangeForm):
         if not roles:
             raise forms.ValidationError("Debes seleccionar al menos un rol.")
         return roles
+
+class CustomSignupForm(SignupForm):
+    first_name = forms.CharField(max_length=30, label='Nombre')
+    last_name = forms.CharField(max_length=30, label='Apellido')
+
+    def save(self, request):
+        user = super(CustomSignupForm, self).save(request)
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.save()
+        return user
