@@ -1,11 +1,9 @@
 function toggleFilters() {
     var filters = document.getElementById("filters");
-    if (filters.style.display === "") {
-        filters.style.display = "block";
-    }else if(filters.style.display ==="none"){
-        filters.style.display = "block";
-    }else if(filters.style.display ==="block"){
+    if (filters.style.display === "block") {
         filters.style.display = "none";
+    } else {
+        filters.style.display = "block";
     }
 }
 

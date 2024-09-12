@@ -53,12 +53,30 @@
         <aside class="lateral_izq">
 
             <ul>
-                <li><strong>Categorías</strong></li>
+                <li><strong>Acciones</strong></li>
             
                 <ul>
-                    <li><a href="#pago">Pago</a></li>
-                    <li><a href="#publico">Público</a></li>
+                    <!-- Panel Gestiones: Se muestra si el usuario tiene más de un rol -->
+
+                    <!-- Paneles individuales: Se muestran si el usuario tiene un solo rol -->
+                    {% if  has_admin_role %}
+                    <li><a href="{% url 'admin_dashboard' %}">Panel de Administrador</a></li>
+                    {% endif %}
+                    
+                    {% if  has_autor_role %}
+                    <li><a href="{% url 'autor_dashboard' %}">Panel de Autor</a></li>
+                    {% endif %}
+                    
+                    {% if has_editor_role %}
+                    <li><a href="{% url 'editor_dashboard' %}">Panel de Editor</a></li>
+                    {% endif %}
+                    
+                    {% if has_publicador_role %}
+                    <li><a href="{% url 'publicador_dashboard' %}">Panel de Publicador</a></li>
+                    {% endif %}
                 </ul>
+                
+                
                 
                 <li><strong>Preferencias</strong></li>
                 <ul>
@@ -66,12 +84,7 @@
                     <li><a href="#notificaciones">Notificaciones</a></li>
                 </ul>
             
-                <li><strong>Gestión de Contenido</strong></li>
-            
-                <ul>
-                    <li><a href="#crear">Crear Nuevo Contenido</a></li>
-                    <li><a href="#editar">Editar Contenido</a></li>
-                </ul>
+
             
                 <li><strong>Configuración</strong></li>
             

@@ -28,11 +28,24 @@ def home(request):
     # Filtrar los contenidos según las categorías filtradas
     contenidos = contenidos.filter(categoria__in=categorias)
 
+    # Obtener el usuario y sus roles
+    user = request.user
+    roles_count = user.roles.count() if user.is_authenticated else 0
+
+    # Lógica de roles: verificar si el usuario tiene un rol específico
     context = {
         'contenidos': contenidos,
         'categorias': categorias,
+        'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
+        'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
+        'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
+        'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
+        'has_multiple_roles': roles_count > 1,
+        'has_single_role': roles_count == 1,
     }
+
     return render(request, 'home/index.html', context)
+
 
 @login_required
 def role_based_redirect(request):

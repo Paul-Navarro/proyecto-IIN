@@ -22,16 +22,22 @@ header h1 {
     font-size: 2.5rem;
 }
 
+/* Cambia el estilo de la barra de navegación para usar Flexbox */
 nav ul {
     list-style: none;
     padding: 0;
     margin: 10px 0 0;
-    text-align: center;
+    display: flex;  /* Usar flexbox */
+    justify-content: center;  /* Centrar elementos en la barra */
 }
 
 nav ul li {
-    display: inline;
     margin-right: 15px;
+}
+
+/* Este estilo moverá el botón de Inicio a la derecha */
+nav ul li.inicio {
+    margin-left: auto;  /* Empuja el botón de Inicio a la derecha */
 }
 
 nav ul li a {
