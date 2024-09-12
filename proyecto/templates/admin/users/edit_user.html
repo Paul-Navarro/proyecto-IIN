@@ -30,6 +30,28 @@
                         </div>
                     {% endif %}
 
+                    <!-- Campo Nombres -->
+                    <div class="form-group">
+                        <label for="id_first_name">Nombres:</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="error">
+                                {{ form.first_name.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Apellidos -->
+                    <div class="form-group">
+                        <label for="id_last_name">Apellidos:</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="error">
+                                {{ form.last_name.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
                     <!-- Campo Nombre de Usuario -->
                     <div class="form-group">
                         <label for="id_username">Nombre de Usuario:</label>

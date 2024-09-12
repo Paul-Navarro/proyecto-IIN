@@ -21,7 +21,7 @@ class CustomUserCreationForm(UserCreationForm):
         @description Clase Meta para especificar el modelo y los campos que se incluirán en el formulario de creación de usuarios.
         """
         model = CustomUser
-        fields = ('username', 'email', 'roles')  # Incluye los campos que deseas utilizar
+        fields = ('username', 'email', 'first_name', 'last_name', 'roles')  # Incluye los campos que deseas utilizar
 
     def clean_roles(self):
         """
@@ -52,7 +52,7 @@ class CustomUserChangeForm(UserChangeForm):
         @description Clase Meta para especificar el modelo y los campos que se incluirán en el formulario de edición de usuarios.
         """
         model = CustomUser
-        fields = ('username', 'email', 'roles', 'is_active', 'is_staff')  # Incluye los campos que deseas modificar
+        fields = ('username', 'email', 'first_name', 'last_name', 'roles', 'is_active', 'is_staff')  # Incluye los campos que deseas modificar
 
     def clean_roles(self):
         """

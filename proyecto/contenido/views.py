@@ -32,7 +32,7 @@ from categorias.models import Categoria
 def contenido_create(request):
     '''
     @function contenido_create
-    @description Crea un nuevo contenido. Maneja la validación del formulario y guarda el nuevo contenido.
+    @description Crea un nuevo contenido. Asigna el autor automáticamente y maneja la validación del formulario.
     @param {HttpRequest} request - El objeto de solicitud HTTP.
     @returns {HttpResponse} Redirige a la lista de contenidos después de crear uno nuevo o muestra el formulario con errores.
     '''
@@ -51,14 +51,16 @@ def contenido_create(request):
             # No guardar el formulario inmediatamente
             contenido = form.save(commit=False)
 
+            # Asignar el autor al usuario actual (el que está creando el contenido)
+            contenido.autor = request.user
+
             # Verificar si la categoría seleccionada es no moderada
             if contenido.categoria and not contenido.categoria.es_moderada:
                 contenido.estado_conte = 'PUBLICADO'
-                print("ENTRE AQUI")
             else:
                 contenido.estado_conte = 'EN_REVISION'
 
-            contenido.save()  # Guardar el contenido con el estado ajustado
+            contenido.save()  # Guardar el contenido con el estado ajustado y el autor
             return redirect('contenido_list')
     else:
         form = ContenidoForm(initial={'categoria': primera_categoria_no_moderada})  # Inicializar con categoría no moderada

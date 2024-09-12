@@ -7,6 +7,7 @@ urlpatterns = [
     path('contenido/new/', views.contenido_create, name='contenido_create'),
     path('contenido/<int:pk>/edit/', views.contenido_update, name='contenido_update'),
     path('contenido/<int:pk>/delete/', views.contenido_delete, name='contenido_delete'),
+    path('contenido/<int:id>/', views.contenido_detail, name='contenido_detail'),
 ]
 
 '''

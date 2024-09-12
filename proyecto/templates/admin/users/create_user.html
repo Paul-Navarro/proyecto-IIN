@@ -30,6 +30,23 @@
                         </div>
                     {% endif %}
                     
+                    <!-- Campo de Nombre -->
+                    {{ form.first_name.label_tag }} {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="error">
+                            {{ form.first_name.errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Campo de Apellidos -->
+                    {{ form.last_name.label_tag }} {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="error">
+                            {{ form.last_name.errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Campo de Nombre de Usuario -->
                     {{ form.username.label_tag }} {{ form.username }}
                     {% if form.username.errors %}
                         <div class="error">
@@ -37,6 +54,7 @@
                         </div>
                     {% endif %}
                     
+                    <!-- Campo de Email -->
                     {{ form.email.label_tag }} {{ form.email }}
                     {% if form.email.errors %}
                         <div class="error">
@@ -44,13 +62,14 @@
                         </div>
                     {% endif %}
                     
+                    <!-- Campo de Roles -->
                     {{ form.roles.label_tag }} {{ form.roles }}
                     {% if form.roles.errors %}
                         <div class="error">
                             {{ form.roles.errors }}
                         </div>
                     {% endif %}
-
+                
                     <!-- Campos de Contraseña -->
                     {{ form.password1.label_tag }} {{ form.password1 }}
                     {% if form.password1.errors %}
@@ -65,9 +84,8 @@
                             {{ form.password2.errors }}
                         </div>
                     {% endif %}
-                    
-                    <!-- Omitir el campo 'password_authentication' si existiera -->
 
+                    <!-- Botón de Enviar -->
                     <button type="submit" class="btn btn-primary">Crear Usuario</button>
                 </form>
             {% endblock %}

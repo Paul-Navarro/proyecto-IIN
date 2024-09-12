@@ -152,7 +152,8 @@
                         <!-- Mostrar el contenido usando el filtro 'safe' para renderizar HTML -->
                         <p>{{ contenido.texto_conte|safe }}</p>
             
-                        <a href="#" class="btn btn-primary">Leer más</a>
+                        <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+
                     </div>
                 {% endfor %}
             </div>
