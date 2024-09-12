@@ -209,7 +209,7 @@ body {
     flex-wrap: wrap;
     gap: 30px; /* Aumenta el espacio entre los contenidos */
     overflow-y: auto;
-    max-height: 70vh;
+    max-height: 80vh;
 }
 
 
@@ -396,6 +396,12 @@ body {
     margin-top: 10px;
 }
 
+.btn-container {
+    text-align: left; /* Centramos el botón */
+    margin-top: 10px;   /* Añadimos un margen superior */
+    margin-bottom: 20px; /* Ajustamos el margen inferior si es necesario */
+}
+
 .btn-primary {
     background-color: #16a085;
     color: white;
@@ -405,25 +411,30 @@ body {
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 0 auto; /* Centramos el botón */
+    display: inline-block; /* Aseguramos que se ajuste al contenido */
+    text-decoration: none;
 }
 
 .btn-primary:hover {
     background-color: #12876a;
+    text-decoration: underline;
 }
 
 .imagenContenido{
-    max-width: 50vh;
+    max-width: 75vh;
     min-width: 30vh;
-    max-height: 30vh;
-    box-shadow: -8px 7px 40px rgba(0, 0, 0, 0.95);
+    max-height: 50vh;
+    box-shadow: -8px 7px 40px rgba(0, 0, 0, 0.2);
 }
 .divImagenContenido{
     width: 100%;
     display: flex;
     justify-content: center;
-    background-color: #16a085;
+    
+    background-color: transparent;
     border-radius: 10px;
     padding-top: 25px;
     padding-bottom: 25px;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2)
+    
 }
