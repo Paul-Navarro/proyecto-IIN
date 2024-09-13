@@ -91,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'leticia',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'PASSWORD': '2910',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -163,7 +163,3 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-ACCOUNT_FORMS = {
-    'signup': 'users.forms.CustomSignupForm',  # Ruta hacia tu formulario personalizado
-}

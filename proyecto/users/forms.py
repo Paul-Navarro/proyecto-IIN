@@ -65,6 +65,11 @@ class CustomUserChangeForm(UserChangeForm):
         return roles
 
 class CustomSignupForm(SignupForm):
+    """
+    @class CustomSignupForm
+    @extends SignupForm
+    @description Formulario de registro personalizado que extiende el formulario de registro de `allauth`. Incluye los campos de nombre y apellido, además de los campos estándar de registro.
+    """
     first_name = forms.CharField(max_length=30, label='Nombre')
     last_name = forms.CharField(max_length=30, label='Apellido')
 

@@ -5,7 +5,12 @@ import sys
 
 
 def main():
-    """Run administrative tasks."""
+    """
+    @function main
+    @description Configura las variables de entorno necesarias para el proyecto de Django y ejecuta 
+    las tareas administrativas a través de la línea de comandos. Verifica que Django esté instalado 
+    y correctamente configurado antes de ejecutar cualquier comando.
+    """
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proyecto.settings')
     try:
         from django.core.management import execute_from_command_line
