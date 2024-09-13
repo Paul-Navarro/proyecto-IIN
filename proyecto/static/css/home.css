@@ -224,7 +224,7 @@ body {
 
 /* Listado lateral derecho */
 .lateral_der {
-    width: 15%;
+    width: 75%;
     background-color: #ffffff;
     padding: 30px; /* Aumenta el padding */
     border-radius: 10px;
