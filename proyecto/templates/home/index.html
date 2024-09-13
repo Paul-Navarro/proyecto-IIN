@@ -29,7 +29,7 @@
             <div>
                 <div class="botonesLogeo">
                     {% if user.is_authenticated %}
-                    <a style = "color: white;" href="{% url 'account_logout' %}" class="menu_link menu_link--logout"><i class="fas fa-arrow-left"></i> Cerrar Sesión</a>
+                    <a style="color: white;" href="{% url 'account_logout' %}" class="menu_link menu_link--logout"><i class="fas fa-arrow-left"></i> Cerrar Sesión</a>
                     {% else %}
                     <div>Accede o crea una cuenta</div>
                     <button onclick="redirigirLogin()" type="button">Log in</button>
@@ -51,15 +51,11 @@
     <div class="cuerpo">
         <!-- Listado lateral izquierdo -->
         <aside class="lateral_izq">
-
             <ul>
                 {% if has_multiple_roles or has_single_role %}
                 <li><strong>Acciones</strong></li>
                 {% endif %}
-            
                 <ul>
-                    <!-- Panel Gestiones: Se muestra si el usuario tiene más de un rol -->
-
                     <!-- Paneles individuales: Se muestran si el usuario tiene un solo rol -->
                     {% if has_admin_role %}
                     <li><a href="{% url 'admin_dashboard' %}">Panel de Administrador</a></li>
@@ -84,28 +80,30 @@
                     <li><a href="#notificaciones">Notificaciones</a></li>
                 </ul>
             
-
-            
                 <li><strong>Configuración</strong></li>
-            
                 <ul>
                     <li><a href="#general">Configuración General</a></li>
                     <li><a href="#seguridad">Seguridad</a></li>
                     <li><a href="#integraciones">Integraciones</a></li>
                 </ul>
             </ul>
-            
         </aside>
+
         <!-- Área de contenidos -->
         <main class="main-content" id="mainID">
             <div class="cajaBusqueda">
-                <input type="text" class="busqueda" placeholder="¿Qué estás buscando?">
-                <button type="button" class="btnBuscar">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button class="filter-button" onclick="toggleFilters()">
-                    <i class="fas fa-filter"></i>
-                </button>
+                <!-- Formulario de búsqueda -->
+                <form method="GET" action="{% url 'home' %}">
+                    <input type="text" name="q" class="busqueda" placeholder="¿Qué estás buscando?" value="{{ request.GET.q }}">
+                    <button type="submit" class="btnBuscar">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="filter-button" onclick="toggleFilters()">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </form>
+
+                <!-- Filtros -->
                 <div class="filter-container">
                     <div class="filter-options" id="filters">
                         <form method="GET" action="">
@@ -133,30 +131,33 @@
                 </div>
             </div>
 
-            <!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
+            <!-- Resultados de contenidos -->
             <div class="cajaContenidos" id="cajaContenidos">
-                {% for contenido in contenidos %}
-                    <div class="contenidoRelleno">
-                        <div class="codigoConte">
-                            <span>Código: {{ contenido.id_conte }}</span>
+                {% if contenidos %}
+                    {% for contenido in contenidos %}
+                        <div class="contenidoRelleno">
+                            <div class="codigoConte">
+                                <span>Código: {{ contenido.id_conte }}</span>
+                            </div>
+                            <h3>{{ contenido.titulo_conte }}</h3>
+                
+                            {% if contenido.imagen_conte %}
+                            <div class="divImagenContenido">
+                                <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+                            </div>
+                            {% endif %}
+                
+                            <p>{{ contenido.texto_conte|safe }}</p>
+                
+                            <div class="btn-container">
+                                <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                            </div>
                         </div>
-                        <h3>{{ contenido.titulo_conte }}</h3>
-            
-                        {% if contenido.imagen_conte %}
-                        <div class="divImagenContenido">
-                            <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
-                        </div>
-                        {% endif %}
-            
-                        <p>{{ contenido.texto_conte|safe }}</p>
-            
-                        <div class="btn-container">
-                            <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
-                        </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <p>No se encontraron resultados para tu búsqueda.</p>
+                {% endif %}
             </div>
-            
         </main>
 
         <!-- Listado lateral derecho -->
@@ -165,7 +166,6 @@
             <ul>
                 {% for categoria in categorias %}
                     <div class="categoria-item">
-                        <!-- Enlace que envía el ID de la categoría como parámetro en la URL -->
                         <li><strong><a href="?categoria={{ categoria.id }}">{{ categoria.nombre }}</a></strong></li>
                         <p class="pLateralDer">{{ categoria.descripcion }}</p>
                     </div>
@@ -175,12 +175,7 @@
             <button onclick="window.location.href='?';" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; color: white; background-color: #20c997; border: none; border-radius: 5px; cursor: pointer; text-align: center; transition: background-color 0.3s ease;">
                 Mostrar todos los contenidos
             </button>
-            
-            
         </aside>
-        
-        
-        
     </div>
 </body>
 

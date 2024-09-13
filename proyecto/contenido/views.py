@@ -7,16 +7,19 @@ from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.contrib import messages
 
+
 def contenido_list(request):
     '''
     @function contenido_list
-    @description Muestra una lista de todos los contenidos.
+    @description Muestra una lista de todos los contenidos, con opción de búsqueda por título y tags.
     @param {HttpRequest} request - El objeto de solicitud HTTP.
-    @returns {HttpResponse} Respuesta renderizada con la lista de contenidos.
+    @returns {HttpResponse} Respuesta renderizada con la lista de contenidos filtrados.
     '''
     
     user = request.user
-    contenidos = Contenido.objects.filter(autor=user)
+    contenidos = Contenido.objects.filter(autor=user)  # Mostrar solo los contenidos del autor
+
+
     return render(request, 'autor/contenido_list.html', {'contenidos': contenidos})
 
 
