@@ -11,11 +11,20 @@ from contenido.models import Contenido, Categoria
 from django.shortcuts import render
 
 def home(request):
-    # Filtrar las categorías basadas en los parámetros recibidos en el request GET
+    # Obtener todas las categorías
     categorias = Categoria.objects.all()
-    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')  # Filtrar solo los contenidos publicados
 
-    # Verificamos si los filtros están aplicados
+    # Filtrar los contenidos publicados
+    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')
+
+    # Verificar si se ha enviado el parámetro de la categoría en el GET
+    categoria_id = request.GET.get('categoria')
+
+    # Si el parámetro está presente, filtrar los contenidos por esa categoría
+    if categoria_id:
+        contenidos = contenidos.filter(categoria_id=categoria_id)
+
+    # Verificamos si los filtros adicionales están aplicados
     if 'moderadas' in request.GET:
         categorias = categorias.filter(es_moderada=True)
     if 'no_moderadas' in request.GET:
@@ -25,14 +34,11 @@ def home(request):
     if 'suscriptores' in request.GET:
         categorias = categorias.filter(para_suscriptores=True)
 
-    # Filtrar los contenidos según las categorías filtradas y estado 'PUBLICADO'
-    contenidos = contenidos.filter(categoria__in=categorias)
-
     # Obtener el usuario y sus roles
     user = request.user
     roles_count = user.roles.count() if user.is_authenticated else 0
 
-    # Lógica de roles: verificar si el usuario tiene un rol específico
+    # Lógica de roles
     context = {
         'contenidos': contenidos,
         'categorias': categorias,

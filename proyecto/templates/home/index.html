@@ -141,53 +141,46 @@
                             <span>Código: {{ contenido.id_conte }}</span>
                         </div>
                         <h3>{{ contenido.titulo_conte }}</h3>
-
-                        <!-- Mostrar la imagen solo si existe -->
+            
                         {% if contenido.imagen_conte %}
                         <div class="divImagenContenido">
                             <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
                         </div>
                         {% endif %}
-                        <!-- Mostrar el contenido usando el filtro 'safe' para renderizar HTML -->
+            
                         <p>{{ contenido.texto_conte|safe }}</p>
-
+            
                         <div class="btn-container">
                             <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
                         </div>
                     </div>
                 {% endfor %}
             </div>
+            
         </main>
 
         <!-- Listado lateral derecho -->
         <aside class="lateral_der">
-            <h2>Información Útil</h2>
+            <h2>Categorías</h2>
             <ul>
-                <li><strong><a href="#registrarme">¿Cómo registrarme?</a></strong></li>
-                <p class="pLateralDer">Guía paso a paso para registrarte en nuestra plataforma y comenzar a usar todas las funcionalidades.</p>
-
-                <li><strong><a href="#recuperar">¿Olvidaste tu contraseña?</a></strong></li>
-                <p class="pLateralDer">Instrucciones para recuperar el acceso a tu cuenta si olvidaste tu contraseña.</p>
-
-                <li><strong><a href="#primerospasos">Primeros pasos</a></strong></li>
-                <p class="pLateralDer">Consejos y recomendaciones para familiarizarte con nuestra plataforma.</p>
-
-                <li><strong><a href="#privacidad">Política de Privacidad</a></strong></li>
-                <p class="pLateralDer">Detalles sobre cómo manejamos tu información y tus derechos sobre tus datos.</p>
-
-                <li><strong><a href="#soporte">Soporte Técnico</a></strong></li>
-                <p class="pLateralDer">Cómo contactar a nuestro equipo de soporte si necesitas ayuda.</p>
-
-                <li><strong><a href="#preguntas">Preguntas Frecuentes (FAQ)</a></strong></li>
-                <p class="pLateralDer">Respuestas a las preguntas más comunes sobre el uso de la plataforma.</p>
-
-                <li><strong><a href="#actualizaciones">Actualizaciones del Sistema</a></strong></li>
-                <p class="pLateralDer">Información sobre las últimas actualizaciones, mejoras y nuevas características.</p>
-
-                <li><strong><a href="#contacto">Contáctanos</a></strong></li>
-                <p class="pLateralDer">Formulario y opciones para ponerte en contacto con nosotros.</p>
+                {% for categoria in categorias %}
+                    <div class="categoria-item">
+                        <!-- Enlace que envía el ID de la categoría como parámetro en la URL -->
+                        <li><strong><a href="?categoria={{ categoria.id }}">{{ categoria.nombre }}</a></strong></li>
+                        <p class="pLateralDer">{{ categoria.descripcion }}</p>
+                    </div>
+                {% endfor %}
             </ul>
+            <!-- Botón para mostrar todos los contenidos -->
+            <button onclick="window.location.href='?';" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; color: white; background-color: #20c997; border: none; border-radius: 5px; cursor: pointer; text-align: center; transition: background-color 0.3s ease;">
+                Mostrar todos los contenidos
+            </button>
+            
+            
         </aside>
+        
+        
+        
     </div>
 </body>
 
