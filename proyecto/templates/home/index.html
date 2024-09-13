@@ -137,27 +137,35 @@
 
             <!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
             <div class="cajaContenidos" id="cajaContenidos">
-                {% for contenido in contenidos %}
-                    <div class="contenidoRelleno">
-                        <div class="codigoConte">
-                            <span>Código: {{ contenido.id_conte }}</span>
-                        </div>
-                        <h3>{{ contenido.titulo_conte }}</h3>
+                {% if contenidos %}
+                    {% for contenido in contenidos %}
+                        <div class="contenidoRelleno">
+                            <div class="codigoConte">
+                                <span>Código: {{ contenido.id_conte }}</span>
+                            </div>
+                            <h3>{{ contenido.titulo_conte }}</h3>
             
-                        {% if contenido.imagen_conte %}
-                        <div class="divImagenContenido">
-                            <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
-                        </div>
-                        {% endif %}
+                            {% if contenido.imagen_conte %}
+                            <div class="divImagenContenido">
+                                <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+                            </div>
+                            {% endif %}
             
-                        <p>{{ contenido.texto_conte|truncatechars:350|safe }}</p>
+                            <p>{{ contenido.texto_conte|truncatechars:350|safe }}</p>
             
-                        <div class="btn-container">
-                            <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                            <div class="btn-container">
+                                <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                            </div>
                         </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-content">
+                        <h3>¡Ups! No hay contenido aquí.</h3>
+                        <p>Vuelve más tarde para ver actualizaciones o usa los filtros para explorar otros contenidos.</p>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
+            
             
         </main>
 
