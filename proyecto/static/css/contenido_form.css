@@ -170,10 +170,18 @@ nav ul li a:hover {
 /* Estilo para los tags en el formulario */
 .tag-container {
     display: flex;
-    flex-wrap: wrap;  /* Permitir que los elementos se envuelvan en varias filas */
+    flex-wrap: nowrap;   /*Permitir que los elementos se envuelvan en varias filas */
     gap: 10px;  /* Espacio entre los elementos */
     margin-bottom: 20px;
 }
+
+.tag-container div{
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
 
 .tag-container label {
     display: flex;
