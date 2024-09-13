@@ -13,12 +13,12 @@
         <h1>Bienvenido, Editor</h1>
         <nav>
             <ul>
+                <li class="btn btn-home"><a href="{% url 'home' %}">Inicio</a></li>
                 <li><a href="#">Crear Nuevo Contenido</a></li>
                 <li><a href="#">Gestionar Contenido Existente</a></li>
                 <li><a href="#">Revisar Comentarios</a></li>
                 <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
-                <!-- Botón de Inicio con la clase especial -->
-                <li class="inicio"><a href="{% url 'home' %}">Inicio</a></li>
+                
             </ul>
         </nav>
     </header>

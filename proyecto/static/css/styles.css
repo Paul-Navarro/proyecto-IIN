@@ -185,3 +185,104 @@ label {
     text-align: left;
     color: #12746b; /* Color verde oscuro para los labels */
 }
+
+
+
+/*--------------------------*/
+
+
+/* Contenedor para el botón "Iniciar Sesión" */
+.action-button {
+    margin-bottom: 20px; /* Espacio debajo del botón "Iniciar Sesión" */
+    text-align: center; /* Centrar el botón */
+  }
+  
+  /* Contenedor para los enlaces "Regresar" y "Olvidaste tu contraseña?" */
+  .additional-actions {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 60px; /* Espacio entre los botones */
+    margin-top: 20px; /* Espacio superior para separar los botones del botón "Iniciar Sesión" */
+  }
+  
+  .additional-actions a {
+    font-size: 14px;
+    text-decoration: none;
+    padding: 5px 10px; /* Espaciado interno */
+    border-radius: 5px;
+    color: #12746b; /* Verde oscuro */
+    background-color: #d6eae3; /* Fondo verde claro */
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-align: center;
+    width: auto; /* El ancho se adapta al contenido del botón */
+  }
+  
+  .additional-actions a:hover {
+    background-color: #b0cec5; /* Fondo más oscuro al pasar el ratón */
+  }
+  
+  /* Botón "Iniciar Sesión" */
+  .primaryAction {
+    background-color: #12746b; /* Color verde oscuro */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%; /* Ocupa todo el ancho */
+    transition: background-color 0.3s;
+    text-align: center;
+  }
+  
+  .primaryAction:hover {
+    background-color: #0e5b5b; /* Color más oscuro al pasar el ratón */
+  }
+
+
+/* Contenedor del botón "Registrarse" */
+.action-button {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Contenedor del botón "Regresar" */
+.back-button-container {
+    margin-top: 20px; /* Espacio superior para separar del formulario */
+    text-align: center; /* Centra el botón en la pantalla */
+}
+
+/* Botón "Regresar" */
+.back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #d6eae3; /* Fondo verde claro */
+    color: #12746b; /* Color del texto verde oscuro */
+    border-radius: 5px;
+    text-decoration: none; /* Sin subrayado */
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #b0cec5; /* Fondo más oscuro al pasar el ratón */
+}
+
+/* Botón de acción "Registrarse" */
+button[type="submit"] {
+    background-color: #12746b;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    width: 100%; /* Botón ocupa todo el ancho del contenedor */
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #0e5b5b;
+}

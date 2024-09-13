@@ -75,7 +75,7 @@ header h1 {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    min-width: 1200px; /* Hacer la tabla más grande */
+    min-width: 800px; /* Hacer la tabla más grande */
 }
 
 .content-table th,

@@ -29,7 +29,7 @@
             <div>
                 <div class="botonesLogeo">
                     {% if user.is_authenticated %}
-                    <a href="{% url 'account_logout' %}" class="menu__link menu__link--logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                    <a style = "color: white;" href="{% url 'account_logout' %}" class="menu_link menu_link--logout"><i class="fas fa-arrow-left"></i> Cerrar Sesión</a>
                     {% else %}
                     <div>Accede o crea una cuenta</div>
                     <button onclick="redirigirLogin()" type="button">Log in</button>
@@ -53,7 +53,7 @@
         <aside class="lateral_izq">
 
             <ul>
-                {% if  has_multiple_roles or has_single_role %}
+                {% if has_multiple_roles or has_single_role %}
                 <li><strong>Acciones</strong></li>
                 {% endif %}
             
@@ -61,11 +61,11 @@
                     <!-- Panel Gestiones: Se muestra si el usuario tiene más de un rol -->
 
                     <!-- Paneles individuales: Se muestran si el usuario tiene un solo rol -->
-                    {% if  has_admin_role %}
+                    {% if has_admin_role %}
                     <li><a href="{% url 'admin_dashboard' %}">Panel de Administrador</a></li>
                     {% endif %}
                     
-                    {% if  has_autor_role %}
+                    {% if has_autor_role %}
                     <li><a href="{% url 'autor_dashboard' %}">Panel de Autor</a></li>
                     {% endif %}
                     
@@ -148,9 +148,11 @@
                             <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
                         </div>
                         {% endif %}
-                        <p>{{ contenido.texto_conte|truncatewords:50 }}</p>
+                        <!-- Mostrar el contenido usando el filtro 'safe' para renderizar HTML -->
+                        <p>{{ contenido.texto_conte|safe }}</p>
+
                         <div class="btn-container">
-                            <a href="#" class="btn btn-primary">Leer más</a>
+                            <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
                         </div>
                     </div>
                 {% endfor %}
