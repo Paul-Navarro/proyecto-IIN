@@ -58,9 +58,9 @@
                 </div>
 
                 <!-- Tags: Mostrar los tags como checkboxes para que se puedan seleccionar -->
-                <div>
-                    <label for="tags">{{ form.tags.label }}</label>
-                    {{ form.tags }}
+                <h3>Selecciona uno o varios tags:</h3>
+                <div class="tag-container">
+                    {{ form.tags }}  <!-- Esto mostrará los checkboxes para los tags de forma ordenada -->
                 </div>
 
                 <!-- Único select para todas las categorías agrupadas -->

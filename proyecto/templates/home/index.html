@@ -150,7 +150,7 @@
                         </div>
                         {% endif %}
             
-                        <p>{{ contenido.texto_conte|safe }}</p>
+                        <p>{{ contenido.texto_conte|truncatechars:350|safe }}</p>
             
                         <div class="btn-container">
                             <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
