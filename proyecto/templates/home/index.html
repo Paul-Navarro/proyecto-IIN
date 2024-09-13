@@ -99,12 +99,14 @@
         <!-- Área de contenidos -->
         <main class="main-content" id="mainID">
             <div class="cajaBusqueda">
-                <input type="text" class="busqueda" placeholder="¿Qué estás buscando?">
-                <button type="button" class="btnBuscar">
-                    <i class="fas fa-search"></i>
-                </button>
+                <form method="GET" action="">
+                    <input type="text" class="busqueda" name="q" placeholder="¿Qué estás buscando?" value="{{ query|default_if_none:'' }}">
+                    <button type="submit" class="btnBuscar">
+                        <i id="icono_buscar" class="fas fa-search"></i>
+                    </button>
+                </form>
                 <button class="filter-button" onclick="toggleFilters()">
-                    <i class="fas fa-filter"></i>
+                    <i id = "icono_filtro" class="fas fa-filter"></i>
                 </button>
                 <div class="filter-container">
                     <div class="filter-options" id="filters">
@@ -135,27 +137,35 @@
 
             <!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
             <div class="cajaContenidos" id="cajaContenidos">
-                {% for contenido in contenidos %}
-                    <div class="contenidoRelleno">
-                        <div class="codigoConte">
-                            <span>Código: {{ contenido.id_conte }}</span>
-                        </div>
-                        <h3>{{ contenido.titulo_conte }}</h3>
+                {% if contenidos %}
+                    {% for contenido in contenidos %}
+                        <div class="contenidoRelleno">
+                            <div class="codigoConte">
+                                <span>Código: {{ contenido.id_conte }}</span>
+                            </div>
+                            <h3>{{ contenido.titulo_conte }}</h3>
             
-                        {% if contenido.imagen_conte %}
-                        <div class="divImagenContenido">
-                            <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
-                        </div>
-                        {% endif %}
+                            {% if contenido.imagen_conte %}
+                            <div class="divImagenContenido">
+                                <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+                            </div>
+                            {% endif %}
             
-                        <p>{{ contenido.texto_conte|safe }}</p>
+                            <p>{{ contenido.texto_conte|truncatechars:350|safe }}</p>
             
-                        <div class="btn-container">
-                            <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                            <div class="btn-container">
+                                <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                            </div>
                         </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-content">
+                        <h3>¡Ups! No hay contenido aquí.</h3>
+                        <p>Vuelve más tarde para ver actualizaciones o usa los filtros para explorar otros contenidos.</p>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
+            
             
         </main>
 

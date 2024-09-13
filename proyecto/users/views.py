@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib import messages
 from contenido.models import Contenido, Categoria
+from django.db.models import Q  # Para realizar búsquedas complejas con OR
 
 
 from django.shortcuts import render
@@ -23,6 +24,15 @@ def home(request):
     # Si el parámetro está presente, filtrar los contenidos por esa categoría
     if categoria_id:
         contenidos = contenidos.filter(categoria_id=categoria_id)
+
+    # Verificar si se ha enviado el término de búsqueda
+    query = request.GET.get('q')
+    if query:
+        # Filtrar los contenidos por título o por tags
+        contenidos = contenidos.filter(
+            Q(titulo_conte__icontains=query) |  # Buscar por título
+            Q(tags__nombre__icontains=query)    # Buscar por tags
+        ).distinct()  # Evitar duplicados si coinciden con ambos
 
     # Verificamos si los filtros adicionales están aplicados
     if 'moderadas' in request.GET:
@@ -48,6 +58,7 @@ def home(request):
         'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
         'has_multiple_roles': roles_count > 1,
         'has_single_role': roles_count == 1,
+        'query': query  # Pasar el término de búsqueda al contexto
     }
 
     return render(request, 'home/index.html', context)

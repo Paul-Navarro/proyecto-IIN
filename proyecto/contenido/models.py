@@ -3,6 +3,14 @@ from categorias.models import Categoria  # Importa el modelo Categoria
 from ckeditor.fields import RichTextField
 from django.conf import settings
 
+
+class Tag(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.nombre
+    
+    
 class Contenido(models.Model):
     '''
     @class Contenido
@@ -26,6 +34,7 @@ class Contenido(models.Model):
     cant_coment_conte = models.IntegerField(default=0)
     imagen_conte = models.ImageField(upload_to='imagenes_contenido/', null=True, blank=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     # Relación con el autor del contenido
     autor = models.ForeignKey(
@@ -37,3 +46,4 @@ class Contenido(models.Model):
 
     def __str__(self):
         return self.titulo_conte
+    

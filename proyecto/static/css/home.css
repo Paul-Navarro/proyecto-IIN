@@ -139,20 +139,25 @@ body {
 .cajaBusqueda {
     display: flex;
     align-items: center;
+    justify-content: center; /* Centramos el contenido horizontalmente */
     margin-bottom: 10px; /* Aumenta el margen inferior */
     background-color: #ffffff;
     padding: 10px; /* Aumenta el padding */
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 80%; /* Ajustamos el ancho a un 50% para que esté centrado */
+    margin-left: auto; /* Esto junto con margin-right asegura el centrado */
+    margin-right: auto;
 }
 
 .busqueda {
-    width: 80%;
+    width: 75%; /* Ajusta el ancho según sea necesario */
     min-height: 4vh;
-    border: 2px solid #ccc; /* Aumenta el grosor del borde */
-    border-radius: 10px; /* Bordes más redondeados */
-    font-size: 1.0rem; /* Aumenta el tamaño de la fuente */
-    text-align: center;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    padding-left: 10px; /* Añadir padding interno para un mejor espaciado */
+    text-align: left; /* Alinear texto a la izquierda */
 }
 
 .btnBuscar {
@@ -166,6 +171,9 @@ body {
     margin-left: 15px; /* Aumenta la separación entre el botón y el campo de búsqueda */
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
+}
+#icono_buscar{
+    pointer-events: none;
 }
 
 .btnBuscar:hover {
@@ -216,7 +224,8 @@ body {
 
 /* Listado lateral derecho */
 .lateral_der {
-    width: 15%;
+    width: 15%;  /* Fija el ancho a un 15% */
+    min-width: 250px; /* Establece un ancho mínimo para evitar que se haga muy pequeño */
     background-color: #ffffff;
     padding: 30px; /* Aumenta el padding */
     border-radius: 10px;
@@ -382,7 +391,9 @@ body {
     transition: background-color 0.3s ease, transform 0.3s ease;
     margin-left: 5px;
 }
-
+#icono_filtro{
+    pointer-events: none;
+}
 .filter-button:hover {
     background-color: #12876a;
     transform: scale(1.1);
@@ -439,3 +450,20 @@ body {
     
 }
 
+
+.no-content {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+.no-content h3 {
+    font-size: 2rem;
+    color: #16a085;
+}
+.no-content p {
+    font-size: 1.2rem;
+    color: #666;
+}

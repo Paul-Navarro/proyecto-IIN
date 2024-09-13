@@ -26,7 +26,7 @@ class ContenidoForm(forms.ModelForm):
 
     class Meta:
         model = Contenido
-        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria']
+        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags']
         labels = {
             'titulo_conte': 'Título del Contenido',
             'tipo_conte': 'Tipo de Contenido',
@@ -34,6 +34,11 @@ class ContenidoForm(forms.ModelForm):
             'fecha_conte': 'Fecha del Contenido',
             'imagen_conte': 'Imagen de Portada (opcional)',
             'categoria': 'Categoría',
+            'tags': 'Tags',
+        }
+        
+        widgets = {
+            'tags': forms.CheckboxSelectMultiple(),  # Mostrar los tags como checkboxes
         }
 
     def __init__(self, *args, **kwargs):
@@ -51,3 +56,5 @@ class ContenidoForm(forms.ModelForm):
         # Establecer la fecha actual como fecha por defecto para el contenido, y hacer el campo readonly
         self.fields['fecha_conte'].initial = timezone.now().date()
         self.fields['fecha_conte'].widget.attrs['readonly'] = True  # Campo de solo lectura
+
+
