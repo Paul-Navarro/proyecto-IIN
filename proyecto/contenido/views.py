@@ -14,7 +14,9 @@ def contenido_list(request):
     @param {HttpRequest} request - El objeto de solicitud HTTP.
     @returns {HttpResponse} Respuesta renderizada con la lista de contenidos.
     '''
-    contenidos = Contenido.objects.all()
+    
+    user = request.user
+    contenidos = Contenido.objects.filter(autor=user)
     return render(request, 'autor/contenido_list.html', {'contenidos': contenidos})
 
 
