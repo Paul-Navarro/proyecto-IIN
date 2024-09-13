@@ -99,10 +99,12 @@
         <!-- Área de contenidos -->
         <main class="main-content" id="mainID">
             <div class="cajaBusqueda">
-                <input type="text" class="busqueda" placeholder="¿Qué estás buscando?">
-                <button type="button" class="btnBuscar">
-                    <i id = "icono_buscar"class="fas fa-search"></i>
-                </button>
+                <form method="GET" action="">
+                    <input type="text" class="busqueda" name="q" placeholder="¿Qué estás buscando?" value="{{ query|default_if_none:'' }}">
+                    <button type="submit" class="btnBuscar">
+                        <i id="icono_buscar" class="fas fa-search"></i>
+                    </button>
+                </form>
                 <button class="filter-button" onclick="toggleFilters()">
                     <i id = "icono_filtro" class="fas fa-filter"></i>
                 </button>

@@ -139,20 +139,25 @@ body {
 .cajaBusqueda {
     display: flex;
     align-items: center;
+    justify-content: center; /* Centramos el contenido horizontalmente */
     margin-bottom: 10px; /* Aumenta el margen inferior */
     background-color: #ffffff;
     padding: 10px; /* Aumenta el padding */
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 80%; /* Ajustamos el ancho a un 50% para que esté centrado */
+    margin-left: auto; /* Esto junto con margin-right asegura el centrado */
+    margin-right: auto;
 }
 
 .busqueda {
-    width: 80%;
+    width: 75%; /* Ajusta el ancho según sea necesario */
     min-height: 4vh;
-    border: 2px solid #ccc; /* Aumenta el grosor del borde */
-    border-radius: 10px; /* Bordes más redondeados */
-    font-size: 1.0rem; /* Aumenta el tamaño de la fuente */
-    text-align: center;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    padding-left: 10px; /* Añadir padding interno para un mejor espaciado */
+    text-align: left; /* Alinear texto a la izquierda */
 }
 
 .btnBuscar {
