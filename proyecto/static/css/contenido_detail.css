@@ -10,7 +10,7 @@ body {
 
 /* Estilo del encabezado */
 .header {
-    background-color: #2ecc71;
+    background-color: #16a085;
     color: white;
     padding: 20px;
     text-align: center;
@@ -36,7 +36,7 @@ body {
 
 .header-container .btn {
     padding: 10px 24px;
-    background-color: #3498db;
+    background-color: #16a085;
     color: white;
     text-decoration: none;
     border-radius: 50px;
@@ -46,7 +46,7 @@ body {
 }
 
 .header-container .btn:hover {
-    background-color: #2980b9;
+    background-color: #12876a;
     transform: translateY(-3px);
 }
 
@@ -67,7 +67,7 @@ body {
 
 /* Estilo del título */
 .content-title {
-    color: #2ecc71;
+    color: #16a085;
     font-size: 2.2rem;
     font-weight: bold;
     margin-bottom: 20px;
@@ -78,7 +78,7 @@ body {
 }
 
 .content-title::before {
-    content: "Título: ";
+    
     font-size: 1.4rem;
     font-weight: normal;
     color: #333;
@@ -98,9 +98,9 @@ body {
     border-radius: 15px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
-
+/* este es para la imagen de portada*/
 .cover-image::before {
-    content: "Imagen de Portada:";
+    
     display: block;
     font-size: 1.2rem;
     font-weight: normal;
@@ -137,14 +137,14 @@ body {
 }
 
 .content-meta p strong {
-    color: #2ecc71;
+    color:#16a085;
 }
 
 /* Botones */
 .btn-primary {
     display: inline-block;
     padding: 12px 30px;
-    background-color: #2ecc71;
+    background-color: #16a085;
     color: white;
     text-decoration: none;
     font-size: 16px;

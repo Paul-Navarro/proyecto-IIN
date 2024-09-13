@@ -167,6 +167,9 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
+#icono_buscar{
+    pointer-events: none;
+}
 
 .btnBuscar:hover {
     background-color: #12876a;
@@ -382,7 +385,9 @@ body {
     transition: background-color 0.3s ease, transform 0.3s ease;
     margin-left: 5px;
 }
-
+#icono_filtro{
+    pointer-events: none;
+}
 .filter-button:hover {
     background-color: #12876a;
     transform: scale(1.1);
