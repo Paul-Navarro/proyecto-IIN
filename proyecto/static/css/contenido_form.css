@@ -165,3 +165,27 @@ nav ul li a:hover {
         font-size: 1.5rem;
     }
 }
+
+
+/* Estilo para los tags en el formulario */
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;  /* Permitir que los elementos se envuelvan en varias filas */
+    gap: 10px;  /* Espacio entre los elementos */
+    margin-bottom: 20px;
+}
+
+.tag-container label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: auto;  /* Dejar que el ancho se ajuste al contenido */
+    margin-bottom: 10px;
+    padding: 5px 10px;  /* Espacio interno (padding) para los elementos */
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.tag-container input[type="checkbox"] {
+    margin-right: 8px; /* Espacio entre el checkbox y el texto */
+}

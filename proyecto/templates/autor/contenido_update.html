@@ -30,7 +30,7 @@
 
             <form method="post" enctype="multipart/form-data" class="content-form">
                 {% csrf_token %}
-                
+
                 <!-- Campos del formulario de contenido -->
                 <div>
                     <label for="titulo_conte">{{ form.titulo_conte.label }}</label>
@@ -55,6 +55,12 @@
                 <div>
                     <label for="imagen_conte">{{ form.imagen_conte.label }}</label>
                     {{ form.imagen_conte }}
+                </div>
+
+                <!-- Tags: Mostrar los tags como checkboxes para que se puedan seleccionar -->
+                <div>
+                    <label for="tags">{{ form.tags.label }}</label>
+                    {{ form.tags }}
                 </div>
 
                 <!-- Único select para todas las categorías agrupadas -->

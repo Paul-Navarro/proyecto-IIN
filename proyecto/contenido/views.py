@@ -63,7 +63,9 @@ def contenido_create(request):
             else:
                 contenido.estado_conte = 'EN_REVISION'
 
+            
             contenido.save()  # Guardar el contenido con el estado ajustado y el autor
+            form.save_m2m()
             return redirect('contenido_list')
     else:
         form = ContenidoForm(initial={'categoria': primera_categoria_no_moderada})  # Inicializar con categoría no moderada
@@ -96,12 +98,19 @@ def contenido_update(request, pk):
     if request.method == 'POST':
         form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Se añade request.FILES
         if form.is_valid():
+            # Guardar el contenido pero no las relaciones many-to-many (como los tags)
+            contenido = form.save(commit=False)
+
             # Si el campo clear_image está marcado, eliminar la imagen
             if form.cleaned_data.get('clear_image'):
                 contenido.imagen_conte.delete()  # Eliminar la imagen del campo
 
-            # Guardar los cambios en el contenido
-            form.save()
+            # Guardar el contenido con los campos actualizados
+            contenido.save()
+
+            # Guardar los tags (relaciones many-to-many)
+            form.save_m2m()
+
             return redirect('contenido_list')
     else:
         form = ContenidoForm(instance=contenido)

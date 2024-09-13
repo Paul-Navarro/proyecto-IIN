@@ -48,10 +48,15 @@
                     {{ form.fecha_conte }}  <!-- El campo se mostrará pero será de solo lectura -->
                 </div>
                 
-
                 <div>
                     <label for="imagen_conte">{{ form.imagen_conte.label }}</label>
                     {{ form.imagen_conte }}
+                </div>
+
+                <!-- Campo de tags para seleccionar uno o varios tags -->
+                <h3>Selecciona uno o varios tags:</h3>
+                <div class="tag-container">
+                    {{ form.tags }}  <!-- Esto mostrará los checkboxes para los tags de forma ordenada -->
                 </div>
 
                 <!-- Único select para todas las categorías agrupadas -->
