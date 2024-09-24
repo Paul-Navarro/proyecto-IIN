@@ -19,7 +19,9 @@ class Contenido(models.Model):
     '''
     
     ESTADOS = [
+        ('BORRADOR', 'Borrador'),
         ('EN_REVISION', 'En Revisión'),
+        ('A_PUBLICAR', 'A Publicar'),
         ('PUBLICADO', 'Publicado'),
         ('RECHAZADO', 'Rechazado'),
     ]

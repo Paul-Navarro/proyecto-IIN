@@ -6,7 +6,9 @@ from django.shortcuts import render, redirect
 from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.contrib import messages
-
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 def contenido_list(request):
     '''
@@ -149,7 +151,7 @@ def contenido_cambiar_estado(request, id_conte):
         # Obtener el nuevo estado desde el formulario
         nuevo_estado = request.POST.get('nuevo_estado')
 
-        if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION']:
+        if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION','BORRADOR','A_PUBLICAR']:
             # Actualizar el estado del contenido
             contenido.estado_conte = nuevo_estado
             contenido.save()
@@ -168,3 +170,28 @@ def gestionar_contenido(request):
     """
     contenidos = Contenido.objects.all()
     return render(request, 'publicador/contenido_gestion.html', {'contenidos': contenidos})
+
+
+@csrf_exempt
+def contenido_cambiar_estado_KANBAN(request, id_conte):
+    # Obtener el contenido por su ID
+    contenido = get_object_or_404(Contenido, pk=id_conte)
+
+    if request.method == 'POST':
+        try:
+            # Obtener el nuevo estado desde la solicitud AJAX
+            data = json.loads(request.body)
+            nuevo_estado = data.get('nuevo_estado')
+
+            if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION', 'BORRADOR', 'A_PUBLICAR']:
+                # Actualizar el estado del contenido
+                contenido.estado_conte = nuevo_estado
+                contenido.save()
+                return JsonResponse({'success': True, 'message': f"Estado cambiado a {nuevo_estado}"})
+            else:
+                return JsonResponse({'success': False, 'error': 'Estado no válido'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Error al procesar los datos'}, status=400)
+    else:
+        return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
