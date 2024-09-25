@@ -140,8 +140,9 @@ def publicador_dashboard(request):
     @description Renderiza el panel de administración para usuarios con el rol de Publicador.
     """
     contenidos = Contenido.objects.all()  
+    user_role = 'Publicador'
     
-    return render(request, '../templates/publicador/dashboard.html',{'contenidos': contenidos})
+    return render(request, '../templates/publicador/dashboard.html',{'contenidos': contenidos,'user_role': user_role})
 
 @login_required
 def suscriptor_dashboard(request):

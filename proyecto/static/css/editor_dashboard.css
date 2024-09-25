@@ -163,7 +163,8 @@ a:hover, button:hover {
 }
 
 .btn-ver {
-    background-color: #28a745;
+    background-color: #4CAF50 !important;  /* Sobreescribe cualquier estilo de Bootstrap */
+    color: white !important;
 }
 
 .btn-ver:hover {

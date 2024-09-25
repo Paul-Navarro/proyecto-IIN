@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Publicador</title>
     
-    {% load static %}  <!-- Cargar archivos estáticos -->
-    <link rel="stylesheet" href="{% static 'css/publicador_dashboard.css' %}">  <!-- Enlace al archivo CSS específico para Publicador -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/editor_dashboard.css' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>Bienvenido Publicador!</h1>
+        <h1>Bienvenido, Publicador</h1>
         <nav>
             <ul>
-                <li><a href="{% url 'home' %}" class="btn btn-home">Inicio</a></li>
-                <li><a href="{% url 'gestionar_contenido'%}">Gestionar Contenidos</a></li>
-                <li><a href="#">Ver Comentarios</a></li>
-                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
+                <li class="btn btn-home"><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="#">Gestionar Contenidos</a></li>
+                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
             </ul>
         </nav>
     </header>
@@ -25,7 +26,19 @@
             <h2>Tablero Kanban</h2>
             <div class="kanban-board">
                 <!-- Columna Borrador -->
-
+                <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Borrador</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'BORRADOR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_update_editor' contenido.id_conte %}" class="btn btn-ver">Editar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
 
                 <!-- Columna En revisión -->
                 <div class="kanban-column" id="en_revision" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -50,7 +63,7 @@
                             {% if contenido.estado_conte == 'A_PUBLICAR' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Editar</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -63,21 +76,6 @@
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'PUBLICADO' %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Columna Rechazado -->
-                <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Rechazado</h3>
-                    <div class="kanban-items">
-                        {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'RECHAZADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
@@ -109,12 +107,17 @@
             
             // Asegurarse de que se suelte en el área correcta (columna)
             if (ev.target.classList.contains('kanban-items')) {
+                var targetColumn = ev.target.closest('.kanban-column').id;
+
+                // Verificar si el usuario es Publicador e intenta mover a la columna "Publicado"
+                if (targetColumn === 'publicado') {
+                      $('#warningModal').modal('show');  // Mostrar el modal de advertencia
+                      return;  // Evitar que se complete la acción de arrastre
+                }
+
                 ev.target.appendChild(draggedItem);
                 
-                // Obtener el nuevo estado según la columna
-                var nuevo_estado = ev.target.closest('.kanban-column').id;
-                
-                // Llamada AJAX para actualizar el estado en el servidor (Usando la nueva URL para Kanban)
+                // Llamada AJAX para actualizar el estado en el servidor
                 fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
                     method: 'POST',
                     headers: {
@@ -122,7 +125,7 @@
                         'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
                     },
                     body: JSON.stringify({
-                        'nuevo_estado': nuevo_estado.toUpperCase()  // Enviar el nuevo estado
+                        'nuevo_estado': targetColumn.toUpperCase()  // Enviar el nuevo estado
                     })
                 })
                 .then(response => {
@@ -136,6 +139,31 @@
             }
         }
     </script>
+
+    <!-- Modal de advertencia -->
+    <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="warningModalLabel">Advertencia</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ¡Solo puedes pasar a "A Publicar", no directamente a "Publicado"!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
 </body>
 </html>
