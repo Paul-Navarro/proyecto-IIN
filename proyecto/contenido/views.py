@@ -231,10 +231,19 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
             nuevo_estado = data.get('nuevo_estado')
 
             if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION', 'BORRADOR', 'A_PUBLICAR']:
+                
                 # Actualizar el estado del contenido
+                old_state = contenido.estado_conte
                 contenido.estado_conte = nuevo_estado
+                
                 contenido.save()
-                return JsonResponse({'success': True, 'message': f"Estado cambiado a {nuevo_estado}"})
+                
+                return JsonResponse({
+                'success': True,
+                'old_state': old_state,
+                'new_state': nuevo_estado,
+                'titulo': contenido.titulo_conte
+            })
             else:
                 return JsonResponse({'success': False, 'error': 'Estado no válido'}, status=400)
 

@@ -21,28 +21,22 @@
             </ul>
         </nav>
     </header>
+
+    <div id="stateChangeAlert" class="alert alert-success alert-dismissible fade show" role="alert" style="display: none;">
+        <span id="stateChangeMessage"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
     <main>
         <section>
             <h2>Tablero Kanban</h2>
             <div class="kanban-board">
-                <!-- Columna Borrador -->
-                <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Borrador</h3>
-                    <div class="kanban-items">
-                        {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'BORRADOR' %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_update_editor' contenido.id_conte %}" class="btn btn-ver">Editar</a>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
 
-                <!-- Columna En revisión -->
+                <!-- Columna Editado/En_Revision -->
                 <div class="kanban-column" id="en_revision" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>En Revisión</h3>
+                    <h3>Editado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'EN_REVISION' %}
@@ -63,7 +57,22 @@
                             {% if contenido.estado_conte == 'A_PUBLICAR' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Editar</a>
+                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Rachazado -->
+                <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Rechazado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'RECHAZADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -84,6 +93,7 @@
                         {% endfor %}
                     </div>
                 </div>
+
             </div>
         </section>
     </main>
@@ -98,7 +108,7 @@
         function drag(ev) {
             ev.dataTransfer.setData("text", ev.target.id);
         }
-    
+
         // Soltar el elemento en la nueva columna y cambiar su estado
         function drop(ev) {
             ev.preventDefault();
@@ -111,8 +121,8 @@
 
                 // Verificar si el usuario es Publicador e intenta mover a la columna "Publicado"
                 if (targetColumn === 'publicado') {
-                      $('#warningModal').modal('show');  // Mostrar el modal de advertencia
-                      return;  // Evitar que se complete la acción de arrastre
+                    $('#warningModal').modal('show');  // Mostrar el modal de advertencia
+                    return;  // Evitar que se complete la acción de arrastre
                 }
 
                 ev.target.appendChild(draggedItem);
@@ -128,8 +138,12 @@
                         'nuevo_estado': targetColumn.toUpperCase()  // Enviar el nuevo estado
                     })
                 })
-                .then(response => {
-                    if (!response.ok) {
+                .then(response => response.json())  // Convertir la respuesta a JSON
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar el mensaje de cambio de estado
+                        showStateChangeMessage(data.titulo, data.old_state, targetColumn);
+                    } else {
                         alert('Error al actualizar el estado.');
                     }
                 })
@@ -138,6 +152,42 @@
                 });
             }
         }
+
+        // Función para transformar los estados en nombres más legibles
+        function transformState(state) {
+            switch(state.toUpperCase()) {
+                case 'EN_REVISION':
+                    return 'Editado';
+                case 'EDITADO':
+                    return 'Editado';
+                case 'A_PUBLICAR':
+                    return 'A Publicar';
+                case 'RECHAZADO':
+                    return 'Rechazado';
+                default:
+                    return state;  // Retorna el estado original si no hay transformación
+            }
+        }
+
+        // Mostrar mensaje de cambio de estado
+        function showStateChangeMessage(titulo, oldState, newState) {
+            const readableOldState = transformState(oldState);  // Transformar oldState
+            const readableNewState = transformState(newState);  // Transformar newState
+            const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
+
+            // Insertar el mensaje en el contenedor de la alerta
+            document.getElementById('stateChangeMessage').textContent = message;
+
+            // Mostrar la alerta
+            const alertElement = document.getElementById('stateChangeAlert');
+            alertElement.style.display = 'block';  // Mostrar la alerta
+
+            // Ocultar la alerta después de 3 segundos
+            setTimeout(function() {
+                alertElement.style.display = 'none';  // Ocultar la alerta
+            }, 10000);
+        }
+
     </script>
 
     <!-- Modal de advertencia -->
