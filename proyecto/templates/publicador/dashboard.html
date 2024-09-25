@@ -107,7 +107,7 @@
     <script>
 
         let contenidoRechazadoId = null;  // Almacena el ID del contenido a rechazar
-        let originalColumn = null; //Utilizamos para la funcion de revertir columna(En caso de cancelacion).
+        let originalColumn = null; // Variable para almacenar la columna original(Cancelacion)
     
         // Permitir que los elementos sean arrastrables
         function allowDrop(ev) {
@@ -117,6 +117,7 @@
         // Empezar a arrastrar
         function drag(ev) {
             ev.dataTransfer.setData("text", ev.target.id);
+            originalColumnId = ev.target.closest('.kanban-column').id;  // Almacenar la columna de origen
         }
     
         // Soltar el elemento en la nueva columna y cambiar su estado
@@ -124,14 +125,22 @@
             ev.preventDefault();
             var data = ev.dataTransfer.getData("text");
             var draggedItem = document.getElementById(data);
-        
+            
             // Asegurarse de que se suelte en el área correcta (columna)
             if (ev.target.classList.contains('kanban-items')) {
                 var targetColumn = ev.target.closest('.kanban-column').id;
         
+                // Guardamos el item original y la columna original antes de cualquier acción
+                originalColumnId = draggedItem.closest('.kanban-column').id;
+
+                if (targetColumn === 'publicado') {
+                    // Mostrar el modal de advertencia
+                    $('#warningModal').modal('show');
+                    return;  // Evitar que se complete el arrastre
+                }
+        
                 // Si el contenido es arrastrado a la columna de rechazado, mostrar el modal para ingresar la razón
                 if (targetColumn === 'rechazado') {
-                    ev.target.appendChild(draggedItem);
                     contenidoRechazadoId = data.replace('item', ''); // Almacenar el ID del contenido
                     $('#razonRechazoModal').modal('show');  // Mostrar el modal para la razón de rechazo
                     return;  // No continuar el arrastre hasta que se guarde la razón
@@ -140,12 +149,6 @@
                 // Si el contenido es movido a una columna diferente a "Rechazado", eliminar la razón del rechazo
                 if (draggedItem.querySelector('.razon-rechazo')) {
                     draggedItem.querySelector('.razon-rechazo').remove();
-                }
-        
-                // Verificar si el usuario es Publicador e intenta mover a la columna "Publicado"
-                if (targetColumn === 'publicado') {
-                    $('#warningModal').modal('show');  // Mostrar el modal de advertencia
-                    return;  // Evitar que se complete la acción de arrastre
                 }
         
                 // Para otras columnas, simplemente mover el contenido
@@ -177,6 +180,7 @@
             }
         }
         
+        
     
 // Espera hasta que el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
@@ -189,13 +193,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Evento para el botón "Guardar"
     guardarRechazoBtn.addEventListener('click', function() {
         var razon = razonInput.value.trim();
-
+    
         if (!razon) {
             alert('Por favor, ingresa una razón válida para el rechazo.');
             return;
         }
-
-        // Enviar la razón de rechazo junto con el nuevo estado
+    
+        // Mueve el contenido inmediatamente al DOM de la columna "Rechazado"
+        const rejectedColumn = document.getElementById('rechazado').querySelector('.kanban-items');
+        const rejectedItem = document.getElementById('item' + contenidoRechazadoId);
+        rejectedColumn.appendChild(rejectedItem);  // Mover a la columna Rechazado inmediatamente
+    
+        // Añadir la razón del rechazo al DOM inmediatamente
+        if (rejectedItem) {
+            let existingReason = rejectedItem.querySelector('.razon-rechazo');
+            if (!existingReason) {
+                var reasonSpan = document.createElement('span');
+                reasonSpan.classList.add('razon-rechazo');
+                reasonSpan.textContent = 'Razón: ' + razon;
+                rejectedItem.appendChild(reasonSpan);
+            } else {
+                existingReason.textContent = 'Razón: ' + razon;
+            }
+        }
+    
+        // Ocultar el modal inmediatamente
+        $('#razonRechazoModal').modal('hide');
+    
+        // Realiza la llamada AJAX en segundo plano para informar al servidor
         fetch(`/contenido/contenido/cambiar_estado/${contenidoRechazadoId}/`, {
             method: 'POST',
             headers: {
@@ -210,44 +235,24 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Ocultar el modal correctamente usando Bootstrap
-                $('#razonRechazoModal').modal('hide');
-        
-                // Mostrar un mensaje de éxito (opcional)
-                alert('El contenido ha sido rechazado con éxito.');
-        
-                // Actualiza el tablero dinámicamente agregando la razón del rechazo en la columna "Rechazado"
-                var rejectedItem = document.getElementById('item' + contenidoRechazadoId);
-        
-                // Si el elemento existe (debería, ya que fue movido al tablero rechazado)
-                if (rejectedItem) {
-                    // Ver si ya existe el span con la razón del rechazo, si no, agregarlo
-                    let existingReason = rejectedItem.querySelector('.razon-rechazo');
-                    if (!existingReason) {
-                        // Crear el span si no existe
-                        var reasonSpan = document.createElement('span');
-                        reasonSpan.classList.add('razon-rechazo');
-                        reasonSpan.textContent = 'Razón: ' + razon;  // Añadir la razón ingresada
-        
-                        // Añadir el span al contenido del item rechazado
-                        rejectedItem.appendChild(reasonSpan);
-                    } else {
-                        // Si ya existe, solo actualiza su contenido
-                        existingReason.textContent = 'Razón: ' + razon;
-                    }
-                }
-        
-                // Actualiza el tablero o muestra un mensaje de éxito
+                // Mostrar el mensaje de éxito (opcional)
                 showStateChangeMessage(data.titulo, data.old_state, 'RECHAZADO');
             } else {
                 alert('Error al rechazar el contenido.');
             }
         })
-        
         .catch(error => {
             console.error('Error:', error);
         });
     });
+    
+        // Evento para el botón "Cancelar" en el modal de rechazo
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            // Aquí no necesitamos mover de vuelta el contenido porque no ha sido movido todavía.
+            // Simplemente cerramos el modal.
+            $('#razonRechazoModal').modal('hide');
+        });
+
 });
 
         // Función para transformar los estados en nombres más legibles
