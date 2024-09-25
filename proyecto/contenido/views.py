@@ -36,6 +36,16 @@ def contenido_detail(request, pk):
     contenido = get_object_or_404(Contenido, pk=pk)
     return render(request, 'autor/contenido_detail.html', {'contenido': contenido})
 
+def contenido_detail_editor(request, pk):
+    '''
+    @function contenido_detail
+    @description Muestra los detalles de un contenido específico.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a mostrar.
+    @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    return render(request, 'editor/contenido_detail_editor.html', {'contenido': contenido})
 
 def contenido_create(request):
     '''
@@ -137,6 +147,7 @@ def contenido_update_editor(request, pk):
     @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
+    rechazos = contenido.rechazos.all()  # Obtener todos los rechazos asociados a este contenido
     
     # Obtener las categorías agrupadas
     categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
@@ -173,6 +184,7 @@ def contenido_update_editor(request, pk):
         'categorias_moderadas': categorias_moderadas,
         'categorias_pagadas': categorias_pagadas,
         'categorias_suscriptores': categorias_suscriptores,
+        'rechazos': rechazos
     })
 
 

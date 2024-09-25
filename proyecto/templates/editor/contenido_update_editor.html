@@ -1,17 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Editar Contenido{% endblock %}</title>
 
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/contenido_form.css' %}">  <!-- Enlace a un archivo CSS específico para Contenido -->
+    <link rel="stylesheet" href="{% static 'css/contenido_form.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <!-- Incluir los archivos necesarios para CKEditor -->
     {{ form.media }}
+    <style>
+        /* Estilo para el contenedor de rechazos */
+        .rechazos-section {
+            background-color: #f8d7da;  /* Fondo rojo claro */
+            border: 1px solid #f5c6cb;  /* Borde en un tono rojo más oscuro */
+            border-radius: 5px;         /* Bordes redondeados */
+            padding: 15px;
+            margin-bottom: 20px;        /* Espacio inferior para separar del resto del contenido */
+            color: #721c24;             /* Texto en rojo oscuro */
+        }
+
+        .rechazos-section h3 {
+            margin-top: 0;              /* Quitar el margen superior del título */
+            font-weight: bold;
+            color: #721c24;
+        }
+
+        .rechazos-section ul {
+            padding-left: 20px;          /* Sangría en la lista */
+        }
+
+        .rechazos-section ul li {
+            margin-bottom: 10px;         /* Espacio entre los rechazos */
+        }
+
+        .rechazos-section p {
+            margin: 0;
+        }
+
+        .rechazo-empty {
+            text-align: center;
+            font-style: italic;
+            color: #6c757d;             /* Texto en gris */
+        }
+    </style>
 </head>
 
 <body>
@@ -27,6 +61,23 @@
     <main class="main-content">
         <div class="container">
             <h2 class="form-title">Formulario de Edición de Contenido</h2>
+
+            <!-- Sección de Rechazos (ahora está al principio) -->
+            {% if rechazos %}
+            <div class="rechazos-section">
+                
+                
+                <h3>Historial de Rechazos</h3>
+                    <ul>
+                        {% for rechazo in rechazos %}
+                            <li><strong>Fecha:</strong> {{ rechazo.fecha|date:"d/m/Y H:i" }} - <strong>Razón:</strong> {{ rechazo.razon }}</li>
+                        {% endfor %}
+                    </ul>
+
+            </div>
+            {% else %}
+            <p class="rechazo-empty">Este contenido no tiene historial de rechazos.</p>
+            {% endif %}
 
             <form method="post" enctype="multipart/form-data" class="content-form">
                 {% csrf_token %}
@@ -95,16 +146,14 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Guardar Cambios (Pasar a Publicador)
+                    <i class="fas fa-save"></i> Guardar Cambios (Cambiar estado a EDITADO)
                 </button>
 
                 <!-- Incluir archivos de CKEditor justo antes de cerrar el formulario -->
                 {{ form.media }}
-
             </form>
         </div>
     </main>
-
 </body>
 
 </html>
