@@ -2,6 +2,7 @@ from django import forms
 from .models import Contenido
 from categorias.models import Categoria
 from django.utils import timezone
+from django.forms.widgets import DateTimeInput
 
 class ContenidoForm(forms.ModelForm):
     '''
@@ -26,7 +27,7 @@ class ContenidoForm(forms.ModelForm):
 
     class Meta:
         model = Contenido
-        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags']
+        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags','fecha_publicacion']
         labels = {
             'titulo_conte': 'Título del Contenido',
             'tipo_conte': 'Tipo de Contenido',
@@ -39,6 +40,7 @@ class ContenidoForm(forms.ModelForm):
         
         widgets = {
             'tags': forms.CheckboxSelectMultiple(),  # Mostrar los tags como checkboxes
+            'fecha_publicacion': DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
     def __init__(self, *args, **kwargs):

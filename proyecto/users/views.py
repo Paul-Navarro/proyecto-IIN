@@ -7,11 +7,17 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib import messages
 from contenido.models import Contenido, Categoria
 from django.db.models import Q  # Para realizar búsquedas complejas con OR
+from contenido.cron import AutopublicarContenido
 
 
 from django.shortcuts import render
 
 def home(request):
+    
+    #DISPARADOR DE CRON
+    cronjob = AutopublicarContenido()
+    cronjob.do()
+    
     # Obtener todas las categorías
     categorias = Categoria.objects.all()
 
@@ -62,8 +68,6 @@ def home(request):
     }
 
     return render(request, 'home/index.html', context)
-
-
 
 @login_required
 def role_based_redirect(request):
@@ -135,6 +139,10 @@ def editor_dashboard(request):
 
 @login_required
 def publicador_dashboard(request):
+    
+    #DISPARADOR DE CRON
+    cronjob = AutopublicarContenido()
+    cronjob.do()
     """
     @function publicador_dashboard
     @description Renderiza el panel de administración para usuarios con el rol de Publicador.

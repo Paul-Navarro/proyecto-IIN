@@ -2,6 +2,7 @@ from django.db import models
 from categorias.models import Categoria  # Importa el modelo Categoria
 from ckeditor.fields import RichTextField
 from django.conf import settings
+from django.utils import timezone
 
 
 class Tag(models.Model):
@@ -45,9 +46,16 @@ class Contenido(models.Model):
         null=True, 
         blank=True
     )
+    fecha_publicacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.titulo_conte
+    
+        # Método para verificar si el contenido debe ser publicado
+    def autopublicar(self):
+        if self.fecha_publicacion and self.fecha_publicacion <= timezone.now() and self.estado_conte == 'A_PUBLICAR':
+            self.estado_conte = 'PUBLICADO'
+            self.save()
     
 
 

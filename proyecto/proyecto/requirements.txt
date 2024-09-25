@@ -5,3 +5,4 @@ pytest==8.3.2
 sphinx==8.0.2
 Pillow
 django-ckeditor
+django-cron
