@@ -20,7 +20,7 @@ class Contenido(models.Model):
     
     ESTADOS = [
         ('BORRADOR', 'Borrador'),
-        ('EN_REVISION', 'En Revisión'),
+        ('EDITADO', 'EDITADO'),
         ('A_PUBLICAR', 'A Publicar'),
         ('PUBLICADO', 'Publicado'),
         ('RECHAZADO', 'Rechazado'),
@@ -49,3 +49,18 @@ class Contenido(models.Model):
     def __str__(self):
         return self.titulo_conte
     
+
+
+class Rechazo(models.Model):
+    '''
+    @class Rechazo
+    @extends models.Model
+    @description Modelo que representa el rechazo de un contenido, incluyendo la razón y la fecha.
+    '''
+    
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='rechazos')
+    razon = models.TextField()  # La razón del rechazo
+    fecha = models.DateTimeField(auto_now_add=True)  # Fecha y hora del rechazo
+
+    def __str__(self):
+        return f"Rechazo de {self.contenido.titulo_conte} en {self.fecha.strftime('%Y-%m-%d')}"

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido
+from .models import Contenido,Rechazo
 from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -155,7 +155,7 @@ def contenido_update_editor(request, pk):
                 contenido.imagen_conte.delete()  # Eliminar la imagen del campo
                 
             
-            contenido.estado_conte = 'EN_REVISION'  # Cambiar el estado a "EN_REVISIÓN"
+            contenido.estado_conte = 'EDITADO'  # Cambiar el estado a "EN_REVISIÓN"
 
             # Guardar el contenido con los campos actualizados
             contenido.save()
@@ -198,7 +198,7 @@ def contenido_cambiar_estado(request, id_conte):
         # Obtener el nuevo estado desde el formulario
         nuevo_estado = request.POST.get('nuevo_estado')
 
-        if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION','BORRADOR','A_PUBLICAR']:
+        if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO','BORRADOR','A_PUBLICAR']:
             # Actualizar el estado del contenido
             contenido.estado_conte = nuevo_estado
             contenido.save()
@@ -230,7 +230,11 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
             data = json.loads(request.body)
             nuevo_estado = data.get('nuevo_estado')
 
-            if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION', 'BORRADOR', 'A_PUBLICAR']:
+            if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO', 'BORRADOR', 'A_PUBLICAR']:
+                
+                if nuevo_estado == 'RECHAZADO':
+                    razon_rechazo = data.get('razon_rechazo', '')
+                    Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
                 
                 # Actualizar el estado del contenido
                 old_state = contenido.estado_conte
@@ -251,7 +255,6 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
             return JsonResponse({'success': False, 'error': 'Error al procesar los datos'}, status=400)
     else:
         return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
-    
     
 
 def editor_dashboard(request):

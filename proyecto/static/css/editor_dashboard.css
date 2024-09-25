@@ -170,3 +170,8 @@ a:hover, button:hover {
 .btn-ver:hover {
     background-color: #218838;
 }
+
+
+#razonRechazoModal {
+    display: none;  /* Oculto por defecto */
+}
