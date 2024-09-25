@@ -66,7 +66,7 @@ def contenido_create(request):
             if contenido.categoria and not contenido.categoria.es_moderada:
                 contenido.estado_conte = 'PUBLICADO'
             else:
-                contenido.estado_conte = 'EN_REVISION'
+                contenido.estado_conte = 'BORRADOR'
 
             
             contenido.save()  # Guardar el contenido con el estado ajustado y el autor
@@ -121,6 +121,53 @@ def contenido_update(request, pk):
         form = ContenidoForm(instance=contenido)
 
     return render(request, 'autor/contenido_update.html', {
+        'form': form,
+        'categorias_no_moderadas': categorias_no_moderadas,
+        'categorias_moderadas': categorias_moderadas,
+        'categorias_pagadas': categorias_pagadas,
+        'categorias_suscriptores': categorias_suscriptores,
+    })
+
+def contenido_update_editor(request, pk):
+    '''
+    @function contenido_update
+    @description Actualiza un contenido existente. Maneja la validación del formulario y guarda los cambios.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a actualizar.
+    @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    
+    # Obtener las categorías agrupadas
+    categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
+    categorias_moderadas = Categoria.objects.filter(es_moderada=True)
+    categorias_pagadas = Categoria.objects.filter(es_pagada=True)
+    categorias_suscriptores = Categoria.objects.filter(para_suscriptores=True)
+
+    if request.method == 'POST':
+        form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Se añade request.FILES
+        if form.is_valid():
+            # Guardar el contenido pero no las relaciones many-to-many (como los tags)
+            contenido = form.save(commit=False)
+
+            # Si el campo clear_image está marcado, eliminar la imagen
+            if form.cleaned_data.get('clear_image'):
+                contenido.imagen_conte.delete()  # Eliminar la imagen del campo
+                
+            
+            contenido.estado_conte = 'EN_REVISION'  # Cambiar el estado a "EN_REVISIÓN"
+
+            # Guardar el contenido con los campos actualizados
+            contenido.save()
+
+            # Guardar los tags (relaciones many-to-many)
+            form.save_m2m()
+
+            return redirect('editor_dashboard')
+    else:
+        form = ContenidoForm(instance=contenido)
+
+    return render(request, 'editor/contenido_update_editor.html', {
         'form': form,
         'categorias_no_moderadas': categorias_no_moderadas,
         'categorias_moderadas': categorias_moderadas,
@@ -195,3 +242,14 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
             return JsonResponse({'success': False, 'error': 'Error al procesar los datos'}, status=400)
     else:
         return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+    
+    
+
+def editor_dashboard(request):
+    """
+    @function editor_dashboard
+    @description Renderiza el panel de administración para usuarios con el rol de Editor.
+    """
+    
+    contenidos = Contenido.objects.all() 
+    return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})

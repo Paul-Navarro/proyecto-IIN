@@ -14,9 +14,7 @@
         <nav>
             <ul>
                 <li class="btn btn-home"><a href="{% url 'home' %}">Inicio</a></li>
-                <li><a href="#">Crear Nuevo Contenido</a></li>
-                <li><a href="#">Gestionar Contenido Existente</a></li>
-                <li><a href="#">Revisar Comentarios</a></li>
+                <li><a href="#">Gestionar Contenidos</a></li>
                 <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
                 
             </ul>
@@ -24,13 +22,131 @@
     </header>
     <main>
         <section>
-            <h2>Herramientas de Edición</h2>
-            <p>Aquí puedes gestionar el contenido de la plataforma, crear nuevos artículos, y revisar los comentarios de los usuarios.</p>
-        </section>
-        <section>
-            <h2>Últimos Artículos Publicados</h2>
-            <p>Revisa los artículos más recientes y realiza ediciones si es necesario.</p>
+            <h2>Tablero Kanban</h2>
+            <div class="kanban-board">
+                <!-- Columna Borrador -->
+                <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Borrador</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'BORRADOR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_update_editor' contenido.id_conte %}" class="btn btn-ver">Editar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna En revisión -->
+                <div class="kanban-column" id="en_revision" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>En Revisión</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'EN_REVISION' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna A publicar -->
+                <div class="kanban-column" id="a_publicar" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>A Publicar</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'A_PUBLICAR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Editar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Publicado -->
+                <div class="kanban-column" id="publicado" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Publicado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'PUBLICADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Editar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Rechazado -->
+                <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Rechazado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'RECHAZADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Editar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
+
+    <script>
+        // Permitir que los elementos sean arrastrables
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+    
+        // Empezar a arrastrar
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+    
+        // Soltar el elemento en la nueva columna y cambiar su estado
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var draggedItem = document.getElementById(data);
+            
+            // Asegurarse de que se suelte en el área correcta (columna)
+            if (ev.target.classList.contains('kanban-items')) {
+                ev.target.appendChild(draggedItem);
+                
+                // Obtener el nuevo estado según la columna
+                var nuevo_estado = ev.target.closest('.kanban-column').id;
+                
+                // Llamada AJAX para actualizar el estado en el servidor (Usando la nueva URL para Kanban)
+                fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
+                    },
+                    body: JSON.stringify({
+                        'nuevo_estado': nuevo_estado.toUpperCase()  // Enviar el nuevo estado
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        alert('Error al actualizar el estado.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
 </body>
 </html>

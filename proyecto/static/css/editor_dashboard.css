@@ -84,3 +84,83 @@ a, button {
 a:hover, button:hover {
     background-color: #12876a;
 }
+
+
+
+/* Estilos del tablero Kanban */
+.kanban-board {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 20px;
+    overflow-x: auto;  /* Permitir desplazamiento horizontal si las columnas son muchas */
+}
+
+.kanban-column {
+    background-color: #f4f4f4;
+    width: 20%;  /* Aumentar el ancho de las columnas */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 500px;  /* Hacer más alto el tablero */
+}
+
+.kanban-column h3 {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.kanban-items {
+    background-color: #e0e0e0;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.kanban-item {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s;
+    cursor: grab; /* Cambiar el cursor cuando sea arrastrable */
+}
+
+.kanban-item:hover {
+    background-color: #f9f9f9;
+}
+
+.kanban-item h4 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: #333;
+}
+
+/* Botón de ver contenido */
+.btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #16a085;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.btn-ver {
+    background-color: #28a745;
+}
+
+.btn-ver:hover {
+    background-color: #218838;
+}

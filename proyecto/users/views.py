@@ -129,7 +129,9 @@ def editor_dashboard(request):
     @function editor_dashboard
     @description Renderiza el panel de administración para usuarios con el rol de Editor.
     """
-    return render(request, '../templates/editor/dashboard.html')
+    
+    contenidos = Contenido.objects.all() 
+    return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})
 
 @login_required
 def publicador_dashboard(request):
@@ -137,7 +139,7 @@ def publicador_dashboard(request):
     @function publicador_dashboard
     @description Renderiza el panel de administración para usuarios con el rol de Publicador.
     """
-    contenidos = Contenido.objects.all()  # Mostrar solo los contenidos del autor
+    contenidos = Contenido.objects.all()  
     
     return render(request, '../templates/publicador/dashboard.html',{'contenidos': contenidos})
 

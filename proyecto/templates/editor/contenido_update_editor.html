@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Editar Contenido{% endblock %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/contenido_form.css' %}">  <!-- Enlace a un archivo CSS específico para Contenido -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Incluir los archivos necesarios para CKEditor -->
+    {{ form.media }}
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">{% block header_title %}Editar Contenido{% endblock %}</h1>
+            <a href="{% url 'editor_dashboard' %}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Atrás
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h2 class="form-title">Formulario de Edición de Contenido</h2>
+
+            <form method="post" enctype="multipart/form-data" class="content-form">
+                {% csrf_token %}
+
+                <!-- Campos del formulario de contenido -->
+                <div>
+                    <label for="titulo_conte">{{ form.titulo_conte.label }}</label>
+                    {{ form.titulo_conte }}
+                </div>
+
+                <div>
+                    <label for="tipo_conte">{{ form.tipo_conte.label }}</label>
+                    {{ form.tipo_conte }}
+                </div>
+
+                <div>
+                    <label for="texto_conte">{{ form.texto_conte.label }}</label>
+                    {{ form.texto_conte }}  <!-- CKEditor debería funcionar aquí -->
+                </div>
+
+                <div>
+                    <label for="fecha_conte">{{ form.fecha_conte.label }}</label>
+                    {{ form.fecha_conte }}
+                </div>
+
+                <div>
+                    <label for="imagen_conte">{{ form.imagen_conte.label }}</label>
+                    {{ form.imagen_conte }}
+                </div>
+
+                <!-- Tags: Mostrar los tags como checkboxes para que se puedan seleccionar -->
+                <h3>Selecciona uno o varios tags:</h3>
+                <div class="tag-container">
+                    {{ form.tags }}  <!-- Esto mostrará los checkboxes para los tags de forma ordenada -->
+                </div>
+
+                <!-- Único select para todas las categorías agrupadas -->
+                <h3>Selecciona una categoría:</h3>
+                <div>
+                    <label for="categoria">{{ form.categoria.label }}</label>
+                    <select name="categoria">
+                        <optgroup label="No Moderadas">
+                            {% for categoria in categorias_no_moderadas %}
+                            <option value="{{ categoria.id }}" {% if categoria == form.initial.categoria %}selected{% endif %}>{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Moderadas">
+                            {% for categoria in categorias_moderadas %}
+                            <option value="{{ categoria.id }}" {% if categoria == form.initial.categoria %}selected{% endif %}>{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Pagadas">
+                            {% for categoria in categorias_pagadas %}
+                            <option value="{{ categoria.id }}" {% if categoria == form.initial.categoria %}selected{% endif %}>{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Para Suscriptores">
+                            {% for categoria in categorias_suscriptores %}
+                            <option value="{{ categoria.id }}" {% if categoria == form.initial.categoria %}selected{% endif %}>{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios (Pasar a Publicador)
+                </button>
+
+                <!-- Incluir archivos de CKEditor justo antes de cerrar el formulario -->
+                {{ form.media }}
+
+            </form>
+        </div>
+    </main>
+
+</body>
+
+</html>
