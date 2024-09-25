@@ -68,36 +68,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
-                <!-- Columna Publicado -->
-                <div class="kanban-column" id="publicado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Publicado</h3>
-                    <div class="kanban-items">
-                        {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'PUBLICADO' %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Editar</a>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Columna Rechazado -->
-                <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Rechazado</h3>
-                    <div class="kanban-items">
-                        {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'RECHAZADO' %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Editar</a>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
             </div>
         </section>
     </main>

@@ -25,19 +25,7 @@
             <h2>Tablero Kanban</h2>
             <div class="kanban-board">
                 <!-- Columna Borrador -->
-                <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Borrador</h3>
-                    <div class="kanban-items">
-                        {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'BORRADOR' %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
+
 
                 <!-- Columna En revisión -->
                 <div class="kanban-column" id="en_revision" ondrop="drop(event)" ondragover="allowDrop(event)">
