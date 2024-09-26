@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido,Rechazo
+from .models import Contenido,Rechazo,VotoContenido
 from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -9,6 +9,8 @@ from django.contrib import messages
 from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+
 
 def contenido_list(request):
     '''
@@ -301,3 +303,60 @@ def editor_dashboard(request):
     
     contenidos = Contenido.objects.all() 
     return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})
+
+@csrf_exempt
+@login_required
+def like_contenido(request, id_conte):
+    contenido = get_object_or_404(Contenido, id_conte=id_conte)
+    usuario = request.user
+
+    if request.method == 'POST':
+        # Verificar si el usuario ya ha dado like o unlike
+        voto, created = VotoContenido.objects.get_or_create(usuario=usuario, contenido=contenido)
+
+        if not created and voto.tipo_voto == 'LIKE':
+            # Si el usuario ya ha dado like, lo quitamos
+            contenido.likes -= 1
+            voto.delete()  # Eliminamos el voto
+        else:
+            if voto.tipo_voto == 'UNLIKE':
+                # Si tenía un unlike, reducimos el contador de unlikes
+                contenido.unlikes -= 1
+            # Aumentamos el contador de likes
+            voto.tipo_voto = 'LIKE'
+            contenido.likes += 1
+            voto.save()
+
+        contenido.save()
+        return JsonResponse({'likes': contenido.likes, 'unlikes': contenido.unlikes})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt
+@login_required
+def unlike_contenido(request, id_conte):
+    contenido = get_object_or_404(Contenido, id_conte=id_conte)
+    usuario = request.user
+
+    if request.method == 'POST':
+        # Verificar si el usuario ya ha dado unlike o like
+        voto, created = VotoContenido.objects.get_or_create(usuario=usuario, contenido=contenido)
+
+        if not created and voto.tipo_voto == 'UNLIKE':
+            # Si ya ha dado unlike, lo quitamos
+            contenido.unlikes -= 1
+            voto.delete()  # Eliminamos el voto
+        else:
+            if voto.tipo_voto == 'LIKE':
+                # Si tenía un like, reducimos el contador de likes
+                contenido.likes -= 1
+            # Aumentamos el contador de unlikes
+            voto.tipo_voto = 'UNLIKE'
+            contenido.unlikes += 1
+            voto.save()
+
+        contenido.save()
+        return JsonResponse({'likes': contenido.likes, 'unlikes': contenido.unlikes})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

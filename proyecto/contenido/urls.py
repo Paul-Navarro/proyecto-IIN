@@ -24,6 +24,10 @@ urlpatterns = [
     
     #Urls del PUBLICADOR para administrar contenidos
      path('publicador/gestionar/', views.gestionar_contenido, name='gestionar_contenido'),
+     
+     
+     path('contenido/<int:id_conte>/like/', views.like_contenido, name='like_contenido'),
+     path('contenido/<int:id_conte>/unlike/', views.unlike_contenido, name='unlike_contenido'),
 ]
 
 '''

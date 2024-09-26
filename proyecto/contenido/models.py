@@ -38,6 +38,8 @@ class Contenido(models.Model):
     imagen_conte = models.ImageField(upload_to='imagenes_contenido/', null=True, blank=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
+    likes = models.IntegerField(default=0)
+    unlikes = models.IntegerField(default=0)
 
     # Relación con el autor del contenido
     autor = models.ForeignKey(
@@ -72,3 +74,19 @@ class Rechazo(models.Model):
 
     def __str__(self):
         return f"Rechazo de {self.contenido.titulo_conte} en {self.fecha.strftime('%Y-%m-%d')}"
+    
+    
+    
+class VotoContenido(models.Model):
+    VOTOS = [
+        ('LIKE', 'Like'),
+        ('UNLIKE', 'Unlike')
+    ]
+    
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
+    tipo_voto = models.CharField(max_length=6, choices=VOTOS)
+    fecha_voto = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('usuario', 'contenido')  # Evita duplicados de votos

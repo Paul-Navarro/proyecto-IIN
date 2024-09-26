@@ -162,6 +162,14 @@
                             {% endif %}
             
                             <p>{{ contenido.texto_conte|truncatechars:350|safe }}</p>
+
+                            <div class="likes-container">
+                                <button class="like-button" data-id="{{ contenido.id_conte }}" onclick="likeContenido({{ contenido.id_conte }})">👍 Like</button>
+                                <span id="like-count-{{ contenido.id_conte }}">{{ contenido.likes }}</span>
+                                
+                                <button class="unlike-button" data-id="{{ contenido.id_conte }}" onclick="unlikeContenido({{ contenido.id_conte }})">👎 Unlike</button>
+                                <span id="unlike-count-{{ contenido.id_conte }}">{{ contenido.unlikes }}</span>
+                            </div>
             
                             <div class="btn-container">
                                 <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
@@ -204,6 +212,11 @@
         </aside>
         
     </div>
+
+    <form id="csrf-form">
+        {% csrf_token %}
+    </form>
+    
 </body>
 
 </html>
