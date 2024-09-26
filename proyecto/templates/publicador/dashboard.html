@@ -42,7 +42,7 @@
                             {% if contenido.estado_conte == 'EDITADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -57,7 +57,7 @@
                             {% if contenido.estado_conte == 'A_PUBLICAR' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -72,7 +72,7 @@
                             {% if contenido.estado_conte == 'RECHAZADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
                                     <!-- Mostrar la razón del rechazo si existe -->
                                     {% if contenido.rechazos.exists %}
                                     <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
@@ -93,7 +93,7 @@
                             {% if contenido.estado_conte == 'PUBLICADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}

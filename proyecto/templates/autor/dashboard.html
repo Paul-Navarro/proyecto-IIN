@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Autor</title>
-    
-    {% load static %}  <!-- Cargar archivos estáticos -->
-    <link rel="stylesheet" href="{% static 'css/autor_dashboard.css' %}">  <!-- Enlace al archivo CSS específico para Autor -->
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/autor_dashboard.css' %}">
 </head>
+
 <body>
     <header>
         <h1>Bienvenido Autor!</h1>
@@ -17,19 +19,99 @@
                 <li><a href="{% url 'contenido_create' %}">Crear Nuevo Contenido</a></li>
                 <li><a href="{% url 'contenido_list' %}">Gestionar tus Contenidos</a></li>
                 <li><a href="#">Ver Comentarios</a></li>
-                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>  <!-- Botón de Logout -->
+                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
             </ul>
         </nav>
     </header>
+
     <main>
         <section>
-            <h2>Panel de Creación</h2>
-            <p>Desde aquí puedes crear y gestionar tus propios contenidos en la plataforma.</p>
-        </section>
-        <section>
-            <h2>Estadísticas de tus Contenidos</h2>
-            <p>Consulta las métricas de rendimiento de tus publicaciones y optimiza tu contenido.</p>
+            <h2>Tablero Kanban</h2>
+            <div class="kanban-board">
+                <!-- Columna Borrador -->
+                <div class="kanban-column" id="borrador">
+                    <h3>Borrador</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'BORRADOR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_update' contenido.id_conte %}" class="btn btn-edit">Editar</a>
+                                    <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Editado -->
+                <div class="kanban-column" id="editado">
+                    <h3>Editado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'EDITADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna A Publicar -->
+                <div class="kanban-column" id="a-publicar">
+                    <h3>A Publicar</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'A_PUBLICAR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Publicado -->
+                <div class="kanban-column" id="publicado">
+                    <h3>Publicado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'PUBLICADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Rechazado -->
+                <div class="kanban-column" id="rechazado">
+                    <h3>Rechazado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'RECHAZADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                    <!-- Mostrar la razón del rechazo si existe -->
+                                    {% if contenido.rechazos.exists %}
+                                        <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
+                                    {% else %}
+                                        <span class="razon-rechazo">Razón: No especificada</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 </body>
+
 </html>

@@ -11,7 +11,7 @@
     <header class="header">
         <div class="header-container">
             <h1 class="header__title">Gestión de Contenidos</h1>
-            <a href="{% url 'editor_dashboard' %}" class="btn">Volver a Kanban Editor</a>
+            <a href="{% url 'publicador_dashboard' %}" class="btn">Volver a Kanban Publicador</a>
         </div>
     </header>
 
@@ -35,10 +35,12 @@
         <div class="content-meta">
             <p><strong>Publicado el:</strong> {{ contenido.fecha_conte }}</p>
             <p><strong>Autor:</strong> {{ contenido.autor.first_name }} {{ contenido.autor.last_name }}</p>
+            <!-- Mostrar la fecha de publicación programada si existe -->
+            {% if contenido.fecha_publicacion %}
+            <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
+            {% endif %}
         </div>
-
-
-
+        
     </div>
 </body>
 </html>
