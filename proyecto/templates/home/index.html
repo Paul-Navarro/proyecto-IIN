@@ -18,6 +18,16 @@
 
     <!-- ENCABEZADO DE LA PÁGINA -->
     <header class="titulos_padres">
+
+        <!-- Mostrar el nombre de usuario como un botón arriba a la izquierda -->
+        <div style="position: absolute; top: 10px; left: 10px;">
+            {% if user.is_authenticated %}
+                <p style="display: inline-block; background-color: #16a085; color: white; padding: 10px 20px; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold;">
+                    Has iniciado sesión como: {{ user.username }}
+                </p>
+            {% endif %}
+        </div>
+
         <div class="titulos_hijos">
             <!-- Caja de relleno. No posee nada -->
         </div>
@@ -173,13 +183,17 @@
         <aside class="lateral_der">
             <h2>Categorías</h2>
             <ul>
-                {% for categoria in categorias %}
-                    <div class="categoria-item">
-                        <!-- Enlace que envía el ID de la categoría como parámetro en la URL -->
-                        <li><strong><a href="?categoria={{ categoria.id }}">{{ categoria.nombre }}</a></strong></li>
-                        <p class="pLateralDer">{{ categoria.descripcion }}</p>
-                    </div>
-                {% endfor %}
+                {% if categorias %}
+                    {% for categoria in categorias %}
+                        <div class="categoria-item">
+                            <!-- Enlace que envía el ID de la categoría como parámetro en la URL -->
+                            <li><strong><a href="?categoria={{ categoria.id }}">{{ categoria.nombre }}</a></strong></li>
+                            <p class="pLateralDer">{{ categoria.descripcion }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <li>Ups! No hay categorias aqui!</li>
+                {% endif %}
             </ul>
             <!-- Botón para mostrar todos los contenidos -->
             <button onclick="window.location.href='?';" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; color: white; background-color: #20c997; border: none; border-radius: 5px; cursor: pointer; text-align: center; transition: background-color 0.3s ease;">
@@ -188,8 +202,6 @@
             
             
         </aside>
-        
-        
         
     </div>
 </body>
