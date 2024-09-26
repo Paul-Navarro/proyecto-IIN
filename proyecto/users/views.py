@@ -167,7 +167,7 @@ def autor_dashboard(request):
     @description Renderiza el panel de administración para usuarios con el rol de Autor.
     """
     
-    contenidos = Contenido.objects.all()
+    contenidos = Contenido.objects.filter(autor=request.user)
     return render(request, '../templates/autor/dashboard.html',{'contenidos': contenidos})
 
 
