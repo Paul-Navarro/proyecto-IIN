@@ -9,6 +9,7 @@ urlpatterns = [
     
     path('contenido_editor/<int:pk>/', views.contenido_detail_editor, name='contenido_detail_editor'),
     path('contenido_publicador/<int:pk>/', views.contenido_detail_publicador, name='contenido_detail_publicador'),
+    path('contenido_autor/<int:pk>/', views.contenido_detail_autor, name='contenido_detail_autor'),
     path('contenido/new/', views.contenido_create, name='contenido_create'),
     
     path('contenido/<int:pk>/edit/', views.contenido_update, name='contenido_update'),

@@ -34,7 +34,7 @@ def contenido_detail(request, pk):
     @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
-    return render(request, 'autor/contenido_detail.html', {'contenido': contenido})
+    return render(request, 'home/contenido_detail.html', {'contenido': contenido})
 
 def contenido_detail_editor(request, pk):
     '''
@@ -57,6 +57,17 @@ def contenido_detail_publicador(request, pk):
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
     return render(request, 'publicador/contenido_detail_publicador.html', {'contenido': contenido})
+
+def contenido_detail_autor(request, pk):
+    '''
+    @function contenido_detail
+    @description Muestra los detalles de un contenido específico.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a mostrar.
+    @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    return render(request, 'autor/contenido_detail_autor.html', {'contenido': contenido})
 
 def contenido_create(request):
     '''
