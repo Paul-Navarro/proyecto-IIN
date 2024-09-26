@@ -18,13 +18,6 @@ class ContenidoForm(forms.ModelForm):
         label='Categoría'
     )
 
-    # Campo para eliminar la imagen actual
-    clear_image = forms.BooleanField(
-        required=False,
-        label="Eliminar la imagen actual",
-        widget=forms.CheckboxInput()
-    )
-
     class Meta:
         model = Contenido
         fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags','fecha_publicacion']
@@ -33,7 +26,7 @@ class ContenidoForm(forms.ModelForm):
             'tipo_conte': 'Tipo de contenido',
             'texto_conte': 'Texto del contenido',
             'fecha_conte': 'Fecha creacion del contenido',
-            'imagen_conte': 'Imagen de Portada (opcional)',
+            'imagen_conte': 'Imagen de Portada (Obligatorio)',
             'categoria': 'Categoría',
             'tags': 'Tags',
         }
@@ -58,5 +51,11 @@ class ContenidoForm(forms.ModelForm):
         # Establecer la fecha actual como fecha por defecto para el contenido, y hacer el campo readonly
         self.fields['fecha_conte'].initial = timezone.now().date()
         self.fields['fecha_conte'].widget.attrs['readonly'] = True  # Campo de solo lectura
+        
+        # Hacer que el campo 'fecha_publicacion' sea requerido explícitamente
+        self.fields['fecha_publicacion'].required = False  # Aquí lo hacemos obligatorio a la fecha_publicacion
+        
+        self.fields['imagen_conte'].required = True  # Aquí lo hacemos obligatorio a la imagen de portada
+        
 
 

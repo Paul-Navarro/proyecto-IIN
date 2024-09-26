@@ -176,8 +176,9 @@ def contenido_update_editor(request, pk):
             if form.cleaned_data.get('clear_image'):
                 contenido.imagen_conte.delete()  # Eliminar la imagen del campo
                 
-            
-            contenido.estado_conte = 'EDITADO'  # Cambiar el estado a "EN_REVISIÓN"
+            #La fecha de programacion de publicacion del contenido se mantiene intacta.    
+            contenido.fecha_publicacion = Contenido.objects.get(pk=pk).fecha_publicacion
+            contenido.estado_conte = 'EDITADO'  # Cambiar el estado a "EDITADO"
 
             # Guardar el contenido con los campos actualizados
             contenido.save()
