@@ -35,9 +35,11 @@
         <div class="content-meta">
             <p><strong>Publicado el:</strong> {{ contenido.fecha_conte }}</p>
             <p><strong>Autor:</strong> {{ contenido.autor.first_name }} {{ contenido.autor.last_name }}</p>
+            <!-- Mostrar la fecha de publicación programada si existe -->
+            {% if contenido.fecha_publicacion %}
+            <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
+            {% endif %}
         </div>
-
-        <!-- Botón de Regreso -->
         
     </div>
 </body>

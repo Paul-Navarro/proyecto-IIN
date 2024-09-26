@@ -29,10 +29,10 @@ class ContenidoForm(forms.ModelForm):
         model = Contenido
         fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags','fecha_publicacion']
         labels = {
-            'titulo_conte': 'Título del Contenido',
-            'tipo_conte': 'Tipo de Contenido',
-            'texto_conte': 'Texto del Contenido',
-            'fecha_conte': 'Fecha del Contenido',
+            'titulo_conte': 'Título del contenido',
+            'tipo_conte': 'Tipo de contenido',
+            'texto_conte': 'Texto del contenido',
+            'fecha_conte': 'Fecha creacion del contenido',
             'imagen_conte': 'Imagen de Portada (opcional)',
             'categoria': 'Categoría',
             'tags': 'Tags',
