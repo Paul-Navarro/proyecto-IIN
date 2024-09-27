@@ -20,6 +20,9 @@ urlpatterns = [
     
     #Urls del PUBLICADOR para administrar contenidos
      path('publicador/gestionar/', views.gestionar_contenido, name='gestionar_contenido'),
+
+    #Url para suscripcion
+    path('suscripciones/', views.suscripciones_view, name='suscripciones'),
 ]
 
 '''

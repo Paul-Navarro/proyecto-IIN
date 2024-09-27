@@ -253,3 +253,11 @@ def editor_dashboard(request):
     
     contenidos = Contenido.objects.all() 
     return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})
+
+
+
+#--------------------------------------
+
+def suscripciones_view(request):
+    return render(request, 'suscripciones/inicio_suscripcion.html')
+
