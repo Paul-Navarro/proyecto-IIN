@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'proyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'produ',
+        'NAME': 'leticia',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
@@ -161,6 +161,14 @@ STATIC_URL = '/static/'
 
 # Directorio donde Django colocará todos los archivos estáticos después de ejecutar collectstatic
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+#nuevo
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
