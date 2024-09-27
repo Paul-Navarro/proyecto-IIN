@@ -360,3 +360,10 @@ def unlike_contenido(request, id_conte):
         return JsonResponse({'likes': contenido.likes, 'unlikes': contenido.unlikes})
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+#--------------------------------------
+
+def suscripciones_view(request):
+    return render(request, 'suscripciones/inicio_suscripcion.html')
+

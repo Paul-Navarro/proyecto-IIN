@@ -61,7 +61,63 @@
     <div class="cuerpo">
         <!-- Listado lateral izquierdo -->
         <aside class="lateral_izq">
+            <!--no tiene que estar acá, tiene que estar en el HOME.css-->
+            <button id = "btn_suscripcion" class = "boton_suscripcion">suscripciones</button>
+            <style>
+                .boton_suscripcion{
+                    position:relative;
+                    display:block;
+                    margin-left: 10px;
+                    height: 2.2rem;
+                    width: 90%;
+                    text-transform: uppercase;
+                    background-color: transparent;
+                    background-color: #16a085;
+                    color:#fff;
+                    font-size: 15px;
+                    overflow: hidden;
+                    transition: all 50ms ease;
+                    border:2px solid #20e2d7;
+                    font-weight: 400;
+                    z-index: 0;
+                    box-shadow: 2px 2px #fffc;
+                    box-shadow: 2px 2px #0009;
+                    border-radius: 7px;
 
+                    &::before{
+                        content:'';
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        top: 0;
+                        margin:auto;
+                        background-color: #107c65;
+                        /*background-color: #16a08f;*/
+                        transition: all 500ms ease;
+                        z-index: -1;
+                        width: 0;
+                        height: 100%;
+                    }
+
+                    &:hover{
+                        color:#383434;
+                        color:#fff8;
+                        box-shadow: none;
+                        &::before{
+                            width: 100%;
+                        }
+                        
+                    }
+                    
+                }
+
+            </style>
+            <script>
+                document.getElementById("btn_suscripcion").onclick = function () {
+                    window.location.href = "{% url 'suscripciones' %}";
+                };
+            </script>
+            <!--##########################-->
             <ul>
                 {% if has_multiple_roles or has_single_role %}
                 <li><strong>Acciones</strong></li>
