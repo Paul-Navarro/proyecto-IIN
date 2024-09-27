@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/editor_dashboard.css' %}">
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
@@ -36,7 +37,7 @@
             <div class="kanban-board">
                 <!-- Columna Borrador -->
                 <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Borrador</h3>
+                    <h3><i class="fas fa-pencil-alt"></i> Borrador</h3> <!-- Icono para Borrador -->
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'BORRADOR' %}
@@ -51,7 +52,7 @@
 
                 <!-- Columna En revisión/EDITADO -->
                 <div class="kanban-column" id="editado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Editado</h3>
+                    <h3><i class="fas fa-edit"></i> Editado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'EDITADO' %}
@@ -66,7 +67,7 @@
 
                 <!-- Columna Rechazado -->
                 <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Rechazado</h3>
+                    <h3><i class="fas fa-times-circle"></i> Rechazado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'RECHAZADO' %}

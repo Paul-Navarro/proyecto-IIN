@@ -142,3 +142,29 @@ main h2 {
 .btn-ver:hover {
     background-color: #218838;
 }
+
+
+/* Icono de Borrador */
+#borrador h3 i {
+    color: #FFA500; /* Naranja */
+}
+
+/* Icono de Editado */
+#editado h3 i {
+    color: #1E90FF; /* Azul */
+}
+
+/* Icono de A Publicar */
+#a-publicar h3 i {
+    color: #FFD700; /* Dorado */
+}
+
+/* Icono de Publicado */
+#publicado h3 i {
+    color: #4CAF50; /* Verde */
+}
+
+/* Icono de Rechazado */
+#rechazado h3 i {
+    color: #FF6347; /* Rojo */
+}

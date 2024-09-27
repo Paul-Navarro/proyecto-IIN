@@ -8,6 +8,7 @@
 
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/autor_dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -30,7 +31,7 @@
             <div class="kanban-board">
                 <!-- Columna Borrador -->
                 <div class="kanban-column" id="borrador">
-                    <h3>Borrador</h3>
+                    <h3><i class="fas fa-pencil-alt"></i> Borrador</h3> <!-- Icono para Borrador -->
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'BORRADOR' %}
@@ -46,7 +47,7 @@
 
                 <!-- Columna Editado -->
                 <div class="kanban-column" id="editado">
-                    <h3>Editado</h3>
+                    <h3><i class="fas fa-edit"></i> Editado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'EDITADO' %}
@@ -61,7 +62,7 @@
 
                 <!-- Columna A Publicar -->
                 <div class="kanban-column" id="a-publicar">
-                    <h3>A Publicar</h3>
+                    <h3><i class="fas fa-upload"></i> A Publicar</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'A_PUBLICAR' %}
@@ -76,7 +77,7 @@
 
                 <!-- Columna Publicado -->
                 <div class="kanban-column" id="publicado">
-                    <h3>Publicado</h3>
+                    <h3><i class="fas fa-check-circle"></i> Publicado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'PUBLICADO' %}
@@ -91,7 +92,7 @@
 
                 <!-- Columna Rechazado -->
                 <div class="kanban-column" id="rechazado">
-                    <h3>Rechazado</h3>
+                    <h3><i class="fas fa-times-circle"></i> Rechazado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'RECHAZADO' %}

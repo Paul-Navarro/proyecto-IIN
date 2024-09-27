@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/editor_dashboard.css' %}">
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
@@ -36,7 +37,7 @@
 
                 <!-- Columna Editado/En_Revision -->
                 <div class="kanban-column" id="editado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Editado</h3>
+                    <h3><i class="fas fa-edit"></i> Editado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'EDITADO' %}
@@ -51,7 +52,7 @@
 
                 <!-- Columna A publicar -->
                 <div class="kanban-column" id="a_publicar" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>A Publicar</h3>
+                    <h3><i class="fas fa-upload"></i> A Publicar</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'A_PUBLICAR' %}
@@ -68,7 +69,7 @@
 
                 <!-- Columna Rachazado -->
                 <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Rechazado</h3>
+                    <h3><i class="fas fa-times-circle"></i> Rechazado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'RECHAZADO' %}
@@ -89,7 +90,7 @@
 
                 <!-- Columna Publicado -->
                 <div class="kanban-column" id="publicado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3>Publicado</h3>
+                    <h3><i class="fas fa-check-circle"></i> Publicado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'PUBLICADO' %}
