@@ -14,8 +14,29 @@
         <div></div>
     </header>
     <main>
-        <div class = "mensaje_inicio"><h2 class ="titulo_mensaje">🌟 Bienvenido a tu sección de Suscripciones 🌟</h2>
-            <p>Aquí podrás explorar y gestionar tus suscripciones a nuestras categorías. Descubre contenido exclusivo y personalizado que se adapta a tus intereses. ¡Aprovecha al máximo tu experiencia!</p></div>
+        {% if user.is_authenticated %}
+            <div class = "mensaje_inicio"><h2 class ="titulo_mensaje">🌟 Bienvenido a tu sección de Suscripciones 🌟</h2>
+                <p>Aquí podrás explorar y gestionar tus suscripciones a nuestras categorías. Descubre contenido exclusivo y personalizado que se adapta a tus intereses. ¡Aprovecha al máximo tu experiencia!</p>
+            </div>
+        {% else %}
+                <!-- Si el usuario no está autenticado, mostrar los botones de login y registro -->
+                <div class="mensaje_no_auth">
+                    <h2 class = "titulo_noinicio">No has iniciado sesión</h2>
+                    <p>Por favor, inicia sesión o regístrate para acceder a tus suscripciones.</p>
+                    <button class = "boton_estilo" onclick="redirigirRegistro()" type="button">Sign up</button>
+                    <button class = "boton_estilo" onclick="redirigirLogin()" type="button">Log in</button>
+                </div>
+        {% endif %}
     </main>
+    <!-- Script para redirigir a la pagina de login/register-->
+    <script type="text/javascript">
+        const redirigirLogin = () => {
+            window.location.href = "{% url 'account_login' %}";
+        }
+
+        const redirigirRegistro = () => {
+            window.location.href = "{% url 'account_signup' %}";
+        }
+    </script>
 </body>
 </html>
