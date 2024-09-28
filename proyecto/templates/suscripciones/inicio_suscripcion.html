@@ -9,25 +9,64 @@
 </head>
 <body>
     <header>
-        <div><a class = "boton_atras" href="javascript:history.back();">Atras</a></div>
-        <div><h2 class = "titulo">Suscripciones</h2></div>
+        <div><a class="boton_atras" href="{% url 'home' %}">Atras</a></div>
+        <div><h2 class="titulo">Suscripciones</h2></div>
         <div></div>
     </header>
+
     <main>
         {% if user.is_authenticated %}
-            <div class = "mensaje_inicio"><h2 class ="titulo_mensaje">🌟 Bienvenido a tu sección de Suscripciones 🌟</h2>
-                <p>Aquí podrás explorar y gestionar tus suscripciones a nuestras categorías. Descubre contenido exclusivo y personalizado que se adapta a tus intereses. ¡Aprovecha al máximo tu experiencia!</p>
+            <!-- Si el usuario está autenticado, mostrar la bienvenida y las suscripciones -->
+            <div class="mensaje_inicio">
+                <h2 class="titulo_mensaje">🌟 Bienvenido a tu sección de Suscripciones 🌟</h2>
+                <p>Aquí podrás explorar y gestionar tus suscripciones a nuestras categorías. ¡Descubre contenido exclusivo y personalizado!</p>
             </div>
-        {% else %}
-                <!-- Si el usuario no está autenticado, mostrar los botones de login y registro -->
-                <div class="mensaje_no_auth">
-                    <h2 class = "titulo_noinicio">No has iniciado sesión</h2>
-                    <p>Por favor, inicia sesión o regístrate para acceder a tus suscripciones.</p>
-                    <button class = "boton_estilo" onclick="redirigirRegistro()" type="button">Sign up</button>
-                    <button class = "boton_estilo" onclick="redirigirLogin()" type="button">Log in</button>
+
+            <!-- Suscripciones Actuales -->
+            <section class="contenedor_suscripciones">
+                <div class="columna_suscripciones">
+                    <h3>Suscripciones Actuales</h3>
+                    <ul>
+                        {% for categoria in categorias_suscritas %}
+                            <li>{{ categoria.nombre }}</li>
+                        {% empty %}
+                            <li>No estás suscrito a ninguna categoría aún.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
+
+                <!-- Categorías Disponibles para Suscripción -->
+                <div class="columna_categorias">
+                    <h3>Categorías Disponibles</h3>
+                    <form method="POST" action="{% url 'comprar_suscripcion' %}">
+                        {% csrf_token %}
+                        <ul>
+                            {% for categoria in categorias_no_suscritas %}
+                                <li>
+                                    <input type="checkbox" name="categorias" value="{{ categoria.id }}">
+                                    {{ categoria.nombre }}
+                                </li>
+                            {% empty %}
+                                <li>No hay más categorías disponibles para suscripción.</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="contenedor-boton">
+                            <button type="submit" class="boton_pago">Suscribirse</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        {% else %}
+            <!-- Si el usuario no está autenticado, mostrar los botones de login y registro -->
+            <div class="mensaje_no_auth">
+                <h2 class="titulo_noinicio">No has iniciado sesión</h2>
+                <p>Por favor, inicia sesión o regístrate para acceder a tus suscripciones.</p>
+                <button class="boton_estilo" onclick="redirigirRegistro()" type="button">Sign up</button>
+                <button class="boton_estilo" onclick="redirigirLogin()" type="button">Log in</button>
+            </div>
         {% endif %}
     </main>
+
     <!-- Script para redirigir a la pagina de login/register-->
     <script type="text/javascript">
         const redirigirLogin = () => {

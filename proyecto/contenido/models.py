@@ -90,3 +90,18 @@ class VotoContenido(models.Model):
     
     class Meta:
         unique_together = ('usuario', 'contenido')  # Evita duplicados de votos
+
+
+############# suscripciones #################
+class Suscripcion(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.usuario.username} - {self.categoria.nombre}"
+    
+    class Meta:
+        unique_together = ('usuario', 'categoria')  # Evita duplicados de suscripciones
+
+
+

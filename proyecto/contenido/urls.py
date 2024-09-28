@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import suscripciones_view, comprar_suscripcion
 
 urlpatterns = [
     
@@ -31,6 +32,12 @@ urlpatterns = [
 
     #Url para suscripcion
     path('suscripciones/', views.suscripciones_view, name='suscripciones'),
+
+    #Url para suscripppcion
+    path('suscripciones/', suscripciones_view, name='suscripciones_view'),
+    path('comprar_suscripcion/', comprar_suscripcion, name='comprar_suscripcion'),
+
+
 ]
 
 '''

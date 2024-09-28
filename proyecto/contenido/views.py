@@ -10,6 +10,7 @@ from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from .models import Suscripcion
 
 
 def contenido_list(request):
@@ -364,6 +365,45 @@ def unlike_contenido(request, id_conte):
 
 #--------------------------------------
 
+#def suscripciones_view(request):
+#   return render(request, 'suscripciones/inicio_suscripcion.html')
+
+
+######### vistas para suscripciones ################
 def suscripciones_view(request):
+    if request.user.is_authenticated:
+        usuario = request.user
+
+        # Obtener las categorías a las que el usuario ya está suscrito
+        suscripciones = Suscripcion.objects.filter(usuario=usuario)
+        categorias_suscritas = [s.categoria for s in suscripciones]
+
+        # Solo mostrar las categorías que son pagadas y a las que el usuario NO está suscrito
+        categorias_no_suscritas = Categoria.objects.filter(es_pagada=True).exclude(id__in=[cat.id for cat in categorias_suscritas])
+
+        context = {
+            'categorias_suscritas': categorias_suscritas,   # Para mostrar las suscripciones actuales, si es necesario
+            'categorias_no_suscritas': categorias_no_suscritas,  # Solo categorías pagadas a las que no está suscrito
+        }
+        return render(request, 'suscripciones/inicio_suscripcion.html', context)
+
     return render(request, 'suscripciones/inicio_suscripcion.html')
+
+
+def comprar_suscripcion(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        usuario = request.user
+        categorias_seleccionadas = request.POST.getlist('categorias')
+
+        # Crear suscripciones solo para las categorías seleccionadas
+        for categoria_id in categorias_seleccionadas:
+            categoria = Categoria.objects.get(id=categoria_id)
+            if categoria.es_pagada:  # Verificar si la categoría es pagada antes de suscribirse
+                Suscripcion.objects.get_or_create(usuario=usuario, categoria=categoria)
+
+        return redirect('suscripciones_view')
+    
+
+
+
 
