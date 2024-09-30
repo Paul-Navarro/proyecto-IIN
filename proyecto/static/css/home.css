@@ -67,6 +67,7 @@ body {
     font-size: 1.1rem; /* Aumenta el tamaño de la fuente */
     cursor: pointer;
     transition: color 0.3s ease, transform 0.3s ease;
+    color:white;
 }
 
 .elementosBarra:hover {

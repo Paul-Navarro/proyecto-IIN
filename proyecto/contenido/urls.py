@@ -36,6 +36,7 @@ urlpatterns = [
     #Url para suscripppcion
     path('suscripciones/', suscripciones_view, name='suscripciones_view'),
     path('comprar_suscripcion/', comprar_suscripcion, name='comprar_suscripcion'),
+    path('contact_us/', views.contact_us, name='contact_us'),
 
 
 ]

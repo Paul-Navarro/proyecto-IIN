@@ -402,6 +402,12 @@ def comprar_suscripcion(request):
                 Suscripcion.objects.get_or_create(usuario=usuario, categoria=categoria)
 
         return redirect('suscripciones_view')
+
+
+
+#vista para contacto
+def contact_us(request):
+    return render(request, 'anhadidos/contact_us.html')
     
 
 
