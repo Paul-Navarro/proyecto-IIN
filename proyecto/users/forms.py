@@ -71,9 +71,17 @@ class CustomSignupForm(SignupForm):
     @extends SignupForm
     @description Formulario de registro personalizado que extiende el formulario de registro de `allauth`. Incluye los campos de nombre y apellido, además de los campos estándar de registro.
     """
-    first_name = forms.CharField(max_length=30, label='Nombre')
-    last_name = forms.CharField(max_length=30, label='Apellido')
-
+    first_name = forms.CharField(
+        max_length=30, 
+        label='Nombre',
+        widget=forms.TextInput(attrs={'placeholder': 'Nombre'})  # Adding placeholder here
+    )
+    
+    last_name = forms.CharField(
+        max_length=30, 
+        label='Apellido',
+        widget=forms.TextInput(attrs={'placeholder': 'Apellido'})  # Adding placeholder here
+    )    
     def save(self, request):
         user = super(CustomSignupForm, self).save(request)
         user.first_name = self.cleaned_data['first_name']

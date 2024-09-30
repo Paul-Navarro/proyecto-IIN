@@ -130,7 +130,7 @@ LOGIN_REDIRECT_URL = '/dashboard/'
   # Redirige a la página principal después de iniciar sesión
 LOGOUT_REDIRECT_URL = '/'  # Redirige a la página principal después de cerrar sesión
 ACCOUNT_SIGNUP_FORM_CLASS = None  # Si deseas utilizar un formulario de registro personalizado
-
+ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm'}
 # Configuración del modelo de usuario personalizado
 AUTH_USER_MODEL = 'users.CustomUser'
 
