@@ -3,14 +3,25 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm,UserChangeForm
 from django.contrib import messages
 from contenido.models import Contenido, Categoria
 from django.db.models import Q  # Para realizar búsquedas complejas con OR
 from contenido.cron import AutopublicarContenido
+from django.contrib.auth import update_session_auth_hash  # Para mantener la sesión después de cambiar la contraseña
+from django.contrib.auth.forms import PasswordChangeForm  # Para el formulario de cambio de contraseña
 
+
+from django.contrib.auth import update_session_auth_hash
 
 from django.shortcuts import render
+
+
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserChangeForm
+from django.contrib import messages
+
 
 def home(request):
     
@@ -211,6 +222,45 @@ def edit_user(request, user_id):
     else:
         form = CustomUserChangeForm(instance=user)
     return render(request, 'admin/users/edit_user.html', {'form': form, 'user': user})
+
+
+@login_required
+def editar_perfil(request):
+    user = request.user
+
+    # Define both forms initially
+    form = CustomUserChangeForm(instance=user)
+    password_form = PasswordChangeForm(user)
+
+    # Handle profile image upload or personal information changes
+    if request.method == 'POST':
+        if 'first_name' in request.POST or 'profile_image' in request.FILES:
+            form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Información personal actualizada exitosamente.')
+                return redirect('editar_perfil')
+            else:
+                messages.error(request, 'Hubo un error al actualizar la información personal.')
+
+        # Handle password change
+        elif 'old_password' in request.POST:
+            password_form = PasswordChangeForm(user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Prevents logout after password change
+                messages.success(request, 'Contraseña cambiada exitosamente.')
+                return redirect('editar_perfil')
+            else:
+                messages.error(request, 'Hubo un error al cambiar la contraseña. Por favor, revisa los campos.')
+
+    # Render the template with both forms
+    return render(request, 'account/configurar_perfil.html', {
+        'form': form,
+        'password_form': password_form,
+    })
+
+
 
 
 @login_required

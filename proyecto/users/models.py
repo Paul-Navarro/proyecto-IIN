@@ -29,6 +29,7 @@ class CustomUser(AbstractUser):
     """
     email = models.EmailField(unique=True)
     roles = models.ManyToManyField(Role, blank=True, related_name='users')  # Relación con roles
+    profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)  # Campo para la imagen de perfil
 
     def __str__(self):
         """

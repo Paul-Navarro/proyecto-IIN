@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import CustomUser, Role
 from allauth.account.forms import SignupForm
+from django.contrib.auth import get_user_model
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -79,3 +80,10 @@ class CustomSignupForm(SignupForm):
         user.last_name = self.cleaned_data['last_name']
         user.save()
         return user
+    
+
+User = get_user_model()
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username']  # Solo mostrar estos campos

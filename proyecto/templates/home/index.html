@@ -158,6 +158,7 @@
                     <li><a href="#general">Configuración General</a></li>
                     <li><a href="#seguridad">Seguridad</a></li>
                     <li><a href="#integraciones">Integraciones</a></li>
+                    <li><a href="{% url 'editar_perfil' %}">Configurar Perfil</a></li>
                 </ul>
             </ul>
             
@@ -220,10 +221,10 @@
                 <p>{{ contenido.texto_conte|truncatechars:350|safe }}</p>
 
                 <div class="likes-container">
-                    <button class="like-button" data-id="{{ contenido.id_conte }}" onclick="likeContenido({{ contenido.id_conte }})">👍 Like</button>
+                    <button class="like-button" data-id="{{ contenido.id_conte }}" onclick="likeContenido({ contenidoid_conte })">👍 Like</button>
                     <span id="like-count-{{ contenido.id_conte }}">{{ contenido.likes }}</span>
                     
-                    <button class="unlike-button" data-id="{{ contenido.id_conte }}" onclick="unlikeContenido({{ contenido.id_conte }})">👎 Unlike</button>
+                    <button class="unlike-button" data-id="{{ contenido.id_conte }}" onclick="unlikeContenido({ contenidoid_conte })">👎 Unlike</button>
                     <span id="unlike-count-{{ contenido.id_conte }}">{{ contenido.unlikes }}</span>
                 </div>
 
@@ -297,6 +298,9 @@
         {% csrf_token %}
     </form>
     <script id="dsq-count-scr" src="//polchi.disqus.com/count.js" async></script>
+    <!-- Botón flotante en la esquina inferior derecha -->
+
+
 </body>
 
 </html>

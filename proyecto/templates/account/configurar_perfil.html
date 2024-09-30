@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar (optional) -->
+        <aside class="sidebar">
+            <ul class="nav-list">
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Section -->
+        <main class="profile-section">
+            <h2>Editar Perfil</h2>
+
+            <!-- Display success or error messages -->
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- Form for Profile Picture and Personal Information -->
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Profile Picture Section -->
+                <div class="profile-picture">
+                    <!-- Display the current profile picture -->
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="User Avatar" width="100" height="100">
+                    {% else %}
+                        <img src="{% static 'img/default-avatar.png' %}" alt="Default Avatar" width="100" height="100">
+                    {% endif %}
+                    
+                    <!-- File input to upload a new profile picture -->
+                    <label for="profile_image">Cambiar Foto</label>
+                    <input type="file" name="profile_image" id="profile_image">
+                </div>
+
+                <!-- Separate form for personal information -->
+                <div class="form-section">
+                    <label for="id_first_name">Nombre</label>
+                    {{ form.first_name }}
+
+                    <label for="id_last_name">Apellidos</label>
+                    {{ form.last_name }}
+
+                    <label for="id_username">Nombre de usuario</label>
+                    {{ form.username }}
+                </div>
+
+                <button type="submit" class="btn-primary">Guardar Cambios</button>
+            </form>
+
+            <!-- Separate form for password change (optional) -->
+            <h3>Cambiar Contraseña</h3>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="form-section">
+                    <label for="id_old_password">Contraseña antigua</label>
+                    {{ password_form.old_password.errors }}
+                    {{ password_form.old_password }}
+
+                    <label for="id_new_password1">Contraseña nueva</label>
+                    {{ password_form.new_password1.errors }}
+                    {{ password_form.new_password1 }}
+
+                    <label for="id_new_password2">Confirmar contraseña nueva</label>
+                    {{ password_form.new_password2.errors }}
+                    {{ password_form.new_password2 }}
+
+                    <button type="submit" class="btn-primary">Cambiar Contraseña</button>
+                </div>
+            </form>
+
+            <a href="{% url 'home' %}" class="btn-secondary">Volver</a>
+        </main>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
