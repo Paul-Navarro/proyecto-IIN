@@ -187,3 +187,18 @@ LOGGING = {
         },
     },
 }
+
+#pasarela de pago stripe
+
+#keys de la cuenta
+STRIPE_TEST_PUBLIC_KEY = 'pk_test_51Q2vVqHgGd0NSdDUyHvjPNnMVJMnU0aJr99r1H9ieaSQVJ8v2Hy4YE1SuGVXLBvmYuhtsr9AuOxVzL14GamULDV800cA7xb7tF'
+STRIPE_TEST_SECRET_KEY = 'sk_test_51Q2vVqHgGd0NSdDU0Z6C88f88yR9lcB4h5tWPlYmdvf8hidhkuMNwQ989Vo8HlQo16NtpVeq9J5UgGVUJQFXZz4A007crMVl5X'
+
+
+
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+SESSION_COOKIE_AGE = 1209600  # 2 semanas, en segundos para que no se desloguee el usuario al pasar a stripe
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # No expira cuando se cierra el navegador
+

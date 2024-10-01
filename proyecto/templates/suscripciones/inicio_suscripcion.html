@@ -38,7 +38,7 @@
                 <!-- Categorías Disponibles para Suscripción -->
                 <div class="columna_categorias">
                     <h3>Categorías Disponibles</h3>
-                    <form method="POST" action="{% url 'comprar_suscripcion' %}">
+                    <form id="formulario-suscripcion">  <!-- Cambié el formulario -->
                         {% csrf_token %}
                         <ul>
                             {% for categoria in categorias_no_suscritas %}
@@ -51,7 +51,7 @@
                             {% endfor %}
                         </ul>
                         <div class="contenedor-boton">
-                            <button type="submit" class="boton_pago">Suscribirse</button>
+                            <button id="checkout-button" type="button" class="boton_pago">Suscribirse</button>
                         </div>
                     </form>
                 </div>
@@ -67,7 +67,49 @@
         {% endif %}
     </main>
 
-    <!-- Script para redirigir a la pagina de login/register-->
+    <!-- Cargar Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <script type="text/javascript">
+        // Inicializar Stripe con la clave pública
+        var stripe = Stripe('{{ stripe_public_key }}');
+
+        document.getElementById('checkout-button').addEventListener('click', function () {
+            const form = document.getElementById('formulario-suscripcion');
+            const formData = new FormData(form);
+
+            // Realizar la solicitud POST al backend para obtener el sessionId
+            fetch("{% url 'comprar_suscripcion' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',  // Asegúrate de que el token CSRF está incluido
+                },
+                body: new URLSearchParams(formData)
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (session) {
+                if (session.error) {
+                    alert(session.error);  // Mostrar cualquier error
+                } else {
+                    console.log("Session ID recibido:", session.id);  // Verificar si el sessionId es válido
+                    // Redirigir al usuario a Stripe Checkout con el sessionId
+                    return stripe.redirectToCheckout({ sessionId: session.id });
+                }
+            })
+            .then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);  // Mostrar cualquier error en la redirección
+                }
+            })
+            .catch(function (error) {
+                console.error('Error:', error);  // Para depurar cualquier error inesperado
+            });
+        });
+    </script>
+
+    <!-- Script para redirigir a la pagina de login/register -->
     <script type="text/javascript">
         const redirigirLogin = () => {
             window.location.href = "{% url 'account_login' %}";

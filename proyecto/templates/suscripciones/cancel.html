@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Cancelado</title>
+</head>
+<body>
+    <header>
+        <h1>Pago Cancelado</h1>
+    </header>
+    <main>
+        <div class="mensaje_cancelacion">
+            <h2>❗ El pago ha sido cancelado ❗</h2>
+            <p>No se ha completado la suscripción. Si deseas intentarlo de nuevo, por favor selecciona las categorías que quieras suscribirte e intenta realizar el pago nuevamente.</p>
+            <a href="{% url 'suscripciones_view' %}" class="boton">Volver a Suscripciones</a>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Tu Sitio Web</p>
+    </footer>
+</body>
+</html>

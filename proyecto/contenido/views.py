@@ -10,7 +10,12 @@ from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from .models import Suscripcion
+from .models import Suscripcion,Categoria
+import stripe
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 
 
 def contenido_list(request):
@@ -365,9 +370,6 @@ def unlike_contenido(request, id_conte):
 
 #--------------------------------------
 
-#def suscripciones_view(request):
-#   return render(request, 'suscripciones/inicio_suscripcion.html')
-
 
 ######### vistas para suscripciones ################
 def suscripciones_view(request):
@@ -384,32 +386,97 @@ def suscripciones_view(request):
         context = {
             'categorias_suscritas': categorias_suscritas,   # Para mostrar las suscripciones actuales, si es necesario
             'categorias_no_suscritas': categorias_no_suscritas,  # Solo categorías pagadas a las que no está suscrito
+            'stripe_public_key': settings.STRIPE_TEST_PUBLIC_KEY
         }
         return render(request, 'suscripciones/inicio_suscripcion.html', context)
 
     return render(request, 'suscripciones/inicio_suscripcion.html')
 
 
-def comprar_suscripcion(request):
-    if request.method == 'POST' and request.user.is_authenticated:
-        usuario = request.user
-        categorias_seleccionadas = request.POST.getlist('categorias')
-
-        # Crear suscripciones solo para las categorías seleccionadas
-        for categoria_id in categorias_seleccionadas:
-            categoria = Categoria.objects.get(id=categoria_id)
-            if categoria.es_pagada:  # Verificar si la categoría es pagada antes de suscribirse
-                Suscripcion.objects.get_or_create(usuario=usuario, categoria=categoria)
-
-        return redirect('suscripciones_view')
-
-
-
 #vista para contacto
 def contact_us(request):
     return render(request, 'anhadidos/contact_us.html')
     
+#vista para la pasarela de pago
+
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+def comprar_suscripcion(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        usuario = request.user
+        categorias_seleccionadas = request.POST.getlist('categorias')  # Recibe las categorías seleccionadas por el usuario
+
+        if not categorias_seleccionadas:
+            return JsonResponse({'error': 'No seleccionaste ninguna categoría.'}, status=400)
+
+        line_items = []
+        precio_por_categoria = 1000  # Precio en centavos (10.00 USD por ejemplo)
+
+        # Crear los line_items para Stripe basado en las categorías seleccionadas
+        for categoria_id in categorias_seleccionadas:
+            categoria = Categoria.objects.get(id=categoria_id)
+            if categoria.es_pagada:
+                line_items.append({
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': f'Suscripción a {categoria.nombre}',  # Nombre de la suscripción
+                        },
+                        'unit_amount': precio_por_categoria,  # Monto por suscripción
+                    },
+                    'quantity': 1,
+                })
+
+        # Crear una sesión de Stripe Checkout y pasar los IDs de categorías en los metadatos
+        dominio = "http://localhost:8000"
+        try:
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=line_items,
+                mode='payment',
+                success_url=dominio + '/contenido/success/?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url=dominio + '/contenido/cancel/',
+                metadata={
+                    'categorias_ids': ','.join(categorias_seleccionadas)  # Pasar los IDs de las categorías seleccionadas
+                }
+            )
+            return JsonResponse({'id': session.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
+#@login_required(login_url='account_login')
+def suscripcion_exitosa(request):
+    # Depurar el estado de request.user
+    print(f"request.user: {request.user}")
+    print(f"request.user.is_authenticated: {request.user.is_authenticated}")
+    
+    session_id = request.GET.get('session_id')
+    if session_id:
+        session = stripe.checkout.Session.retrieve(session_id)
 
+        # Obtener el usuario actual
+        usuario = request.user
+
+        # Verifica si el usuario es anónimo antes de hacer algo
+        if usuario.is_anonymous:
+            print("Error: Usuario anónimo detectado")
+            return redirect('account_login')
+
+        # Obtener los IDs de las categorías desde los metadatos de la sesión
+        categorias_ids = session.metadata['categorias_ids'].split(',')
+
+        # Crear suscripciones para las categorías seleccionadas
+        categorias_seleccionadas = Categoria.objects.filter(id__in=categorias_ids)
+        for categoria in categorias_seleccionadas:
+            Suscripcion.objects.get_or_create(usuario=usuario, categoria=categoria)
+
+        return render(request, 'suscripciones/success.html')
+
+    return redirect('suscripciones_view')
+
+
+def suscripcion_cancelada(request):
+    return render(request, 'suscripciones/cancel.html')
 
