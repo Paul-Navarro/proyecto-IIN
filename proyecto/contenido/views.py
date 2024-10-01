@@ -15,8 +15,9 @@ import stripe
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
 from .models import Categoria, Suscripcion
+from django.core.mail import send_mail
+from .forms import ContactForm
 
 def contenido_list(request):
     '''
@@ -488,3 +489,38 @@ def desuscribir_categoria(request, categoria_id):
         if suscripcion.exists():
             suscripcion.delete()
         return redirect('suscripciones_view')
+    
+
+#para el envio de correos
+# views.py
+
+def contacto(request):
+    mensaje_exito = None  # Bandera para mostrar mensaje de éxito
+    
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            nombre = form.cleaned_data['nombre']
+            email = form.cleaned_data['email']
+            asunto = form.cleaned_data['asunto']
+            mensaje = form.cleaned_data['mensaje']
+            
+            # Construir el mensaje de correo
+            mensaje_correo = f"Nombre: {nombre}\nEmail: {email}\nAsunto: {asunto}\n\nMensaje:\n{mensaje}"
+            
+            # Enviar el correo
+            send_mail(
+                'Nuevo mensaje de contacto',
+                mensaje_correo,
+                settings.EMAIL_HOST_USER,  # Remitente
+                ['2024g5is2@gmail.com'],  # Cambia esto al correo donde deseas recibir los mensajes
+                fail_silently=False,
+            )
+            
+            # Cambiar la bandera de éxito
+            mensaje_exito = "¡Gracias por contactarnos! Nos pondremos en contacto contigo pronto."
+    
+    else:
+        form = ContactForm()
+    
+    return render(request, 'anhadidos/contact_us.html', {'form': form, 'mensaje_exito': mensaje_exito})

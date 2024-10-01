@@ -91,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'leticia',
         'USER': 'postgres',
-        'PASSWORD': '212612',
+        'PASSWORD': '2910',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -136,6 +136,12 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 # Configuración del backend de correo para desarrollo
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Configuración de correo para envío de campos en contacto
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '2024g5is2@gmail.com'
+EMAIL_HOST_PASSWORD = 'leti1168'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
