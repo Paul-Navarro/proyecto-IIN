@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pago Cancelado</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/inicio_suscripcion.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cancel.css' %}">
 </head>
 <body>
     <header>
@@ -13,11 +16,12 @@
         <div class="mensaje_cancelacion">
             <h2>❗ El pago ha sido cancelado ❗</h2>
             <p>No se ha completado la suscripción. Si deseas intentarlo de nuevo, por favor selecciona las categorías que quieras suscribirte e intenta realizar el pago nuevamente.</p>
-            <a href="{% url 'suscripciones_view' %}" class="boton">Volver a Suscripciones</a>
+        </div>
+
+        <!-- Contenedor para alinear el botón a la izquierda -->
+        <div class="contenedor-boton">
+            <a href="{% url 'suscripciones_view' %}" class="boton_pago">Volver a Suscripciones</a>
         </div>
     </main>
-    <footer>
-        <p>&copy; 2024 Tu Sitio Web</p>
-    </footer>
 </body>
 </html>

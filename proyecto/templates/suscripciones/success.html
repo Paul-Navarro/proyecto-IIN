@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pago Exitoso</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/inicio_suscripcion.css' %}">
+    <link rel="stylesheet" href="{% static 'css/success.css' %}">
 </head>
 <body>
     <header>
@@ -13,11 +16,12 @@
         <div class="mensaje_exito">
             <h2>🌟 Pago completado con éxito 🌟</h2>
             <p>Te has suscrito correctamente a las categorías seleccionadas. Ahora tienes acceso al contenido exclusivo.</p>
-            <a href="{% url 'suscripciones_view' %}" class="boton">Ver mis suscripciones</a>
+            
+        </div>
+        <div class="contenedor-boton"></div>
+            <a href="{% url 'suscripciones_view' %}" class="boton_pago">Ver mis suscripciones</a>
         </div>
     </main>
-    <footer>
-        <p>&copy; 2024 Tu Sitio Web</p>
-    </footer>
+    
 </body>
 </html>

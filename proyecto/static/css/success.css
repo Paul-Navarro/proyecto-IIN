@@ -1,0 +1,97 @@
+/*Estilo general*/
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #eef2f3;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/*Cabecera*/
+header {
+    background-color: #16a085;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 2.6em;
+    margin: 0;
+}
+
+/* Contenido principal */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+/* Mensaje de cancelación/exitoso */
+.mensaje_exito, .mensaje_cancelacion {
+    text-align: center;
+    width: 60%;
+    background-color: #fff7;
+    border-radius: 10px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.mensaje_exito h2, .mensaje_cancelacion h2 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #e74c3c; /* Color rojo para destacar el mensaje */
+    margin-bottom: 10px;
+}
+
+.mensaje_exito p, .mensaje_cancelacion p {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+
+/* Contenedor para centrar el botón */
+.contenedor-boton {
+    display: flex;
+    justify-content: center; /* Centra el botón */
+    width: auto;
+    margin-top: 5px;
+}
+
+/* Estilo para el botón de pago corregido */
+.boton_pago {
+    display: inline-block;
+    height: 30px; 
+    line-height: 30px;/* Ajusta el espacio alrededor del texto */
+    padding: 10px 20px; /* Ajusta el espacio alrededor del texto */
+    font-size: 13px;
+    background-color: #16a085;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    text-decoration: none; /* Elimina el subrayado del enlace */
+    border-radius: 5px; /* Bordes redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    transition: background-color 0.3s ease; /* Transición suave */
+    border: none;
+    cursor: pointer; /* Cambia el cursor al de mano */
+    width: auto;
+    
+}
+
+.boton_pago:hover {
+    background-color: #138d75; /* Cambia el color al pasar el ratón */
+}
+
+.boton_pago:active {
+    background-color: #107c65; /* Color verde más oscuro al hacer clic */
+}
