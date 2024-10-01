@@ -16,7 +16,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-
+from .models import Categoria, Suscripcion
 
 def contenido_list(request):
     '''
@@ -480,3 +480,11 @@ def suscripcion_exitosa(request):
 def suscripcion_cancelada(request):
     return render(request, 'suscripciones/cancel.html')
 
+#desuscribirse
+def desuscribir_categoria(request, categoria_id):
+    if request.method == 'POST':
+        categoria = get_object_or_404(Categoria, id=categoria_id)
+        suscripcion = Suscripcion.objects.filter(usuario=request.user, categoria=categoria)
+        if suscripcion.exists():
+            suscripcion.delete()
+        return redirect('suscripciones_view')

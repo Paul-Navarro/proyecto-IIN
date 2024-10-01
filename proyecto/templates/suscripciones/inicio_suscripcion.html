@@ -6,6 +6,8 @@
     <title>Suscripciones</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/inicio_suscripcion.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 <body>
     <header>
@@ -28,7 +30,14 @@
                     <h3>Suscripciones Actuales</h3>
                     <ul>
                         {% for categoria in categorias_suscritas %}
-                            <li>{{ categoria.nombre }}</li>
+                            <li class="categoria-item">{{ categoria.nombre }}
+                                <form method="POST" action="{% url 'desuscribir_categoria' categoria.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="boton_pago boton_chico">
+                                        <i class="fas fa-times"></i> 
+                                    </button>
+                                </form>
+                            </li>
                         {% empty %}
                             <li>No estás suscrito a ninguna categoría aún.</li>
                         {% endfor %}

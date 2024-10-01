@@ -39,7 +39,8 @@ urlpatterns = [
     path('success/', views.suscripcion_exitosa, name='suscripcion_exitosa'),
     path('cancel/', views.suscripcion_cancelada, name='suscripcion_cancelada'),
     path('contact_us/', views.contact_us, name='contact_us'),
-
+    #url para desuscripcion
+    path('desuscribir/<int:categoria_id>/', views.desuscribir_categoria, name='desuscribir_categoria'),
 
 ]
 

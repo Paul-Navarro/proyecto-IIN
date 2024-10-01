@@ -175,3 +175,33 @@ p{
 .boton_pago:hover::before {
     width: 100%;  /* El ancho se expande al 100% al hacer hover */
 }
+.boton_chico {
+    font-size: 12px; /* Ajusta el tamaño del ícono */
+    padding: 2px; /* Relleno pequeño */
+    width: 20px; /* Ancho pequeño */
+    height: 20px; /* Alto pequeño */
+    display: inline-flex; /* Flexbox para centrar el ícono */
+    justify-content: center; /* Centrar el ícono horizontalmente */
+    align-items: center; /* Centrar el ícono verticalmente */
+    border-radius: 50%; /* Botón circular */
+    background-color: #16a085; /* Color del fondo del botón */
+    color: white; /* Color del ícono */
+    border: none; /* Sin bordes */
+    cursor: pointer; /* Manito al pasar el cursor */
+    margin-left: 10px; /* Margen a la izquierda para separarlo del texto */
+    transition: background-color 0.3s ease;
+}
+
+.boton_chico:hover {
+    background-color: #107c65; /* Color más oscuro al pasar el mouse */
+}
+.categoria-item {
+    display: flex;
+    justify-content: space-between; /* Distribuir el nombre de la categoría y el botón */
+    align-items: center; /* Alinear verticalmente los ítems */
+    margin-bottom: 10px; /* Separación entre las categorías */
+}
+
+.categoria-item form {
+    margin: 0; /* Eliminar márgenes extra del formulario */
+}
