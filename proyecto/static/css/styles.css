@@ -303,80 +303,11 @@ button[type="submit"]:hover {
     font-weight: bold;
     display: block;
 }
-
-.profile-section {
-    flex-grow: 1;
-    padding: 40px;
-    background-color: white;
+/* Asegura que el contenedor principal esté centrado y tenga un ancho máximo */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-.profile-section h2 {
-    margin-top: 0;
-    color: #333;
-}
 
-.form-section {
-    margin-bottom: 20px;
-}
-
-.form-section label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.form-section input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.form-actions {
-    margin-top: 20px;
-}
-
-.btn-primary {
-    background-color: #16a085;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.btn-secondary {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-    margin-left: 10px;
-}
-
-/* Optional profile picture styling */
-.profile-picture {
-    display: flex;
-    align-items: center;
-}
-
-.profile-picture img {
-    border-radius: 50%;
-    margin-right: 20px;
-    width: 100px;
-    height: 100px;
-}
-
-.profile-picture button {
-    padding: 10px;
-    background-color: #16a085;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}

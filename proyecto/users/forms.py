@@ -91,7 +91,7 @@ class CustomSignupForm(SignupForm):
     
 
 User = get_user_model()
-class CustomUserChangeForm(UserChangeForm):
+class UserProfileChangeForm(UserChangeForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username']  # Solo mostrar estos campos
+        fields = ['first_name', 'last_name', 'username', 'profile_image']  # Incluye el campo de imagen

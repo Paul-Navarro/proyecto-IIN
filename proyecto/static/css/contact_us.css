@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+* {
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+body {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(rgba(0 0 0 / .85),rgba(0 0 0 / .85)), url('../img/bg3.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    height: 100%;
+}
+html{
+    height: 100%;
+}
+.container {
+    display:grid;
+    grid-template-columns: repeat(2,50%);
+    padding:20px;
+    gap:10px;
+    width: 1000px;
+}
+
+.box-info {
+    color:#fff;
+    display:flex;
+    flex-direction: column;
+    gap:50px;
+}
+
+.box-info > h1 {
+    text-align: left;
+    letter-spacing: 5px;
+}
+
+.data {
+    display: flex;
+    flex-direction: column;
+    gap:25px
+}
+
+.data > p {
+    font-size: 1rem;
+}
+
+.data > p > i {
+    color:#fffa;
+    margin-right: 10px;
+    font-size:25px;
+}
+
+
+.links {
+    display:flex;
+    gap:15px;
+}
+
+.links > a {
+    text-decoration: none;
+    width: 40px;
+    height: 40px;
+    background:#18a484;
+    text-align: center;
+    transition: .1s;
+    border-radius: 10px;
+}
+
+.links > a > i {
+    color:#fff;
+    line-height: 40px;
+    font-size: 20px;
+}
+
+form {
+    display:flex;
+    flex-direction: column;
+    text-align: center;
+    gap:15px;
+}
+
+.input-box {
+    position:relative;
+}
+
+.input-box > input {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    outline:none;
+    background: rgba(255 255 255 / .1);
+    border:3px solid transparent;
+    letter-spacing: 1px;
+    transition:.3s;
+    color:#fff;
+    
+}
+
+.input-box > input::placeholder,
+.input-box > textarea::placeholder {
+    color:#a3a3a3;
+    
+}
+
+.input-box > input:focus::placeholder,
+.input-box > textarea:focus::placeholder {
+    color:transparent;
+}
+
+.input-box > input:focus,
+.input-box > textarea:focus {
+    border-bottom:3px solid #18a484;
+    animation: shake .2s;
+}
+
+.input-box > textarea {
+    width: 100%;
+    height: 130px;
+    padding: 10px;
+    background: rgba(255 255 255 / .1);
+    border:3px solid transparent;
+    letter-spacing: 1px;
+    outline: none;
+    transition:.3s;
+    color:#fff;
+    letter-spacing: 1.5px;
+}
+
+
+.input-box > i {
+    position:absolute;
+    top:50%;
+    transform: translateY(-50%);
+    right: 10px;
+    color:rgba(255 255 255 / .3);
+    transition: .3s;
+}
+
+.input-box > input:focus ~ i {
+    color:#18a484;
+}
+
+form > button {
+    width: 100%;
+    padding: 10px;
+    outline: none;
+    background: #18a484;
+    color:#fff;
+    border:none;
+    transition: .1s;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+
+form > button:hover,
+.links > a:hover {
+    background-color: #10634f;
+}
+
+@keyframes shake { 
+    0%, 100% {transform: translateX(0);} 
+    10%, 30%, 50%, 70%, 90% {transform: translateX(-10px);} 
+    20%, 40%, 60%, 80% {transform: translateX(10px);} 
+ }
+
+
+@media screen and (max-width:600px) {
+    .container {
+        width: 95%;
+        display: flex;
+        flex-direction: column;
+        gap:20px;
+    }
+
+    .box-info {
+        gap:15px;
+    }
+
+    .box-info > h1 {
+        font-size: 1.5rem;
+    }
+}
+
+.boton_atras{
+    font-size: 19px;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #12746b;
+    background-color: #d6eae3;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-align: center;
+    width: auto;
+    position: absolute;
+    top:20px;
+    left:20px;
+}
+
+.mensaje-exito {
+    position:absolute;
+    top:0;
+    right: 0;
+    margin-top: 20px;
+    margin-right: 20px;
+    background-color: #dff0d8;
+    color: #3c763d;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 1s ease-out; /* Transición suave */
+}
+

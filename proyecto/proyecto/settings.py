@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'users', # Agregamos el app "users"
     'contenido', # Agregamos el app "contenido"
     'categorias', # Agregamos el app "categorias"
+
+    
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -91,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'leticia',
         'USER': 'postgres',
-        'PASSWORD': '13100864',
+        'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -136,6 +138,12 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 # Configuración del backend de correo para desarrollo
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Configuración de correo para envío de campos en contacto
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '2024g5is2@gmail.com'
+EMAIL_HOST_PASSWORD = 'leti1168'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -187,3 +195,20 @@ LOGGING = {
         },
     },
 }
+
+#pasarela de pago stripe
+
+#keys de la cuenta
+STRIPE_TEST_PUBLIC_KEY = 'pk_test_51Q2vVqHgGd0NSdDUyHvjPNnMVJMnU0aJr99r1H9ieaSQVJ8v2Hy4YE1SuGVXLBvmYuhtsr9AuOxVzL14GamULDV800cA7xb7tF'
+STRIPE_TEST_SECRET_KEY = 'sk_test_51Q2vVqHgGd0NSdDU0Z6C88f88yR9lcB4h5tWPlYmdvf8hidhkuMNwQ989Vo8HlQo16NtpVeq9J5UgGVUJQFXZz4A007crMVl5X'
+
+
+
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+SESSION_COOKIE_AGE = 1209600  # 2 semanas, en segundos para que no se desloguee el usuario al pasar a stripe
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # No expira cuando se cierra el navegador
+
+
+

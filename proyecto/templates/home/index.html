@@ -20,9 +20,9 @@
     <header class="titulos_padres">
 
         <!-- Mostrar el nombre de usuario como un botón arriba a la izquierda -->
-        <div style="position: absolute; top: 10px; left: 10px;">
+        <div style="position: absolute; top: 10px; left: 10px;width: 250px;height: 100px;text-overflow: ellipsis;overflow: hidden;">
             {% if user.is_authenticated %}
-                <p style="display: inline-block; background-color: #16a085; color: white; padding: 10px 20px; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold;">
+                <p style="margin:0;white-space: normal;width: 90%;display: inline-block; background-color: transparent; color: white; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold;">
                     Has iniciado sesión como: {{ user.username }}
                 </p>
             {% endif %}
@@ -32,7 +32,7 @@
             <!-- Caja de relleno. No posee nada -->
         </div>
         <div class="titulos_hijos">
-            <h2>{% block header_title %}Sistema de Gestión de Contenidos{% endblock %}</h2>
+            <h2 style = "margin-left: 70px;">{% block header_title %}Sistema de Gestión de Contenidos{% endblock %}</h2>
         </div>
         <!-- Sección de login -->
         <div class="titulos_hijos divLogin">
@@ -54,7 +54,7 @@
     <nav class="barraNavegacion">
         <div class="elementosBarra">¿Quiénes somos?</div>
         <div class="elementosBarra">Inicio</div>
-        <div class="elementosBarra">Contacto</div>
+        <a href = "{% url 'contact_us' %}" class="elementosBarra" style="text-decoration: none;">Contacto</a>
     </nav>
 
     <!-- Área de lateral izquierdo, contenidos y lateral derecho -->

@@ -56,6 +56,11 @@ class ContenidoForm(forms.ModelForm):
         self.fields['fecha_publicacion'].required = False  # Aquí lo hacemos obligatorio a la fecha_publicacion
         
         self.fields['imagen_conte'].required = True  # Aquí lo hacemos obligatorio a la imagen de portada
-        
 
+#formulario de contacto     
+class ContactForm(forms.Form):
+    nombre = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Nombre y apellido'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Correo electrónico'}))
+    asunto = forms.CharField(max_length=200, required=False, widget=forms.TextInput(attrs={'placeholder': 'Asunto'}))
+    mensaje = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Escribe tu mensaje...'}))
 

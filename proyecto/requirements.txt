@@ -6,3 +6,4 @@ sphinx==8.0.2
 Pillow
 django-ckeditor
 django-cron
+stripe

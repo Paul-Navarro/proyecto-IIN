@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, CustomUserChangeForm,UserChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm,UserChangeForm, UserProfileChangeForm
 from django.contrib import messages
 from contenido.models import Contenido, Categoria
 from django.db.models import Q  # Para realizar búsquedas complejas con OR
@@ -223,19 +223,18 @@ def edit_user(request, user_id):
         form = CustomUserChangeForm(instance=user)
     return render(request, 'admin/users/edit_user.html', {'form': form, 'user': user})
 
-
 @login_required
 def editar_perfil(request):
     user = request.user
 
-    # Define both forms initially
-    form = CustomUserChangeForm(instance=user)
+    # Initialize both forms with user instance data
+    form = UserProfileChangeForm(instance=user)
     password_form = PasswordChangeForm(user)
 
-    # Handle profile image upload or personal information changes
     if request.method == 'POST':
+        # Handle profile image upload or personal information changes
         if 'first_name' in request.POST or 'profile_image' in request.FILES:
-            form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
+            form = UserProfileChangeForm(request.POST, request.FILES, instance=user)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Información personal actualizada exitosamente.')
@@ -259,6 +258,7 @@ def editar_perfil(request):
         'form': form,
         'password_form': password_form,
     })
+
 
 
 

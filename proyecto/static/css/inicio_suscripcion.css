@@ -46,6 +46,7 @@ main{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 /*Mensaje de inicio*/
@@ -68,4 +69,139 @@ p{
     margin-bottom: 7px;
     text-align: center;
 }
+/*botones de no inicio de sesión*/
+.boton_estilo {
+    font-size: 19px;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #12746b;
+    background-color: #d6eae3;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-align: center;
+    width: auto;
+    border: none; /* Para quitar el borde del botón */
+    cursor: pointer; /* Cambia el cursor al de "mano" */
+    margin-top: 20px;
+    margin-left: 25%;
+}
 
+/* Estilo cuando el botón está siendo presionado o enfocado */
+.boton_estilo:hover {
+    background-color: #c5dbd6; /* Cambia el color de fondo al pasar el mouse */
+}
+
+/* Estilo cuando el botón está presionado */
+.boton_estilo:active {
+    background-color: #b4cbc9;
+}
+
+.boton_estilo:last-child{
+    margin-left: 50px;
+}
+
+/*Titulo de mensaje de usuario no registrado/logueado*/
+.titulo_noinicio{
+    text-align: center;
+}
+
+/*section de categorías*/
+.contenedor_suscripciones{
+    display: flex;
+    margin-top: 50px;
+    width: 80%;
+    justify-content: space-evenly;
+}
+
+.columna_suscripciones{
+    box-shadow: 0 0 10px #0001;
+    padding: 20px;
+    padding-top: 0;
+}
+
+.columna_categorias{
+    box-shadow: 0 0 10px #0001;
+    padding: 20px;
+    padding-top: 0;
+}
+
+.contenedor-boton{
+    display: flex;           
+    justify-content: center;  
+    align-items: center;      
+    margin-top: 20px;         
+}
+
+.boton_pago {
+    position: relative;
+    display: block;
+    margin-left: 10px;
+    height: 2.2rem;
+    width: 90%;  /* Puedes ajustar este ancho si lo prefieres más o menos grande */
+    text-transform: uppercase;
+    background-color: transparent;
+    background-color: #16a085;
+    color: #fff;
+    font-size: 15px;
+    overflow: hidden;
+    transition: all 50ms ease;
+    border:none;
+    font-weight: 400;
+    z-index: 0;
+    box-shadow: 0 0 5px #000a;
+    border-radius: 7px;
+}
+
+.boton_pago::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin: auto;
+    background-color: #107c65;
+    transition: all 500ms ease;
+    z-index: -1;
+    width: 0;
+    height: 100%;
+}
+
+.boton_pago:hover {
+    color: #fff8;  /* Cambia el color al pasar el ratón */
+    box-shadow: none;
+}
+
+.boton_pago:hover::before {
+    width: 100%;  /* El ancho se expande al 100% al hacer hover */
+}
+.boton_chico {
+    font-size: 12px; /* Ajusta el tamaño del ícono */
+    padding: 2px; /* Relleno pequeño */
+    width: 20px; /* Ancho pequeño */
+    height: 20px; /* Alto pequeño */
+    display: inline-flex; /* Flexbox para centrar el ícono */
+    justify-content: center; /* Centrar el ícono horizontalmente */
+    align-items: center; /* Centrar el ícono verticalmente */
+    border-radius: 50%; /* Botón circular */
+    background-color: #16a085; /* Color del fondo del botón */
+    color: white; /* Color del ícono */
+    border: none; /* Sin bordes */
+    cursor: pointer; /* Manito al pasar el cursor */
+    margin-left: 10px; /* Margen a la izquierda para separarlo del texto */
+    transition: background-color 0.3s ease;
+}
+
+.boton_chico:hover {
+    background-color: #107c65; /* Color más oscuro al pasar el mouse */
+}
+.categoria-item {
+    display: flex;
+    justify-content: space-between; /* Distribuir el nombre de la categoría y el botón */
+    align-items: center; /* Alinear verticalmente los ítems */
+    margin-bottom: 10px; /* Separación entre las categorías */
+}
+
+.categoria-item form {
+    margin: 0; /* Eliminar márgenes extra del formulario */
+}
