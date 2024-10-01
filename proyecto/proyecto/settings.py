@@ -210,5 +210,3 @@ CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_AGE = 1209600  # 2 semanas, en segundos para que no se desloguee el usuario al pasar a stripe
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # No expira cuando se cierra el navegador
 
-
-
