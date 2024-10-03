@@ -234,6 +234,20 @@ def contenido_delete(request, pk):
         return redirect('contenido_list')
     return render(request, 'autor/contenido_delete.html', {'contenido': contenido})
 
+def contenido_delete_admin(request, pk):
+    '''
+    @function contenido_delete_admin
+    @description Elimina un contenido existente después de confirmar la eliminación(Para el Kanban del administrador).
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a eliminar.
+    @returns {HttpResponse} Redirige a la lista de contenidos después de la eliminación o muestra una página de confirmación.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    if request.method == 'POST':
+        contenido.delete()
+        return redirect('administrador_KANBAN')
+    return render(request, 'admin/contenido/contenido_delete.html', {'contenido': contenido})
+
 def contenido_cambiar_estado(request, id_conte):
     # Obtener el contenido por su ID
     contenido = get_object_or_404(Contenido, id_conte=id_conte)
@@ -261,6 +275,17 @@ def gestionar_contenido(request):
     """
     contenidos = Contenido.objects.all()
     return render(request, 'publicador/contenido_gestion.html', {'contenidos': contenidos})
+
+
+def administrador_KANBAN(request):
+    """
+    @function administrador_KANBAN
+    @description Redirige a la página de gestión de KANBAN del administrador.
+    @param {HttpRequest} request - La solicitud HTTP.
+    @returns {HttpResponse} Renderiza la plantilla 'admin/contenido/contenido_kanban.html'.
+    """
+    contenidos = Contenido.objects.all()
+    return render(request, 'admin/contenido/contenido_kanban.html', {'contenidos': contenidos})
 
 
 @csrf_exempt

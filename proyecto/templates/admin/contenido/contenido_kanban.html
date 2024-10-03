@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/autor_dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <h1>Bienvenido Administrador!</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}" class="btn btn-home">Inicio</a></li>
+                <li><a href="{% url 'account_logout' %}" class="btn btn-logout">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Tablero Kanban</h2>
+            <div class="kanban-board">
+                <!-- Columna Borrador -->
+                <div class="kanban-column" id="borrador">
+                    <h3><i class="fas fa-pencil-alt"></i> Borrador</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'BORRADOR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_delete_admin' contenido.pk %}" class="btn btn-delete">Eliminar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Editado -->
+                <div class="kanban-column" id="editado">
+                    <h3><i class="fas fa-edit"></i> Editado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'EDITADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_delete_admin' contenido.pk %}" class="btn btn-delete">Eliminar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna A Publicar -->
+                <div class="kanban-column" id="a-publicar">
+                    <h3><i class="fas fa-upload"></i> A Publicar</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'A_PUBLICAR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_delete_admin' contenido.pk %}" class="btn btn-delete">Eliminar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Publicado -->
+                <div class="kanban-column" id="publicado">
+                    <h3><i class="fas fa-check-circle"></i> Publicado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'PUBLICADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_delete_admin' contenido.pk %}" class="btn btn-delete">Eliminar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Rechazado -->
+                <div class="kanban-column" id="rechazado">
+                    <h3><i class="fas fa-times-circle"></i> Rechazado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'RECHAZADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_delete_admin' contenido.pk %}" class="btn btn-delete">Eliminar</a>
+                                    <!-- Mostrar la razón del rechazo si existe -->
+                                    {% if contenido.rechazos.exists %}
+                                        <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
+                                    {% else %}
+                                        <span class="razon-rechazo">Razón: No especificada</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -8,6 +8,9 @@ urlpatterns = [
     path('', views.contenido_list, name='contenido_list'),
     path('contenido/<int:pk>/', views.contenido_detail, name='contenido_detail'),
     
+    path('contenido_admin', views.administrador_KANBAN, name='administrador_KANBAN'),
+    
+    
     path('contenido_editor/<int:pk>/', views.contenido_detail_editor, name='contenido_detail_editor'),
     path('contenido_publicador/<int:pk>/', views.contenido_detail_publicador, name='contenido_detail_publicador'),
     path('contenido_autor/<int:pk>/', views.contenido_detail_autor, name='contenido_detail_autor'),
@@ -17,6 +20,8 @@ urlpatterns = [
     path('contenido/<int:pk>/edit_editor/', views.contenido_update_editor, name='contenido_update_editor'),
     
     path('contenido/<int:pk>/delete/', views.contenido_delete, name='contenido_delete'),
+    path('contenido_admin/<int:pk>/delete/', views.contenido_delete_admin, name='contenido_delete_admin'),
+    
     path('contenido/<int:id>/', views.contenido_detail, name='contenido_detail'),
     
     path('contenido/cambiar-estado/<int:id_conte>/', views.contenido_cambiar_estado, name='contenido_cambiar_estado'),
