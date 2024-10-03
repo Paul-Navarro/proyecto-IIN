@@ -43,6 +43,11 @@ def contenido_detail(request, pk):
     @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
+    
+    # Incrementar la cantidad de visualizaciones
+    contenido.cant_visualiz_conte += 1
+    contenido.save()  # Guardar el cambio en la base de datos
+    
     return render(request, 'home/contenido_detail.html', {'contenido': contenido})
 
 def contenido_detail_editor(request, pk):
