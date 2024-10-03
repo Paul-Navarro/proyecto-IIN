@@ -140,19 +140,20 @@ body {
     padding: 10px; /* Aumenta el padding */
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    width: 80%; /* Ajustamos el ancho a un 50% para que esté centrado */
+    width: 50%;  
     margin-left: auto; /* Esto junto con margin-right asegura el centrado */
     margin-right: auto;
 }
 
 .busqueda {
-    width: 75%; /* Ajusta el ancho según sea necesario */
+    width: 70%; /* Ajusta el ancho según sea necesario */
     min-height: 4vh;
     border: 2px solid #ccc;
     border-radius: 10px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     padding-left: 10px; /* Añadir padding interno para un mejor espaciado */
     text-align: left; /* Alinear texto a la izquierda */
+
 }
 
 .btnBuscar {
@@ -163,9 +164,13 @@ body {
     font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
     border: none;
     border-radius: 10px;
-    margin-left: 15px; /* Aumenta la separación entre el botón y el campo de búsqueda */
+    margin-left: 10px; 
+    margin-right: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 #icono_buscar{
     pointer-events: none;
@@ -179,6 +184,21 @@ body {
 .filter-container {
     margin-left: 15px; /* Aumenta la separación entre el botón de filtro y el campo de búsqueda */
     position: relative;
+}
+
+.filter-group label {
+    margin-right: 10px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.filter-group select, .filter-group input[type="date"] {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
 
@@ -388,6 +408,9 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
     margin-left: 5px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 #icono_filtro{
     pointer-events: none;
@@ -396,7 +419,14 @@ body {
     background-color: #12876a;
     transform: scale(1.1);
 }
+.filter-button, .btnBuscar {
+    margin-right: 0;
+}
 
+.filter-button:hover, .btnBuscar:hover {
+    background-color: #12876a;
+    transform: scale(1.1); /* Aumentar ligeramente el tamaño en hover */
+}
 .filter-options {
     background-color: white;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
