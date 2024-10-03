@@ -22,9 +22,14 @@
         <!-- Mostrar el nombre de usuario como un botón arriba a la izquierda -->
         <div style="position: absolute; top: 10px; left: 10px;width: 250px;height: 100px;text-overflow: ellipsis;overflow: hidden;">
             {% if user.is_authenticated %}
-                <p style="margin:0;white-space: normal;width: 90%;display: inline-block; background-color: transparent; color: white; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold;">
+            <div class="info_sesion">
+                <p>
+                    <i class="fas fa-user"></i> <!-- Ícono de usuario de FontAwesome -->
                     Has iniciado sesión como: {{ user.username }}
                 </p>
+            </div>
+            
+ 
             {% endif %}
         </div>
 
@@ -54,7 +59,7 @@
     <nav class="barraNavegacion">
         <div class="elementosBarra">¿Quiénes somos?</div>
         <div class="elementosBarra">Inicio</div>
-        <a href = "{% url 'contact_us' %}" class="elementosBarra" style="text-decoration: none;">Contacto</a>
+        
     </nav>
 
     <!-- Área de lateral izquierdo, contenidos y lateral derecho -->
@@ -143,23 +148,15 @@
                     <li><a href="{% url 'publicador_dashboard' %}">Panel de Publicador</a></li>
                     {% endif %}
                 </ul>
-                
-                <li><strong>Preferencias</strong></li>
-                <ul>
-                    <li><a href="#idioma">Idioma</a></li>
-                    <li><a href="#notificaciones">Notificaciones</a></li>
-                </ul>
-            
-
-            
+                            
                 <li><strong>Configuración</strong></li>
             
                 <ul>
-                    <li><a href="#general">Configuración General</a></li>
-                    <li><a href="#seguridad">Seguridad</a></li>
-                    <li><a href="#integraciones">Integraciones</a></li>
                     <li><a href="{% url 'editar_perfil' %}">Configurar Perfil</a></li>
+                    <li> <a href = "{% url 'contact_us' %}">Contacto</a></li>
                 </ul>
+
+               
             </ul>
             
         </aside>
@@ -224,7 +221,7 @@
             
                             <!-- Descripción del contenido -->
                             <div class="descripcion">
-                            <p class="contenido-descripcion">{{ contenido.texto_conte|truncatechars:350|safe }}</p>
+                            <p class="contenido-descripcion">{{ contenido.texto_conte|truncatechars:550|safe }}</p>
                             </div>
             
                             <!-- Información adicional del contenido -->

@@ -18,6 +18,7 @@ body {
     padding: 5px; /* Aumenta el padding */
     text-align: center;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    height: 100px;
 }
 
 .titulos_hijos h2 {
@@ -492,4 +493,118 @@ body {
     font-size: 16px;
     line-height: 1.5;
     border: 2px solid #a1e1c1; /* Borde verde claro */
+}
+
+
+.like-button, .unlike-button {
+    background-color: #28a745; /* Color verde brillante */
+    color: white;
+    padding: 10px 20px; /* Tamaño de padding mayor para un botón más llamativo */
+    font-size: 1.1rem; /* Tamaño de fuente ligeramente más grande */
+    border: none;
+    border-radius: 12px; /* Bordes más redondeados */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra inicial */
+    position: relative; /* Para usar pseudo-elementos */
+    overflow: hidden; /* Asegura que los efectos de animación no se desborden */
+}
+
+.like-button::before, .unlike-button::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    transition: transform 0.6s ease;
+}
+
+.like-button:hover::before, .unlike-button:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.like-button:hover, .unlike-button:hover {
+    background-color: #218838; /* Verde más oscuro en hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Aumenta la sombra en hover */
+    transform: translateY(-3px); /* Efecto de "flotar" hacia arriba */
+}
+
+.like-button:active, .unlike-button:active {
+    background-color: #1e7e34; /* Verde aún más oscuro cuando se hace clic */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Sombra más reducida al hacer clic */
+    transform: translateY(2px); /* Efecto de presión al hacer clic */
+}
+
+.like-button span, .unlike-button span {
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Efectos adicionales: animación cuando el botón es clicado */
+.like-button:focus::after, .unlike-button:focus::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+.contenido-titulo {
+    font-size: 21px;
+    font-weight: bold;
+    margin-bottom: 10px; /* Margen inferior de 10 píxeles */
+    color: #333;
+    padding: 10px 15px; /* Añadimos un poco de padding alrededor del título */
+    border: 2px solid #a1e1c1; /* Borde verde claro */
+    border-radius: 8px; /* Bordes redondeados para un efecto más suave */
+    background-color: #f9f9f9; /* Fondo claro para destacar el título */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera para dar profundidad */
+}
+
+
+.info_sesion {
+    padding: 5px 10px; /* Espaciado interno cómodo */
+    background-color: #f9f9f9; /* Fondo claro para destacar */
+    border: 2px solid #a1e1c1; /* Borde verde claro */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
+    margin-bottom: 20px; /* Separación con otros elementos */
+    font-size: 1rem; /* Aumentamos ligeramente el tamaño del texto */
+    color: #333; /* Color del texto */
+    display: flex; /* Usamos flexbox para alinear el ícono y el texto */
+    align-items: center; /* Centramos verticalmente el ícono y el texto */
+}
+
+.info_sesion i {
+    color: #16a085; /* Color verde para el ícono */
+    margin-right: 10px; /* Espacio entre el ícono y el texto */
+    font-size: 1.5rem; /* Hacemos el ícono un poco más grande */
+}
+
+.info_sesion p {
+    margin: 0; /* Eliminamos márgenes para que el contenido esté alineado */
+    font-weight: bold; /* Resaltamos el texto para mejor legibilidad */
 }
