@@ -283,6 +283,7 @@ body {
 
     .contenidoRelleno {
         flex: 1 1 100%; /* Un elemento por fila */
+       
     }
 }
 
@@ -308,7 +309,9 @@ body {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     flex: 1 1 45%;
     font-size: 1.2rem;
+    border: 2px solid #a1e1c1; /* Borde verde claro */
 }
+
 
 
 /* Personalización de los checkbox */
@@ -460,4 +463,33 @@ body {
 .no-content p {
     font-size: 1.2rem;
     color: #666;
+}
+
+.info-contenido {
+    margin-top: 20px;
+}
+
+.info-contenido p {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.info-contenido i {
+    color: #16a085; /* Verde suave para los íconos */
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+
+.descripcion {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    line-height: 1.5;
+    border: 2px solid #a1e1c1; /* Borde verde claro */
 }

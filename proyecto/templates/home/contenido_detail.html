@@ -40,7 +40,26 @@
             <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
             {% endif %}
         </div>
-        
+
+        <!-- Insertar sección de Disqus -->
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_config = function () {
+                this.page.url = "{{ request.build_absolute_uri }}";  // URL completa de la página actual
+                this.page.identifier = "{{ contenido.id_conte }}";   // Identificador único del contenido
+            };
+
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://polchi.disqus.com/embed.js';  // Reemplaza 'polchi' con tu nombre de subdominio en Disqus
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>
+            Por favor, habilita JavaScript para ver los 
+            <a href="https://disqus.com/?ref_noscript">comentarios impulsados por Disqus.</a>
+        </noscript>
     </div>
 </body>
 </html>
