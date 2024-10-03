@@ -35,6 +35,13 @@ def home(request):
     # Filtrar los contenidos publicados
     contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')
 
+    # Filtrar por autor si se ha enviado un autor en la URL
+    autores_seleccionados = request.GET.getlist('autor')
+
+    # Si hay autores seleccionados, filtrar por esos autores
+    if autores_seleccionados:
+        contenidos = contenidos.filter(autor_id__in=autores_seleccionados)
+
     # Verificar si se ha enviado el parámetro de la categoría en el GET
     categoria_id = request.GET.get('categoria')
 
@@ -46,10 +53,20 @@ def home(request):
     query = request.GET.get('q')
     if query:
         # Filtrar los contenidos por título o por tags
-        contenidos = contenidos.filter(
+         contenidos = contenidos.filter(
             Q(titulo_conte__icontains=query) |  # Buscar por título
-            Q(tags__nombre__icontains=query)    # Buscar por tags
+            Q(tags__nombre__icontains=query) |  # Buscar por tags
+            Q(autor__first_name__icontains=query) |  # Buscar por nombre del autor
+            Q(autor__last_name__icontains=query)  # Buscar por apellido del autor
         ).distinct()  # Evitar duplicados si coinciden con ambos
+    
+     # Filtro de rango de fechas
+    if request.GET.get('filtrar_fecha'):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        if start_date and end_date:
+            contenidos = contenidos.filter(fecha_publicacion__range=[start_date, end_date])
+
 
     # Verificamos si los filtros adicionales están aplicados
     if 'moderadas' in request.GET:
@@ -61,6 +78,13 @@ def home(request):
     if 'suscriptores' in request.GET:
         categorias = categorias.filter(para_suscriptores=True)
 
+    if 'ordenar_fecha' in request.GET:
+        contenidos = contenidos.order_by('-fecha_publicacion')
+
+    # Obtener los autores para el formulario de filtro
+    autores = User.objects.filter(contenido__estado_conte='PUBLICADO').distinct()
+
+
     # Obtener el usuario y sus roles
     user = request.user
     roles_count = user.roles.count() if user.is_authenticated else 0
@@ -69,6 +93,8 @@ def home(request):
     context = {
         'contenidos': contenidos,
         'categorias': categorias,
+        'autores': autores,  # Pasar los autores al contexto para el filtro
+        'autores_seleccionados': autores_seleccionados,  # Pasar los autores seleccionados al template
         'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
         'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
         'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
