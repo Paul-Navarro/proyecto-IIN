@@ -44,6 +44,10 @@
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_update_editor' contenido.id_conte %}" class="btn btn-ver">Editar</a>
+                                        <!-- Mostrar la razón del cambio a Borrador solo si existe -->
+                                    {% if contenido.cambios_borrador %}
+                                    <span class="razon-borrador">Razón: {{ contenido.cambios_borrador.last.razon }}</span>
+                                {% endif %} 
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -100,6 +104,7 @@
             ev.dataTransfer.setData("text", ev.target.id);
         }
 
+        let contenidoBorradorId = null; 
         // Soltar el elemento en la nueva columna y cambiar su estado
         function drop(ev) {
             ev.preventDefault();
@@ -114,6 +119,14 @@
                 if (targetColumn === 'rechazado') {
                     $('#warningModal').modal('show');  // Mostrar modal si se intenta arrastrar a "Rechazado"
                     return;  // Detener el proceso de arrastre
+                }
+
+                if (targetColumn === 'borrador') {
+                    // Mostrar el modal para ingresar la razón de mover a Borrador
+
+                    contenidoBorradorId = data.replace('item', ''); // Almacenar el ID del contenido
+                    $('#razonBorradorModal').modal('show');
+                    return;  // No mover el contenido todavía
                 }
 
                 // Mover el contenido visualmente a la nueva columna
@@ -162,6 +175,70 @@
                 });
             }
         }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Seleccionar el botón "Guardar" del modal de Borrador
+            var guardarBorradorBtn = document.getElementById('guardarBorradorBtn');
+            var razonInputBorrador = document.getElementById('razonBorradorInput');
+            
+            // Evento para el botón "Guardar" del modal de Borrador
+            guardarBorradorBtn.addEventListener('click', function() {
+                if (!contenidoBorradorId) {
+                    alert('No se ha seleccionado ningún contenido para mover a Borrador.');
+                    return;
+                }
+        
+                var razon = razonInputBorrador.value.trim();
+        
+                if (!razon) {
+                    alert('Por favor, ingresa una razón válida para mover a Borrador.');
+                    return;
+                }
+        
+                // Mueve el contenido inmediatamente al DOM de la columna "Borrador"
+                const borradorColumn = document.getElementById('borrador').querySelector('.kanban-items');
+                const borradorItem = document.getElementById('item' + contenidoBorradorId);
+        
+                // Verificar si borradorItem es un nodo válido antes de mover
+                if (!borradorItem) {
+                    alert('No se encontró el contenido en el DOM para moverlo a Borrador.');
+                    return;
+                }
+        
+                borradorColumn.appendChild(borradorItem);  // Mover a la columna Borrador inmediatamente
+        
+                // Ocultar el modal
+                $('#razonBorradorModal').modal('hide');
+        
+                // Realizar la llamada AJAX para informar al servidor
+                fetch(`/contenido/contenido/cambiar_estado/${contenidoBorradorId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'nuevo_estado': 'BORRADOR',
+                        'razon_cambio': razon  // Enviar la razón
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar el mensaje de éxito (opcional)
+                        showStateChangeMessage(data.titulo, data.old_state, 'BORRADOR');
+                    } else {
+                        alert('Error al mover el contenido a Borrador.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+        
+        
 
         // Mostrar mensaje de cambio de estado
         function showStateChangeMessage(titulo, oldState, newState) {
@@ -244,6 +321,34 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Modal para ingresar la razón de mover a Borrador -->
+<div class="modal fade" id="razonBorradorModal" tabindex="-1" role="dialog" aria-labelledby="razonBorradorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="razonBorradorModalLabel">Razón de Cambio a Borrador</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="razonBorradorInput">Por favor, ingresa la razón para mover a Borrador:</label>
+                        <textarea class="form-control" id="razonBorradorInput" rows="3" placeholder="Escribe la razón..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="guardarBorradorBtn" class="btn btn-warning">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

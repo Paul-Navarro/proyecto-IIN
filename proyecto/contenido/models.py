@@ -107,6 +107,20 @@ class Rechazo(models.Model):
         return f"Rechazo de {self.contenido.titulo_conte} en {self.fecha.strftime('%Y-%m-%d')}"
     
     
+class CambioBorrador(models.Model):
+    '''
+    @class CambioBorrador
+    @extends models.Model
+    @description Modelo que representa el cambio de un contenido a la columna Borrador, incluyendo la razón y la fecha.
+    '''
+    
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='cambios_borrador')
+    razon = models.TextField()  # La razón del cambio a Borrador
+    fecha = models.DateTimeField(auto_now_add=True)  # Fecha y hora del cambio
+
+    def __str__(self):
+        return f"Cambio a Borrador de {self.contenido.titulo_conte} el {self.fecha.strftime('%Y-%m-%d')}"
+
     
 class VotoContenido(models.Model):
     VOTOS = [
