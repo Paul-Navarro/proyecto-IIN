@@ -73,9 +73,9 @@ class Contenido(models.Model):
                 VersionContenido.objects.create(
                     contenido_original=self,
                     version_num=version_num,
-                    titulo_conte=self.titulo_conte,
-                    tipo_conte=self.tipo_conte,
-                    texto_conte=self.texto_conte,
+                    titulo_conte=original.titulo_conte,
+                    tipo_conte=original.tipo_conte,
+                    texto_conte=original.texto_conte,
                     fecha_version=timezone.now(),
                 )
         
