@@ -81,12 +81,14 @@ class VotoContenido(models.Model):
     VOTOS = [
         ('LIKE', 'Like'),
         ('UNLIKE', 'Unlike')
+        
     ]
     
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
-    tipo_voto = models.CharField(max_length=6, choices=VOTOS)
+    tipo_voto = models.CharField(max_length=6, choices=VOTOS, blank=True, null=True)
     fecha_voto = models.DateTimeField(auto_now_add=True)
+    estrellas = models.IntegerField(default=0)
     
     class Meta:
         unique_together = ('usuario', 'contenido')  # Evita duplicados de votos

@@ -18,6 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Categoria, Suscripcion
 from django.core.mail import send_mail
 from .forms import ContactForm
+from django.db import models
+
 
 def contenido_list(request):
     '''
@@ -34,7 +36,7 @@ def contenido_list(request):
     return render(request, 'autor/contenido_list.html', {'contenidos': contenidos})
 
 
-def contenido_detail(request, pk):
+#def contenido_detail(request, pk):
     '''
     @function contenido_detail
     @description Muestra los detalles de un contenido específico.
@@ -49,6 +51,37 @@ def contenido_detail(request, pk):
     contenido.save()  # Guardar el cambio en la base de datos
     
     return render(request, 'home/contenido_detail.html', {'contenido': contenido})
+from django.shortcuts import render, get_object_or_404
+from .models import Contenido, VotoContenido
+
+def contenido_detail(request, pk):
+    contenido = get_object_or_404(Contenido, pk=pk)
+
+    # Incrementar las visualizaciones
+    contenido.cant_visualiz_conte += 1
+    contenido.save()
+
+    # Obtener el usuario actual
+    usuario = request.user
+
+    # Obtener el voto del usuario actual para este contenido
+    voto_usuario = VotoContenido.objects.filter(contenido=contenido, usuario=usuario).first()
+
+    # Si el usuario ha votado, tomar el valor de estrellas, si no, usar 0
+    valor_estrellas = voto_usuario.estrellas if voto_usuario else 0
+
+    # Calcular el promedio de estrellas de todos los usuarios para este contenido
+    promedio_estrellas = VotoContenido.objects.filter(contenido=contenido, estrellas__gt=0).aggregate(models.Avg('estrellas'))['estrellas__avg'] or 0
+
+    # Renderizar el template
+    return render(request, 'home/contenido_detail.html', {
+        'contenido': contenido,
+        'valor_estrellas': valor_estrellas,  # Pasamos la calificación del usuario actual
+        'promedio_estrellas': round(promedio_estrellas, 1),  # Promedio de las calificaciones
+    })
+
+
+
 
 def contenido_detail_editor(request, pk):
     '''
@@ -554,3 +587,40 @@ def contacto(request):
         form = ContactForm()
     
     return render(request, 'anhadidos/contact_us.html', {'form': form, 'mensaje_exito': mensaje_exito})
+
+
+
+#Estrellas
+@csrf_exempt
+@login_required
+def calificar_contenido(request, id_conte):
+    contenido = get_object_or_404(Contenido, id_conte=id_conte)
+    usuario = request.user
+
+    if request.method == 'POST':
+        try:
+            # Extraer la calificación de la solicitud POST
+            data = json.loads(request.body)
+            estrellas = data.get('estrellas')
+
+            if estrellas and 1 <= int(estrellas) <= 5:
+                # Verificar si el usuario ya ha calificado el contenido
+                voto, created = VotoContenido.objects.get_or_create(usuario=usuario, contenido=contenido)
+
+                # Guardar la nueva calificación de estrellas
+                voto.estrellas = int(estrellas)
+                voto.save()
+
+                # Calcular el promedio de estrellas para el contenido
+                votos_contenido = VotoContenido.objects.filter(contenido=contenido, estrellas__gt=0)
+                promedio_estrellas = votos_contenido.aggregate(models.Avg('estrellas'))['estrellas__avg']
+
+                return JsonResponse({'success': True, 'promedio_estrellas': round(promedio_estrellas, 1)})
+
+            else:
+                return JsonResponse({'success': False, 'error': 'Valor de estrellas no válido.'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Error al procesar los datos.'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

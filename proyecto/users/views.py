@@ -47,7 +47,14 @@ def home(request):
     # Filtrar los contenidos publicados
     contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')
 
-    # Filtrar por categoría si está presente en la solicitud
+    # Filtrar por autor si se ha enviado un autor en la URL
+    autores_seleccionados = request.GET.getlist('autor')
+
+    # Si hay autores seleccionados, filtrar por esos autores
+    if autores_seleccionados:
+        contenidos = contenidos.filter(autor_id__in=autores_seleccionados)
+
+    # Verificar si se ha enviado el parámetro de la categoría en el GET
     categoria_id = request.GET.get('categoria')
     if categoria_id:
         contenidos = contenidos.filter(categoria_id=categoria_id)
@@ -55,51 +62,38 @@ def home(request):
     # Verificar si se ha enviado un término de búsqueda
     query = request.GET.get('q')
     if query:
-        contenidos = contenidos.filter(
+        # Filtrar los contenidos por título o por tags
+         contenidos = contenidos.filter(
             Q(titulo_conte__icontains=query) |  # Buscar por título
-            Q(tags__nombre__icontains=query)    # Buscar por tags
-        ).distinct()
-
-    # Aplicar los filtros adicionales
-    moderadas = 'moderadas' in request.GET
-    no_moderadas = 'no_moderadas' in request.GET
-    pagadas = 'pagadas' in request.GET
-    suscriptores = 'suscriptores' in request.GET
-
-    # Filtrar contenidos por moderación
-    if moderadas and no_moderadas:
-        # Mostrar tanto moderadas como no moderadas
-        contenidos = contenidos.filter(
-            Q(categoria__es_moderada=True) | Q(categoria__es_moderada=False)
-        )
-    elif moderadas:
-        # Mostrar solo moderadas
-        contenidos = contenidos.filter(categoria__es_moderada=True)
-    elif no_moderadas:
-        # Mostrar solo no moderadas
-        contenidos = contenidos.filter(categoria__es_moderada=False)
-
-    # Filtrar contenidos por pagadas
-    if pagadas:
-        contenidos = contenidos.filter(categoria__es_pagada=True)
-
-    # Filtrar contenidos para suscriptores
-    if suscriptores:
-        contenidos = contenidos.filter(categoria__para_suscriptores=True)
-
-    # Filtrar por rango de fechas
-    fecha_desde = request.GET.get('fecha_desde')
-    fecha_hasta = request.GET.get('fecha_hasta')
+            Q(tags__nombre__icontains=query) |  # Buscar por tags
+            Q(autor__first_name__icontains=query) |  # Buscar por nombre del autor
+            Q(autor__last_name__icontains=query)  # Buscar por apellido del autor
+        ).distinct()  # Evitar duplicados si coinciden con ambos
     
-    if fecha_desde:
-        contenidos = contenidos.filter(fecha_publicacion__gte=parse_date(fecha_desde))
-    if fecha_hasta:
-        contenidos = contenidos.filter(fecha_publicacion__lte=parse_date(fecha_hasta))
+     # Filtro de rango de fechas
+    if request.GET.get('filtrar_fecha'):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        if start_date and end_date:
+            contenidos = contenidos.filter(fecha_publicacion__range=[start_date, end_date])
 
-    # Filtrar por autor
-    autor_id = request.GET.get('autor')
-    if autor_id:
-        contenidos = contenidos.filter(autor_id=autor_id)
+
+    # Verificamos si los filtros adicionales están aplicados
+    if 'moderadas' in request.GET:
+        categorias = categorias.filter(es_moderada=True)
+    if 'no_moderadas' in request.GET:
+        categorias = categorias.filter(es_moderada=False)
+    if 'pagadas' in request.GET:
+        categorias = categorias.filter(es_pagada=True)
+    if 'suscriptores' in request.GET:
+        categorias = categorias.filter(para_suscriptores=True)
+
+    if 'ordenar_fecha' in request.GET:
+        contenidos = contenidos.order_by('-fecha_publicacion')
+
+    # Obtener los autores para el formulario de filtro
+    autores = User.objects.filter(contenido__estado_conte='PUBLICADO').distinct()
+
 
     # Obtener el usuario y sus roles
     user = request.user
@@ -109,7 +103,8 @@ def home(request):
     context = {
         'contenidos': contenidos,
         'categorias': categorias,
-        'autores': autores,  # Pasamos los autores al contexto
+        'autores': autores,  # Pasar los autores al contexto para el filtro
+        'autores_seleccionados': autores_seleccionados,  # Pasar los autores seleccionados al template
         'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
         'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
         'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,

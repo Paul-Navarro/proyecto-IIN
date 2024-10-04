@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import suscripciones_view, comprar_suscripcion, contacto
+from .views import calificar_contenido, suscripciones_view, comprar_suscripcion, contacto
 
 urlpatterns = [
     
@@ -48,6 +48,8 @@ urlpatterns = [
     path('desuscribir/<int:categoria_id>/', views.desuscribir_categoria, name='desuscribir_categoria'),
     path('contacto/', contacto, name='contacto'),
 
+     path('contenido/<int:id_conte>/calificar/', calificar_contenido, name='calificar_contenido'),
+    
 ]
 
 '''

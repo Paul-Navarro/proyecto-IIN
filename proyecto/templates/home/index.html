@@ -308,7 +308,30 @@
                                     <div class="btn-container">
                                         <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
                                     </div>
+
+                                    <!-- Sección para calificación de estrellas -->
+                                    <!-- Contenedor de estrellas, por cada contenido -->
+                                    <div class="estrellas-container" id="estrellas-{{ contenido.id_conte }}" data-id="{{ contenido.id_conte }}" data-valor="{{ valor_estrellas }}">
+                                        <p>Califica este artículo:</p>
+                                        <div class="rating">
+                                            <span data-value="1" class="estrella {% if valor_estrellas >= 1 %}selected{% endif %}">★</span>
+                                            <span data-value="2" class="estrella {% if valor_estrellas >= 2 %}selected{% endif %}">★</span>
+                                            <span data-value="3" class="estrella {% if valor_estrellas >= 3 %}selected{% endif %}">★</span>
+                                            <span data-value="4" class="estrella {% if valor_estrellas >= 4 %}selected{% endif %}">★</span>
+                                            <span data-value="5" class="estrella {% if valor_estrellas == 5 %}selected{% endif %}">★</span>
+                                        </div>
                                     
+                                        <!-- Mostrar la calificación anterior -->
+                                        <p id="calificacion-usuario-{{ contenido.id_conte }}">Tu calificación anterior: {{ valor_estrellas }} estrellas</p>
+                                    
+                                        <!-- Mostrar el promedio -->
+                                        <p id="promedio-estrellas-{{ contenido.id_conte }}">Promedio: {{ promedio_estrellas }}</p>
+                                    </div>
+                                    
+                                    
+                                    
+                                    
+                                      
                                 </div>
             
 
