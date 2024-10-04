@@ -141,6 +141,8 @@ def contenido_update(request, pk):
     @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
+    rechazos = contenido.rechazos.all()  # Obtener todos los rechazos asociados a este contenido
+    
     
     # Obtener las categorías agrupadas
     categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
@@ -158,6 +160,8 @@ def contenido_update(request, pk):
             if form.cleaned_data.get('clear_image'):
                 contenido.imagen_conte.delete()  # Eliminar la imagen del campo
 
+            #La fecha de programacion de publicacion del contenido se mantiene intacta.    
+            contenido.fecha_publicacion = Contenido.objects.get(pk=pk).fecha_publicacion
             # Guardar el contenido con los campos actualizados
             contenido.save()
 

@@ -44,6 +44,11 @@ class ContenidoForm(forms.ModelForm):
 
         if primera_categoria_no_moderada:
             self.fields['categoria'].initial = primera_categoria_no_moderada
+            
+        if self.instance.pk:
+            self.fields['fecha_publicacion'].required = False  # Edición: no es requerido
+        else:
+            self.fields['fecha_publicacion'].required = True   # Creación: es requerido
 
         # Personalizar el queryset del campo categoría
         self.fields['categoria'].queryset = Categoria.objects.all()
@@ -51,10 +56,7 @@ class ContenidoForm(forms.ModelForm):
         # Establecer la fecha actual como fecha por defecto para el contenido, y hacer el campo readonly
         self.fields['fecha_conte'].initial = timezone.now().date()
         self.fields['fecha_conte'].widget.attrs['readonly'] = True  # Campo de solo lectura
-        
-        # Hacer que el campo 'fecha_publicacion' sea requerido explícitamente
-        self.fields['fecha_publicacion'].required = False  # Aquí lo hacemos obligatorio a la fecha_publicacion
-        
+         
         self.fields['imagen_conte'].required = True  # Aquí lo hacemos obligatorio a la imagen de portada
 
 #formulario de contacto     
