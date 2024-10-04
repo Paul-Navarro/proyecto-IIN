@@ -93,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'leticia',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'PASSWORD': '2910',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -230,7 +230,7 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
 SESSION_COOKIE_AGE = 1209600  # 2 semanas, en segundos para que no se desloguee el usuario al pasar a stripe
-SESSION_SAVE_EVERY_REQUEST = True #asegura que la sesión se renueve con cada solicitud del usuario
+#SESSION_SAVE_EVERY_REQUEST = True #asegura que la sesión se renueve con cada solicitud del usuario
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # No expira cuando se cierra el navegador
 

@@ -403,6 +403,7 @@ def unlike_contenido(request, id_conte):
 
 
 ######### vistas para suscripciones ################
+'''
 def suscripciones_view(request):
     if request.user.is_authenticated:
         usuario = request.user
@@ -418,6 +419,34 @@ def suscripciones_view(request):
             'categorias_suscritas': categorias_suscritas,   # Para mostrar las suscripciones actuales, si es necesario
             'categorias_no_suscritas': categorias_no_suscritas,  # Solo categorías pagadas a las que no está suscrito
             'stripe_public_key': settings.STRIPE_TEST_PUBLIC_KEY
+        }
+        return render(request, 'suscripciones/inicio_suscripcion.html', context)
+
+    return render(request, 'suscripciones/inicio_suscripcion.html')
+'''
+
+def suscripciones_view(request):
+    if request.user.is_authenticated:
+        usuario = request.user
+
+        # Obtener las categorías a las que el usuario ya está suscrito
+        suscripciones = Suscripcion.objects.filter(usuario=usuario)
+        categorias_suscritas = [s.categoria for s in suscripciones]
+
+        # Categorías pagadas a las que NO está suscrito
+        categorias_no_suscritas = Categoria.objects.filter(es_pagada=True).exclude(id__in=[cat.id for cat in categorias_suscritas])
+
+        # Categorías NO pagadas pero disponibles para suscriptores a las que NO está suscrito
+        categorias_no_pagadas_para_suscriptores = Categoria.objects.filter(
+            es_pagada=False,
+            para_suscriptores=True
+        ).exclude(id__in=[cat.id for cat in categorias_suscritas])
+
+        context = {
+            'categorias_suscritas': categorias_suscritas,  # Categorías a las que el usuario ya está suscrito
+            'categorias_no_suscritas': categorias_no_suscritas,  # Categorías pagadas disponibles para suscripción
+            'categorias_no_pagadas_para_suscriptores': categorias_no_pagadas_para_suscriptores,  # Categorías no pagadas disponibles para suscriptores
+            'stripe_public_key': settings.STRIPE_TEST_PUBLIC_KEY  # Si estás usando Stripe para pagos
         }
         return render(request, 'suscripciones/inicio_suscripcion.html', context)
 
@@ -554,3 +583,20 @@ def contacto(request):
         form = ContactForm()
     
     return render(request, 'anhadidos/contact_us.html', {'form': form, 'mensaje_exito': mensaje_exito})
+
+
+#para suscripciones que no son pagadas
+def suscribirse_no_pagadas(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        usuario = request.user
+        categorias_seleccionadas = request.POST.getlist('categorias_no_pagadas')
+
+        # Crear suscripciones para las categorías seleccionadas (no pagadas)
+        for categoria_id in categorias_seleccionadas:
+            categoria = Categoria.objects.get(id=categoria_id)
+            
+            # Guardar suscripción solo si la categoría no es pagada y es para suscriptores
+            if not categoria.es_pagada and categoria.para_suscriptores:
+                Suscripcion.objects.get_or_create(usuario=usuario, categoria=categoria)
+
+        return redirect('suscripciones_view')

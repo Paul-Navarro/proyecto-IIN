@@ -47,6 +47,7 @@ urlpatterns = [
     #url para desuscripcion
     path('desuscribir/<int:categoria_id>/', views.desuscribir_categoria, name='desuscribir_categoria'),
     path('contacto/', contacto, name='contacto'),
+    path('suscripciones/no-pagadas/', views.suscribirse_no_pagadas, name='suscribirse_no_pagadas'),
 
 ]
 
