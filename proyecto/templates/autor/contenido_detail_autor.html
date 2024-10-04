@@ -39,6 +39,30 @@
             {% if contenido.fecha_publicacion %}
             <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
             {% endif %}
+
+            <h3><i class="fas fa-history"></i> Versiones Anteriores</h3>
+
+            {% if versiones %}
+                <ul class="version-list">
+                    {% for version in versiones %}
+                        <li class="version-item">
+                            <i class="fas fa-file-alt"></i> 
+                            <strong>Versión {{ version.version_num }}:</strong> {{ version.fecha_version }} - {{ version.titulo_conte }}
+                            <a href="{% url 'contenido_version_detail' pk=contenido.pk version_num=version.version_num %}" class="btn-view-version">
+                                <i class="fas fa-eye"></i> Ver esta versión
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p><i class="fas fa-info-circle"></i> No hay versiones anteriores disponibles para este contenido.</p>
+            {% endif %}
+            
+            
+            <!-- Cargar Font Awesome -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+            
+            
         </div>
         
     </div>

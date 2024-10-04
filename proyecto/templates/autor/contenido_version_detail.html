@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ version.titulo_conte }} (Versión {{ version.version_num }})</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/contenido_detail.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <h1 class="header__title">Gestión de Contenidos</h1>
+            <a href="{% url 'autor_dashboard' %}" class="btn">Volver a Kanban Autor</a>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <!-- Título del Contenido -->
+        <h1 class="content-title">{{ version.titulo_conte }} (Versión {{ version.version_num }})</h1>
+
+        <!-- Imagen de Portada (opcional si lo guardas en la versión) -->
+        <div class="cover-image">
+            {% if contenido.imagen_conte %}
+            <img src="{{ contenido.imagen_conte.url }}" alt="{{ version.titulo_conte }}">
+            {% endif %}
+        </div>
+
+        <!-- Cuerpo del Contenido de la Versión -->
+        <div class="content-body">
+            <p>{{ version.texto_conte|safe }}</p>
+        </div>
+
+        <!-- Metadatos del Contenido -->
+        <div class="content-meta">
+            <p><strong>Fecha de la versión:</strong> {{ version.fecha_version }}</p>
+            <p><strong>Tipo de contenido:</strong> {{ version.tipo_conte }}</p>
+            <p><strong>Autor:</strong> {{ contenido.autor.first_name }} {{ contenido.autor.last_name }}</p>
+        </div>
+
+        <!-- Volver a la versión actual -->
+        <a href="{% url 'contenido_detail_autor' pk=contenido.pk %}" class="btn">Volver a la versión actual</a>
+    </div>
+</body>
+</html>

@@ -16,6 +16,8 @@ urlpatterns = [
     path('contenido_autor/<int:pk>/', views.contenido_detail_autor, name='contenido_detail_autor'),
     path('contenido/new/', views.contenido_create, name='contenido_create'),
     
+    path('contenido/<int:pk>/version/<int:version_num>/', views.contenido_version_detail, name='contenido_version_detail'),
+    
     path('contenido/<int:pk>/edit/', views.contenido_update, name='contenido_update'),
     path('contenido/<int:pk>/edit_editor/', views.contenido_update_editor, name='contenido_update_editor'),
     

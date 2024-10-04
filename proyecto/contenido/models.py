@@ -58,8 +58,39 @@ class Contenido(models.Model):
         if self.fecha_publicacion and self.fecha_publicacion <= timezone.now() and self.estado_conte == 'A_PUBLICAR':
             self.estado_conte = 'PUBLICADO'
             self.save()
-    
+            
+    def save(self, *args, **kwargs):
+        # Detectar si el contenido ya existía en la base de datos
+        if self.pk:
+            # Obtener el contenido original desde la base de datos
+            original = Contenido.objects.get(pk=self.pk)
 
+            # Comparar si hubo cambios significativos en los campos
+            if original.texto_conte != self.texto_conte or original.titulo_conte != self.titulo_conte:
+                # Incrementar el número de versión basado en las versiones existentes
+                version_num = self.versiones.count() + 1
+                # Crear una nueva versión del contenido
+                VersionContenido.objects.create(
+                    contenido_original=self,
+                    version_num=version_num,
+                    titulo_conte=self.titulo_conte,
+                    tipo_conte=self.tipo_conte,
+                    texto_conte=self.texto_conte,
+                    fecha_version=timezone.now(),
+                )
+        
+        super(Contenido, self).save(*args, **kwargs)  # Guardar el contenido normalmente
+    
+class VersionContenido(models.Model):
+    contenido_original = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='versiones')
+    version_num = models.PositiveIntegerField()  # Número de versión
+    titulo_conte = models.CharField(max_length=255)
+    tipo_conte = models.CharField(max_length=50)
+    texto_conte = RichTextField()  # El contenido en sí
+    fecha_version = models.DateTimeField(default=timezone.now)  # Fecha de la versión
+    
+    def __str__(self):
+        return f"{self.contenido_original.titulo_conte} - v{self.version_num}"
 
 class Rechazo(models.Model):
     '''

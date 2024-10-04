@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido,Rechazo,VotoContenido
+from .models import Contenido,Rechazo,VotoContenido,VersionContenido
 from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -81,7 +81,9 @@ def contenido_detail_autor(request, pk):
     @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
-    return render(request, 'autor/contenido_detail_autor.html', {'contenido': contenido})
+    versiones = contenido.versiones.all()
+    
+    return render(request, 'autor/contenido_detail_autor.html', {'contenido': contenido , 'versiones': versiones})
 
 def contenido_create(request):
     '''
@@ -281,7 +283,19 @@ def gestionar_contenido(request):
     contenidos = Contenido.objects.all()
     return render(request, 'publicador/contenido_gestion.html', {'contenidos': contenidos})
 
-
+def contenido_version_detail(request, pk, version_num):
+    '''
+    @function contenido_version_detail
+    @description Muestra los detalles de una versión específica de un contenido.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido original.
+    @param {int} version_num - El número de la versión a mostrar.
+    @returns {HttpResponse} Respuesta renderizada con los detalles de la versión.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    version = get_object_or_404(VersionContenido, contenido_original=contenido, version_num=version_num)
+    
+    return render(request, 'autor/contenido_version_detail.html', {'contenido': contenido, 'version': version})
 def administrador_KANBAN(request):
     """
     @function administrador_KANBAN
