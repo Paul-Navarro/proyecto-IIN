@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido,Rechazo,VotoContenido,VersionContenido
+from .models import Contenido,Rechazo,VotoContenido,VersionContenido,CambioBorrador
 from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -141,6 +141,8 @@ def contenido_update(request, pk):
     @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
+    rechazos = contenido.rechazos.all()  # Obtener todos los rechazos asociados a este contenido
+    
     
     # Obtener las categorías agrupadas
     categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
@@ -158,6 +160,8 @@ def contenido_update(request, pk):
             if form.cleaned_data.get('clear_image'):
                 contenido.imagen_conte.delete()  # Eliminar la imagen del campo
 
+            #La fecha de programacion de publicacion del contenido se mantiene intacta.    
+            contenido.fecha_publicacion = Contenido.objects.get(pk=pk).fecha_publicacion
             # Guardar el contenido con los campos actualizados
             contenido.save()
 
@@ -323,6 +327,12 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 if nuevo_estado == 'RECHAZADO':
                     razon_rechazo = data.get('razon_rechazo', '')
                     Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
+                    
+                # Lógica para mover a BORRADOR con la razón del cambio
+                if nuevo_estado == 'BORRADOR':
+                    razon_cambio = data.get('razon_cambio', '')  # Obtener la razón del cambio a Borrador
+                    CambioBorrador.objects.create(contenido=contenido, razon=razon_cambio)  # Guardar la razón del cambio
+
                 
                 # Actualizar el estado del contenido
                 old_state = contenido.estado_conte
@@ -349,11 +359,12 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
 def editor_dashboard(request):
     """
     @function editor_dashboard
-    @description Renderiza el panel de administración para usuarios con el rol de Editor.
-    """
+    @description Renderiza el panel de administración para usuarios con el rol de Editor.
+    """
     
-    contenidos = Contenido.objects.all() 
-    return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})
+    contenidos = Contenido.objects.all()
+    return render(request, '../templates/editor/dashboard.html', {'contenidos': contenidos})
+
 
 @csrf_exempt
 @login_required
