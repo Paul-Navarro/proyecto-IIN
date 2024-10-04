@@ -35,6 +35,11 @@ from django.utils.dateparse import parse_date
 
 from django.utils.dateparse import parse_date  # Import to handle date parsing
 
+#para las notificaciones
+from django.views.generic import ListView
+from .models import Notificacion
+from django.http import JsonResponse
+
 def home(request):
     # DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
@@ -105,6 +110,13 @@ def home(request):
     user = request.user
     roles_count = user.roles.count() if user.is_authenticated else 0
 
+    # Obtener las notificaciones no leídas del usuario autenticado
+    notificaciones_no_leidas = 0
+    notificaciones = []
+    if user.is_authenticated:
+        notificaciones = Notificacion.objects.filter(usuario=user, leida=False)
+        notificaciones_no_leidas = notificaciones.count()
+
     # Contexto para pasar a la plantilla
     context = {
         'contenidos': contenidos,
@@ -116,12 +128,30 @@ def home(request):
         'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
         'has_multiple_roles': roles_count > 1,
         'has_single_role': roles_count == 1,
-        'query': query  # Pasar el término de búsqueda al contexto
+        'query': query,  # Pasar el término de búsqueda al contexto
+        'notificaciones': notificaciones,  # Añadir las notificaciones al contexto
+        'notificaciones_no_leidas': notificaciones_no_leidas,  # Añadir el conteo de no leídas
     }
 
     return render(request, 'home/index.html', context)
 
 
+#para marcar notificaciones como leidas
+def marcar_como_leida(request, id):
+    # Verificar que el método sea POST y que el usuario esté autenticado
+    if request.method == 'POST' and request.user.is_authenticated:
+        # Obtener la notificación del usuario autenticado
+        notificacion = get_object_or_404(Notificacion, id=id, usuario=request.user)
+        
+        # Marcar la notificación como leída
+        notificacion.leida = True
+        notificacion.save()
+        
+        # Devolver una respuesta JSON con estado 'ok'
+        return JsonResponse({'status': 'ok'})
+    
+    # Si falla, devolver una respuesta de error
+    return JsonResponse({'status': 'error'}, status=400)
 
 
 

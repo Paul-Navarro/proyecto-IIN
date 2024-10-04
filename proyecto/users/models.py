@@ -1,5 +1,6 @@
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractUser, Group, Permission, User
 from django.db import models
+from django.conf import settings
 
 
 #clase para los roles
@@ -59,6 +60,18 @@ class CustomUser(AbstractUser):
         for role in self.roles.all():
             permissions |= set(role.permissions.values_list('codename', flat=True))
         return permissions
+    
+
+#clase de notificaciones
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notificaciones')
+    titulo = models.CharField(max_length=255)
+    descripcion = models.TextField()
+    leida = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Notificación para {self.usuario} - {self.titulo}'
     
 
 

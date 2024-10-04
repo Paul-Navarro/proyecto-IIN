@@ -39,6 +39,35 @@
         <div class="titulos_hijos">
             <h2 style = "margin-left: 70px;">{% block header_title %}Sistema de Gestión de Contenidos{% endblock %}</h2>
         </div>
+        
+        <!-- Botón de notificaciones -->
+        {% if user.is_authenticated %}
+            <div class="notificaciones">
+                <i id="icono_notificaciones" class="fas fa-bell"></i> <!-- Ícono de campana -->
+                <span id="contador_notificaciones">{{ notificaciones_no_leidas }}</span> <!-- Conteo de notificaciones no leídas -->
+            </div>
+        {% endif %}
+        <div id="overlay" class="overlay" style="display: none;"></div>
+        <!-- Ventana flotante de notificaciones -->
+        <div id="notificaciones_contenedor" class="notificaciones-contenedor" style="display: none;">
+            <h4>Tus Notificaciones</h4>
+            <ul id="lista-notificaciones">
+                {% if notificaciones %}
+                    {% for notificacion in notificaciones %}
+                        <li id="notificacion-{{ notificacion.id }}" class="notificacion-item">
+                            {{ notificacion.titulo }} - {{ notificacion.descripcion }}
+                            <button title = "Marcar como leído" onclick="marcarLeida({{ notificacion.id }})">
+                                <i class="fas fa-check"></i> <!-- Ícono de check -->
+                            </button>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>No tienes notificaciones pendientes.</li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        
         <!-- Sección de login -->
         <div class="titulos_hijos divLogin">
             <div>
@@ -355,8 +384,94 @@
     </form>
     <script id="dsq-count-scr" src="//polchi.disqus.com/count.js" async></script>
     <!-- Botón flotante en la esquina inferior derecha -->
+    <script>
+        // Mostrar u ocultar la ventana de notificaciones
+        document.getElementById("icono_notificaciones").onclick = function() {
+            var contenedor = document.getElementById("notificaciones_contenedor");
+            var overlay = document.getElementById("overlay");
+            var mainContent = document.querySelector('.main-content-wrapper');  // Selecciona el contenido principal
+
+            if (contenedor.style.display === "none") {
+                contenedor.style.display = "block";  // Mostrar notificaciones
+                overlay.style.display = "block";     // Mostrar overlay
+
+                // Compensar el ancho de la barra de scroll solo para el contenido principal
+                var scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+                mainContent.style.marginRight = scrollBarWidth + "px";
+
+                document.body.classList.add('overlay-active');  // Desactivar scroll
+            } else {
+                contenedor.style.display = "none";   // Ocultar notificaciones
+                overlay.style.display = "none";      // Ocultar overlay
+
+                // Restaurar el margen en el contenido principal
+                mainContent.style.marginRight = "0";
+
+                document.body.classList.remove('overlay-active');  // Habilitar scroll
+            }
+        };
+
+        // Cerrar la ventana flotante si se hace clic fuera de ella
+        document.addEventListener("click", function(event) {
+            var contenedor = document.getElementById("notificaciones_contenedor");
+            var overlay = document.getElementById("overlay");
+            var icono = document.getElementById("icono_notificaciones");
+            var mainContent = document.querySelector('.main-content-wrapper');  // Selecciona el contenido principal
+
+            // Si se hace clic fuera de la ventana de notificaciones y del icono de la campanita
+            if (!contenedor.contains(event.target) && event.target !== icono) {
+                contenedor.style.display = "none";   // Ocultar ventana de notificaciones
+                overlay.style.display = "none";      // Ocultar overlay
+
+                // Restaurar el margen en el contenido principal
+                mainContent.style.marginRight = "0";
+
+                document.body.classList.remove('overlay-active');  // Habilitar scroll
+            }
+        });
 
 
+
+    </script>
+    <script>
+        function marcarLeida(id) {
+            console.log("Marcando como leída la notificación con id:", id);
+            var url = "/users/notificacion/leida/" + id + "/";  // Asegúrate de que la URL sea correcta
+
+            fetch(url, {
+                method: "POST",  // Asegúrate de que sea una solicitud POST
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    // Ocultar la notificación marcada como leída
+                    var notificacion = document.getElementById("notificacion-" + id);
+                    notificacion.style.display = "none"; 
+
+                    // Actualizar el contador de notificaciones
+                    var contador = document.getElementById("contador_notificaciones");
+                    contador.innerText = parseInt(contador.innerText) - 1;
+
+                    // Revisar si quedan notificaciones visibles
+                    var notificacionesRestantes = document.querySelectorAll('.notificacion-item:not([style*="display: none"])');
+
+                    // Si no hay notificaciones restantes, mostrar el mensaje "No tienes notificaciones pendientes"
+                    if (notificacionesRestantes.length === 0) {
+                        var listaNotificaciones = document.getElementById("lista-notificaciones");
+                        listaNotificaciones.innerHTML = '<li>No tienes notificaciones pendientes.</li>';
+                    }
+                }
+            })
+            .catch(error => console.log('Error en la solicitud:', error));
+        }
+
+
+    </script>       
 </body>
 
 </html>
+
