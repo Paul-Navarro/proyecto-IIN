@@ -163,42 +163,78 @@
         <!-- Área de contenidos -->
         <main class="main-content" id="mainID">
             <div class="cajaBusqueda">
-                <form method="GET" action="">
+                <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
+                    <!-- Search input -->
                     <input type="text" class="busqueda" name="q" placeholder="¿Qué estás buscando?" value="{{ query|default_if_none:'' }}">
+                    
+                    <!-- Search button (magnifying glass) -->
                     <button type="submit" class="btnBuscar">
                         <i id="icono_buscar" class="fas fa-search"></i>
                     </button>
+            
+                    <!-- Filter button -->
+                    <button type="button" class="filter-button" onclick="toggleFilters()">
+                        <i id="icono_filtro" class="fas fa-filter"></i>
+                    </button>
                 </form>
-                <button class="filter-button" onclick="toggleFilters()">
-                    <i id = "icono_filtro" class="fas fa-filter"></i>
-                </button>
-                <div class="filter-container">
-                    <div class="filter-options" id="filters">
-                        <form method="GET" action="">
-                            <div class="filter-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="moderadas" {% if request.GET.moderadas %}checked{% endif %}>
-                                    <span class="checkmark"></span> Moderadas
-                                </label>
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="no_moderadas" {% if request.GET.no_moderadas %}checked{% endif %}>
-                                    <span class="checkmark"></span> No Moderadas
-                                </label>
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="pagadas" {% if request.GET.pagadas %}checked{% endif %}>
-                                    <span class="checkmark"></span> Pagadas
-                                </label>
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="suscriptores" {% if request.GET.suscriptores %}checked{% endif %}>
-                                    <span class="checkmark"></span> Para Suscriptores
-                                </label>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
-                        </form>
-                    </div>
-                </div>
             </div>
-
+            
+            <!-- Filter options -->
+            <div class="filter-options" id="filters">
+                <form method="GET" action="">
+                    <!-- Filter checkboxes -->
+                    <div class="filter-group">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="moderadas" {% if request.GET.moderadas %}checked{% endif %}>
+                            <span class="checkmark"></span> Moderadas
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="no_moderadas" {% if request.GET.no_moderadas %}checked{% endif %}>
+                            <span class="checkmark"></span> No Moderadas
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="pagadas" {% if request.GET.pagadas %}checked{% endif %}>
+                            <span class="checkmark"></span> Pagadas
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="suscriptores" {% if request.GET.suscriptores %}checked{% endif %}>
+                            <span class="checkmark"></span> Para Suscriptores
+                        </label>
+                    </div>
+            
+                    <!-- Date range filters -->
+                    <div class="filter-group">
+                        <label for="fecha_desde">Desde:</label>
+                        <input type="date" name="fecha_desde" value="{{ request.GET.fecha_desde }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="fecha_hasta">Hasta:</label>
+                        <input type="date" name="fecha_hasta" value="{{ request.GET.fecha_hasta }}">
+                    </div>
+            
+                    <!-- Author filter -->
+                    <div class="filter-group">
+                        <label for="autor">Autor:</label>
+                        <select name="autor">
+                            <option value="">Selecciona un autor</option>
+                            {% for autor in autores %}
+                                <option value="{{ autor.id }}" {% if autor.id|stringformat:"s" == request.GET.autor %}selected{% endif %}>
+                                    {{ autor.get_full_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                
+                </form>
+            </div>
+            
+            
+            
+            
+            
+            
             <!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
             <div class="cajaContenidos" id="cajaContenidos">
                 {% if contenidos %}

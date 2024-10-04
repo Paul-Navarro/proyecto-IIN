@@ -12,6 +12,9 @@ from django.contrib.auth import update_session_auth_hash  # Para mantener la ses
 from django.contrib.auth.forms import PasswordChangeForm  # Para el formulario de cambio de contraseña
 
 
+# En tu vista, al procesar los datos
+
+
 from django.contrib.auth import update_session_auth_hash
 
 from django.shortcuts import render
@@ -22,53 +25,91 @@ from django.contrib.auth.decorators import login_required
 from .forms import CustomUserChangeForm
 from django.contrib import messages
 
+from django.contrib.auth import get_user_model
+from datetime import datetime
+
+from django.contrib.auth import get_user_model
+from datetime import datetime, timedelta
+from django.utils.dateparse import parse_date
+
+
+from django.utils.dateparse import parse_date  # Import to handle date parsing
 
 def home(request):
-    
-    #DISPARADOR DE CRON
+    # DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
     cronjob.do()
-    
-    # Obtener todas las categorías
+
+    # Obtener todas las categorías y autores
     categorias = Categoria.objects.all()
+    autores = User.objects.all()
 
     # Filtrar los contenidos publicados
     contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')
 
-    # Verificar si se ha enviado el parámetro de la categoría en el GET
+    # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')
-
-    # Si el parámetro está presente, filtrar los contenidos por esa categoría
     if categoria_id:
         contenidos = contenidos.filter(categoria_id=categoria_id)
 
-    # Verificar si se ha enviado el término de búsqueda
+    # Verificar si se ha enviado un término de búsqueda
     query = request.GET.get('q')
     if query:
-        # Filtrar los contenidos por título o por tags
         contenidos = contenidos.filter(
             Q(titulo_conte__icontains=query) |  # Buscar por título
             Q(tags__nombre__icontains=query)    # Buscar por tags
-        ).distinct()  # Evitar duplicados si coinciden con ambos
+        ).distinct()
 
-    # Verificamos si los filtros adicionales están aplicados
-    if 'moderadas' in request.GET:
-        categorias = categorias.filter(es_moderada=True)
-    if 'no_moderadas' in request.GET:
-        categorias = categorias.filter(es_moderada=False)
-    if 'pagadas' in request.GET:
-        categorias = categorias.filter(es_pagada=True)
-    if 'suscriptores' in request.GET:
-        categorias = categorias.filter(para_suscriptores=True)
+    # Aplicar los filtros adicionales
+    moderadas = 'moderadas' in request.GET
+    no_moderadas = 'no_moderadas' in request.GET
+    pagadas = 'pagadas' in request.GET
+    suscriptores = 'suscriptores' in request.GET
+
+    # Filtrar contenidos por moderación
+    if moderadas and no_moderadas:
+        # Mostrar tanto moderadas como no moderadas
+        contenidos = contenidos.filter(
+            Q(categoria__es_moderada=True) | Q(categoria__es_moderada=False)
+        )
+    elif moderadas:
+        # Mostrar solo moderadas
+        contenidos = contenidos.filter(categoria__es_moderada=True)
+    elif no_moderadas:
+        # Mostrar solo no moderadas
+        contenidos = contenidos.filter(categoria__es_moderada=False)
+
+    # Filtrar contenidos por pagadas
+    if pagadas:
+        contenidos = contenidos.filter(categoria__es_pagada=True)
+
+    # Filtrar contenidos para suscriptores
+    if suscriptores:
+        contenidos = contenidos.filter(categoria__para_suscriptores=True)
+
+    # Filtrar por rango de fechas
+    fecha_desde = request.GET.get('fecha_desde')
+    fecha_hasta = request.GET.get('fecha_hasta')
+    
+    if fecha_desde:
+        contenidos = contenidos.filter(fecha_publicacion__gte=parse_date(fecha_desde))
+    if fecha_hasta:
+        contenidos = contenidos.filter(fecha_publicacion__lte=parse_date(fecha_hasta))
+
+    # Filtrar por autor
+    autor_id = request.GET.get('autor')
+    if autor_id:
+        contenidos = contenidos.filter(autor_id=autor_id)
 
     # Obtener el usuario y sus roles
     user = request.user
     roles_count = user.roles.count() if user.is_authenticated else 0
 
-    # Lógica de roles
+    # Contexto para pasar a la plantilla
     context = {
         'contenidos': contenidos,
         'categorias': categorias,
+        'autores': autores,  # Pasamos los autores al contexto
         'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
         'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
         'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
@@ -79,6 +120,15 @@ def home(request):
     }
 
     return render(request, 'home/index.html', context)
+
+
+
+
+
+
+
+
+
 
 @login_required
 def role_based_redirect(request):
