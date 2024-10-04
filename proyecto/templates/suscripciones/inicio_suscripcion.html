@@ -27,7 +27,7 @@
             <!-- Suscripciones Actuales -->
             <section class="contenedor_suscripciones">
                 <div class="columna_suscripciones">
-                    <h3>Suscripciones Actuales</h3>
+                    <h3 style="text-align: center;">Suscripciones Actuales</h3>
                     <ul>
                         {% for categoria in categorias_suscritas %}
                             <li class="categoria-item">{{ categoria.nombre }}
@@ -43,10 +43,27 @@
                         {% endfor %}
                     </ul>
                 </div>
+                <div class="columna_categorias">
+                    <h3 style="text-align: center;">Categorías Gratuitas</h3>
+                    <form method="POST" action="{% url 'suscribirse_no_pagadas' %}">
+                        {% csrf_token %}
+                        <ul>
+                            {% for categoria in categorias_no_pagadas_para_suscriptores %}
+                                <li>
+                                    <input type="checkbox" name="categorias_no_pagadas" value="{{ categoria.id }}">
+                                    {{ categoria.nombre }}
+                                </li>
+                            {% empty %}
+                                <li>No hay categorías no pagadas disponibles para suscripción.</li>
+                            {% endfor %}
+                        </ul>
+                        <button type="submit" class="boton_pago">Suscribirse</button>
+                    </form>
+                </div>
 
                 <!-- Categorías Disponibles para Suscripción -->
                 <div class="columna_categorias">
-                    <h3>Categorías Disponibles</h3>
+                    <h3 style="text-align: center;">Categorías de Pago</h3>
                     <form id="formulario-suscripcion">  <!-- Cambié el formulario -->
                         {% csrf_token %}
                         <ul>

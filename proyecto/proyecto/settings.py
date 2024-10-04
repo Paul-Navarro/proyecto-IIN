@@ -93,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'leticia',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'PASSWORD': '212612',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -234,3 +234,6 @@ SESSION_SAVE_EVERY_REQUEST = True #asegura que la sesión se renueve con cada so
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # No expira cuando se cierra el navegador
 
+# Configuración de seguridad de cookies
+SESSION_COOKIE_SECURE = False  # Cambiar a True si usas HTTPS en producción
+CSRF_COOKIE_SECURE = False  # Cambiar a True si usas HTTPS en producción
