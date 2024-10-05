@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'users', # Agregamos el app "users"
     'contenido', # Agregamos el app "contenido"
     'categorias', # Agregamos el app "categorias"
+    'imageshare'
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
