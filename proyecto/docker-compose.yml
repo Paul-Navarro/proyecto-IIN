@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: gunicorn --bind 0.0.0.0:8000 wsgi:application
+    volumes:
+      - ./PROYECTO-IIN/proyecto/proyecto:/app
+      - django_media:/app/media
+      - django_static:/app/static
+    environment:
+      - DJANGO_ENV=produccion  # Establece el entorno de producción
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: leticia
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  pictshare:
+    image: ghcr.io/hascheksolutions/pictshare
+    container_name: pictshare
+    ports:  
+      - "9080:80"
+    volumes:
+      - ./data:/var/www/html/upload
+    environment:
+      - ALLOW_ALL=1
+    restart: always
+
+volumes:
+  django_media:
+  django_static:
+

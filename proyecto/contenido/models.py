@@ -32,7 +32,8 @@ class Contenido(models.Model):
     fecha_conte = models.DateField()
     cant_visualiz_conte = models.IntegerField(default=0)
     cant_coment_conte = models.IntegerField(default=0)
-    imagen_conte = models.ImageField(upload_to='imagenes_contenido/', null=True, blank=True)
+    #imagen_conte = models.ImageField(upload_to='imagenes_contenido/', null=True, blank=True)
+    imagen_conte = models.ImageField(upload_to="images/", blank=True, null=True) #Nuevo para almacenar en pictshare
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
 
