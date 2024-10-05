@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Eliminar Contenido{% endblock %}</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/delete_user.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <h1 class="header__title">{% block header_title %}Eliminar Contenido{% endblock %}</h1>
+            <a href="{% url 'administrador_KANBAN' %}" class="btn btn-secondary">Volver a Kanban Administrador</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+                <h2 class="warning-title">Confirmar Eliminación</h2>
+                <p class="warning-text">¿Estás seguro de que deseas eliminar el contenido <strong>{{ contenido.titulo_conte }}</strong>?</p>
+                <form method="post" class="delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar Contenido</button>
+                </form>
+            {% endblock %}
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil</title>
+    {% load static %}
+    <style>
+        /* Asegura que el contenedor principal esté centrado y tenga un ancho máximo */
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-section {
+            flex: 1;
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-left: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .profile-section h2 {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+
+        .btn-secondary {
+            background-color: #3bb5a4;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 20px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background-color: #60c4b8;
+            color: white;
+        }
+
+        .profile-picture {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-picture img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .profile-picture label {
+            margin-top: 10px;
+            font-weight: bold;
+            display: block;
+            font-family: Arial, sans-serif;
+        }
+
+        input[type="text"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .btn-primary {
+            background-color: #00796b;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 18px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+
+        .btn-primary:hover {
+            background-color: #004d40;
+        }
+
+        .form-section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        h3 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        p {
+            font-family: Arial, sans-serif;
+            color: #5f6368;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .profile-section {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main class="profile-section">
+            <h2>Editar Perfil</h2>
+
+            <!-- Display success or error messages -->
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <!-- Form for Profile Picture and Personal Information -->
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Profile Picture Section -->
+                <div class="profile-picture">
+                    <!-- Display the current profile picture -->
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="User Avatar">
+                    {% else %}
+                        <img src="{% static 'img/default-avatar.png' %}" alt="Default Avatar">
+                    {% endif %}
+                    
+                    <!-- File input to upload a new profile picture -->
+                    <label for="profile_image">Cambiar Foto</label>
+                    <input type="file" name="profile_image" id="profile_image">
+                </div>
+
+                <!-- Separate form for personal information -->
+                <div class="form-section">
+                    <label for="id_first_name">Nombre</label>
+                    {{ form.first_name }}
+
+                    <label for="id_last_name">Apellidos</label>
+                    {{ form.last_name }}
+
+                    <label for="id_username">Nombre de usuario</label>
+                    {{ form.username }}
+                </div>
+
+                <button type="submit" class="btn-primary">Guardar Cambios</button>
+            </form>
+
+            <!-- Separate form for password change (optional) -->
+            <h3>Cambiar Contraseña</h3>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="form-section">
+                    <label for="id_old_password">Contraseña antigua</label>
+                    {{ password_form.old_password.errors }}
+                    {{ password_form.old_password }}
+
+                    <label for="id_new_password1">Contraseña nueva</label>
+                    {{ password_form.new_password1.errors }}
+                    {{ password_form.new_password1 }}
+
+                    <label for="id_new_password2">Confirmar contraseña nueva</label>
+                    {{ password_form.new_password2.errors }}
+                    {{ password_form.new_password2 }}
+
+                    <button type="submit" class="btn-primary">Cambiar Contraseña</button>
+                </div>
+            </form>
+
+            <a href="{% url 'home' %}" class="btn-secondary">Volver</a>
+        </main>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

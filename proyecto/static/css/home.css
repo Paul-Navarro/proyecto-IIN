@@ -18,6 +18,7 @@ body {
     padding: 5px; /* Aumenta el padding */
     text-align: center;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    height: 100px;
 }
 
 .titulos_hijos h2 {
@@ -67,6 +68,7 @@ body {
     font-size: 1.1rem; /* Aumenta el tamaño de la fuente */
     cursor: pointer;
     transition: color 0.3s ease, transform 0.3s ease;
+    color:white;
 }
 
 .elementosBarra:hover {
@@ -138,19 +140,20 @@ body {
     padding: 10px; /* Aumenta el padding */
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    width: 80%; /* Ajustamos el ancho a un 50% para que esté centrado */
+    width: 50%;  
     margin-left: auto; /* Esto junto con margin-right asegura el centrado */
     margin-right: auto;
 }
 
 .busqueda {
-    width: 75%; /* Ajusta el ancho según sea necesario */
+    width: 70%; /* Ajusta el ancho según sea necesario */
     min-height: 4vh;
     border: 2px solid #ccc;
     border-radius: 10px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     padding-left: 10px; /* Añadir padding interno para un mejor espaciado */
     text-align: left; /* Alinear texto a la izquierda */
+
 }
 
 .btnBuscar {
@@ -161,9 +164,13 @@ body {
     font-size: 1.2rem; /* Aumenta el tamaño de la fuente */
     border: none;
     border-radius: 10px;
-    margin-left: 15px; /* Aumenta la separación entre el botón y el campo de búsqueda */
+    margin-left: 10px; 
+    margin-right: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 #icono_buscar{
     pointer-events: none;
@@ -177,6 +184,21 @@ body {
 .filter-container {
     margin-left: 15px; /* Aumenta la separación entre el botón de filtro y el campo de búsqueda */
     position: relative;
+}
+
+.filter-group label {
+    margin-right: 10px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.filter-group select, .filter-group input[type="date"] {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
 
@@ -282,6 +304,7 @@ body {
 
     .contenidoRelleno {
         flex: 1 1 100%; /* Un elemento por fila */
+       
     }
 }
 
@@ -307,7 +330,9 @@ body {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     flex: 1 1 45%;
     font-size: 1.2rem;
+    border: 2px solid #a1e1c1; /* Borde verde claro */
 }
+
 
 
 /* Personalización de los checkbox */
@@ -383,6 +408,9 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
     margin-left: 5px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 #icono_filtro{
     pointer-events: none;
@@ -391,7 +419,14 @@ body {
     background-color: #12876a;
     transform: scale(1.1);
 }
+.filter-button, .btnBuscar {
+    margin-right: 0;
+}
 
+.filter-button:hover, .btnBuscar:hover {
+    background-color: #12876a;
+    transform: scale(1.1); /* Aumentar ligeramente el tamaño en hover */
+}
 .filter-options {
     background-color: white;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
@@ -459,4 +494,291 @@ body {
 .no-content p {
     font-size: 1.2rem;
     color: #666;
+}
+
+.info-contenido {
+    margin-top: 20px;
+}
+
+.info-contenido p {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.info-contenido i {
+    color: #16a085; /* Verde suave para los íconos */
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+
+.descripcion {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    line-height: 1.5;
+    border: 2px solid #a1e1c1; /* Borde verde claro */
+}
+
+
+.like-button, .unlike-button {
+    background-color: #28a745; /* Color verde brillante */
+    color: white;
+    padding: 10px 20px; /* Tamaño de padding mayor para un botón más llamativo */
+    font-size: 1.1rem; /* Tamaño de fuente ligeramente más grande */
+    border: none;
+    border-radius: 12px; /* Bordes más redondeados */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra inicial */
+    position: relative; /* Para usar pseudo-elementos */
+    overflow: hidden; /* Asegura que los efectos de animación no se desborden */
+}
+
+.like-button::before, .unlike-button::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    transition: transform 0.6s ease;
+}
+
+.like-button:hover::before, .unlike-button:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.like-button:hover, .unlike-button:hover {
+    background-color: #218838; /* Verde más oscuro en hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Aumenta la sombra en hover */
+    transform: translateY(-3px); /* Efecto de "flotar" hacia arriba */
+}
+
+.like-button:active, .unlike-button:active {
+    background-color: #1e7e34; /* Verde aún más oscuro cuando se hace clic */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Sombra más reducida al hacer clic */
+    transform: translateY(2px); /* Efecto de presión al hacer clic */
+}
+
+.like-button span, .unlike-button span {
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Efectos adicionales: animación cuando el botón es clicado */
+.like-button:focus::after, .unlike-button:focus::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+.contenido-titulo {
+    font-size: 21px;
+    font-weight: bold;
+    margin-bottom: 10px; /* Margen inferior de 10 píxeles */
+    color: #333;
+    padding: 10px 15px; /* Añadimos un poco de padding alrededor del título */
+    border: 2px solid #a1e1c1; /* Borde verde claro */
+    border-radius: 8px; /* Bordes redondeados para un efecto más suave */
+    background-color: #f9f9f9; /* Fondo claro para destacar el título */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera para dar profundidad */
+}
+
+
+.info_sesion {
+    padding: 5px 10px; /* Espaciado interno cómodo */
+    background-color: #f9f9f9; /* Fondo claro para destacar */
+    border: 2px solid #a1e1c1; /* Borde verde claro */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
+    margin-bottom: 20px; /* Separación con otros elementos */
+    font-size: 1rem; /* Aumentamos ligeramente el tamaño del texto */
+    color: #333; /* Color del texto */
+    display: flex; /* Usamos flexbox para alinear el ícono y el texto */
+    align-items: center; /* Centramos verticalmente el ícono y el texto */
+}
+
+.info_sesion i {
+    color: #16a085; /* Color verde para el ícono */
+    margin-right: 10px; /* Espacio entre el ícono y el texto */
+    font-size: 1.5rem; /* Hacemos el ícono un poco más grande */
+}
+
+.info_sesion p {
+    margin: 0; /* Eliminamos márgenes para que el contenido esté alineado */
+    font-weight: bold; /* Resaltamos el texto para mejor legibilidad */
+}
+
+
+
+/* Ventana flotante de notificaciones */
+/* Ventana flotante de notificaciones */
+.notificaciones-contenedor {
+    position: absolute;
+    top: 60px; /* Ajusta la distancia desde el ícono de notificaciones */
+    right: 20px; /* Alineado a la derecha junto con las notificaciones */
+    background-color: #ffffff; /* Fondo blanco para un aspecto más limpio */
+    color: #333; /* Color del texto */
+    border: 1px solid #ddd; /* Borde gris claro */
+    border-radius: 8px; /* Bordes más redondeados para un look más moderno */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Sombra suave y profunda */
+    width: 320px; /* Ajusta el ancho */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    padding: 15px; /* Espaciado interno más amplio */
+    font-size: 0.9rem; /* Tamaño de texto */
+    transition: opacity 0.3s ease-in-out; /* Animación de suavidad al aparecer */
+}
+
+.notificaciones-contenedor h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1rem; /* Un poco más grande para el título */
+    text-align: center; /* Centrado */
+    color: #2c3e50; /* Color oscuro elegante para el título */
+}
+
+.notificaciones-contenedor ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notificaciones-contenedor ul li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+    color: #555; /* Texto ligeramente más suave */
+}
+
+.notificaciones-contenedor ul li:last-child {
+    border-bottom: none;
+}
+
+/* Botón para marcar como leído */
+.notificaciones-contenedor ul li button {
+    background-color: #3498db; /* Azul elegante */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
+}
+
+.notificaciones-contenedor ul li button:hover {
+    background-color: #2980b9; /* Color más oscuro al hacer hover */
+}
+
+/* Ícono de notificaciones */
+.notificaciones {
+    position: absolute;  /* Mantener en su lugar con "fixed" */
+    top: 40px;  /* Ajusta la distancia desde la parte superior */
+    right: 200px; /* Ajusta la distancia desde la derecha */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    display: flex;  /* Alineación interna de los elementos */
+    align-items: center; /* Centrar verticalmente el ícono y el contador */
+}
+
+#icono_notificaciones {
+    font-size: 1.7rem; /* Un poco más grande para mejor visibilidad */
+    color: white; /* Mantiene el color blanco */
+}
+
+#contador_notificaciones {
+    background-color: #e74c3c;  /* Fondo rojo del contador */
+    color: white;  /* Color del texto del contador */
+    border-radius: 50%;  /* Hacer que el contador sea circular */
+    padding: 3px 7px;  /* Espaciado dentro del contador */
+    font-size: 0.75rem;  /* Tamaño del texto del contador */
+    position: absolute;
+    right: -10px;
+    top: -10px;
+}
+
+/* Compensar el margen del contenido para evitar movimiento cuando desaparece el scroll */
+.main-content-wrapper {
+    transition: margin-right 0.3s ease;  /* Transición suave */
+}
+
+/*overlay*/
+/* Estilo para el overlay oscuro */
+.overlay {
+    position: fixed;  /* Fijo para que cubra toda la pantalla */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);  /* Fondo negro con transparencia */
+    z-index: 1;  /* Debe estar por debajo de la ventana de notificaciones */
+    display: none;  /* Inicia oculto */
+}
+
+/* Ajustamos el contenedor de notificaciones para que esté por encima */
+.notificaciones-contenedor {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background-color: #f8f8f8;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2;  /* Por encima del overlay */
+    border-radius: 10px;
+}
+
+/* Para que el contenido de la página se quede debajo cuando el overlay esté activo */
+body.overlay-active {
+    overflow: hidden;  /* Evita el scroll cuando el overlay está activo */
+}
+
+/* Botón de marcar como leído con ícono */
+.btn-marcar-leido {
+    background-color: transparent; /* Fondo transparente */
+    border: none; /* Sin bordes */
+    color: #3498db; /* Color azul del ícono */
+    font-size: 1.2rem; /* Tamaño del ícono */
+    cursor: pointer; /* Manito en el cursor */
+    transition: color 0.3s ease; /* Transición suave en el color */
+    padding: 5px;
+}
+
+.btn-marcar-leido:hover {
+    color: #27ae60; /* Cambia a verde cuando se pasa el ratón */
+}
+
+.notificacion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

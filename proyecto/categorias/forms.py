@@ -16,3 +16,7 @@ class CategoriaForm(forms.ModelForm):
                   'para_suscriptores',
                   'tipo_contenido',
                   'descripcion']
+        widgets = {
+            'es_pagada': forms.CheckboxInput(attrs={'id': 'id_es_pagada'}),
+            'para_suscriptores': forms.CheckboxInput(attrs={'id': 'id_para_suscriptores'}),
+        }

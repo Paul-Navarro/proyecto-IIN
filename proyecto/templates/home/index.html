@@ -20,11 +20,16 @@
     <header class="titulos_padres">
 
         <!-- Mostrar el nombre de usuario como un botón arriba a la izquierda -->
-        <div style="position: absolute; top: 10px; left: 10px;">
+        <div style="position: absolute; top: 10px; left: 10px;width: 250px;height: 100px;text-overflow: ellipsis;overflow: hidden;">
             {% if user.is_authenticated %}
-                <p style="display: inline-block; background-color: #16a085; color: white; padding: 10px 20px; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold;">
+            <div class="info_sesion">
+                <p>
+                    <i class="fas fa-user"></i> <!-- Ícono de usuario de FontAwesome -->
                     Has iniciado sesión como: {{ user.username }}
                 </p>
+            </div>
+            
+ 
             {% endif %}
         </div>
 
@@ -32,8 +37,37 @@
             <!-- Caja de relleno. No posee nada -->
         </div>
         <div class="titulos_hijos">
-            <h2>{% block header_title %}Sistema de Gestión de Contenidos{% endblock %}</h2>
+            <h2 style = "margin-left: 70px;">{% block header_title %}Sistema de Gestión de Contenidos{% endblock %}</h2>
         </div>
+        
+        <!-- Botón de notificaciones -->
+        {% if user.is_authenticated %}
+            <div class="notificaciones">
+                <i id="icono_notificaciones" class="fas fa-bell"></i> <!-- Ícono de campana -->
+                <span id="contador_notificaciones">{{ notificaciones_no_leidas }}</span> <!-- Conteo de notificaciones no leídas -->
+            </div>
+        {% endif %}
+        <div id="overlay" class="overlay" style="display: none;"></div>
+        <!-- Ventana flotante de notificaciones -->
+        <div id="notificaciones_contenedor" class="notificaciones-contenedor" style="display: none;">
+            <h4>Tus Notificaciones</h4>
+            <ul id="lista-notificaciones">
+                {% if notificaciones %}
+                    {% for notificacion in notificaciones %}
+                        <li id="notificacion-{{ notificacion.id }}" class="notificacion-item">
+                            {{ notificacion.titulo }} - {{ notificacion.descripcion }}
+                            <button title = "Marcar como leído" onclick="marcarLeida({{ notificacion.id }})">
+                                <i class="fas fa-check"></i> <!-- Ícono de check -->
+                            </button>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>No tienes notificaciones pendientes.</li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        
         <!-- Sección de login -->
         <div class="titulos_hijos divLogin">
             <div>
@@ -54,7 +88,7 @@
     <nav class="barraNavegacion">
         <div class="elementosBarra">¿Quiénes somos?</div>
         <div class="elementosBarra">Inicio</div>
-        <div class="elementosBarra">Contacto</div>
+        
     </nav>
 
     <!-- Área de lateral izquierdo, contenidos y lateral derecho -->
@@ -143,128 +177,181 @@
                     <li><a href="{% url 'publicador_dashboard' %}">Panel de Publicador</a></li>
                     {% endif %}
                 </ul>
-                
-                <li><strong>Preferencias</strong></li>
-                <ul>
-                    <li><a href="#idioma">Idioma</a></li>
-                    <li><a href="#notificaciones">Notificaciones</a></li>
-                </ul>
-            
-
-            
+                            
                 <li><strong>Configuración</strong></li>
             
                 <ul>
-                    <li><a href="#general">Configuración General</a></li>
-                    <li><a href="#seguridad">Seguridad</a></li>
-                    <li><a href="#integraciones">Integraciones</a></li>
+                    <li><a href="{% url 'editar_perfil' %}">Configurar Perfil</a></li>
+                    <li> <a href = "{% url 'contact_us' %}">Contacto</a></li>
                 </ul>
+
+               
             </ul>
             
         </aside>
         <!-- Área de contenidos -->
         <main class="main-content" id="mainID">
             <div class="cajaBusqueda">
-                <form method="GET" action="">
+                <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
+                    <!-- Search input -->
                     <input type="text" class="busqueda" name="q" placeholder="¿Qué estás buscando?" value="{{ query|default_if_none:'' }}">
+                    
+                    <!-- Search button (magnifying glass) -->
                     <button type="submit" class="btnBuscar">
                         <i id="icono_buscar" class="fas fa-search"></i>
                     </button>
+            
+                    <!-- Filter button -->
+                    <button type="button" class="filter-button" onclick="toggleFilters()">
+                        <i id="icono_filtro" class="fas fa-filter"></i>
+                    </button>
                 </form>
-                <button class="filter-button" onclick="toggleFilters()">
-                    <i id = "icono_filtro" class="fas fa-filter"></i>
-                </button>
-                <div class="filter-container">
-                    <div class="filter-options" id="filters">
-                        <form method="GET" action="">
-                            <div class="filter-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="moderadas" {% if request.GET.moderadas %}checked{% endif %}>
-                                    <span class="checkmark"></span> Moderadas
-                                </label>
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="no_moderadas" {% if request.GET.no_moderadas %}checked{% endif %}>
-                                    <span class="checkmark"></span> No Moderadas
-                                </label>
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="pagadas" {% if request.GET.pagadas %}checked{% endif %}>
-                                    <span class="checkmark"></span> Pagadas
-                                </label>
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="suscriptores" {% if request.GET.suscriptores %}checked{% endif %}>
-                                    <span class="checkmark"></span> Para Suscriptores
-                                </label>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
-                        </form>
+            </div>
+            
+            <!-- Filter options -->
+            <div class="filter-options" id="filters">
+                <form method="GET" action="">
+                    <!-- Filter checkboxes -->
+                    <div class="filter-group">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="moderadas" {% if request.GET.moderadas %}checked{% endif %}>
+                            <span class="checkmark"></span> Moderadas
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="no_moderadas" {% if request.GET.no_moderadas %}checked{% endif %}>
+                            <span class="checkmark"></span> No Moderadas
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="pagadas" {% if request.GET.pagadas %}checked{% endif %}>
+                            <span class="checkmark"></span> Pagadas
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="suscriptores" {% if request.GET.suscriptores %}checked{% endif %}>
+                            <span class="checkmark"></span> Para Suscriptores
+                        </label>
                     </div>
-                </div>
-            </div>
-
-<!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
-<div class="cajaContenidos" id="cajaContenidos">
-    {% if contenidos %}
-        {% for contenido in contenidos %}
-            <div class="contenidoRelleno">
-                <div class="codigoConte">
-                    <span>Código: {{ contenido.id_conte }}</span>
-                </div>
-                <h3>{{ contenido.titulo_conte }}</h3>
-
-                {% if contenido.imagen_conte %}
-                <div class="divImagenContenido">
-                    <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
-                </div>
-                {% endif %}
-
-                <p>{{ contenido.texto_conte|truncatechars:350|safe }}</p>
-
-                <div class="likes-container">
-                    <button class="like-button" data-id="{{ contenido.id_conte }}" onclick="likeContenido({{ contenido.id_conte }})">👍 Like</button>
-                    <span id="like-count-{{ contenido.id_conte }}">{{ contenido.likes }}</span>
+            
+                    <!-- Date range filters -->
+                    <div class="filter-group">
+                        <label for="fecha_desde">Desde:</label>
+                        <input type="date" name="fecha_desde" value="{{ request.GET.fecha_desde }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="fecha_hasta">Hasta:</label>
+                        <input type="date" name="fecha_hasta" value="{{ request.GET.fecha_hasta }}">
+                    </div>
+            
+                    <!-- Author filter -->
+                    <div class="filter-group">
+                        <label for="autor">Autor:</label>
+                        <select name="autor">
+                            <option value="">Selecciona un autor</option>
+                            {% for autor in autores %}
+                                <option value="{{ autor.id }}" {% if autor.id|stringformat:"s" == request.GET.autor %}selected{% endif %}>
+                                    {{ autor.get_full_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     
-                    <button class="unlike-button" data-id="{{ contenido.id_conte }}" onclick="unlikeContenido({{ contenido.id_conte }})">👎 Unlike</button>
-                    <span id="unlike-count-{{ contenido.id_conte }}">{{ contenido.unlikes }}</span>
-                </div>
-
-                <div id="disqus_thread"></div>
-            <script>
-                /**
-                *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-                *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+                    <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
                 
-                var disqus_config = function () {
-                this.page.url = "{{ request.build_absolute_uri }}";  // Replace PAGE_URL with your page's canonical URL variable
-                this.page.identifier =  "{{ contenido.id_conte }}";  // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-                };
-                
-                (function() { // DON'T EDIT BELOW THIS LINE
-                var d = document, s = d.createElement('script');
-                s.src = 'https://polchi.disqus.com/embed.js';
-                s.setAttribute('data-timestamp', +new Date());
-                (d.head || d.body).appendChild(s);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-                <!-- Modificación en el enlace con #disqus_thread -->
-                <div class="btn-container">
-                    <a href="{% url 'contenido_detail' contenido.id_conte %}#disqus_thread" class="btn btn-primary">Leer más</a>
-                </div>
-
-                <!-- Insertar sección de Disqus -->
-                <div id="disqus_thread_{{ contenido.id_conte }}"></div>
+                </form>
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="no-content">
-            <h3>¡Ups! No hay contenido aquí.</h3>
-            <p>Vuelve más tarde para ver actualizaciones o usa los filtros para explorar otros contenidos.</p>
-        </div>
-    {% endif %}
-</div>
             
             
+            
+            
+            
+            
+            <!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
+            <div class="cajaContenidos" id="cajaContenidos">
+                {% if contenidos %}
+                    {% for contenido in contenidos %}
+                        <div class="contenidoRelleno">
+                            <!-- Código del contenido -->
+                            <div class="codigoConte">
+                                <span>Código: {{ contenido.id_conte }}</span>
+                            </div>
+            
+                            <!-- Título del contenido -->
+                            <h3 class="contenido-titulo">{{ contenido.titulo_conte }}</h3>
+            
+                            <!-- Imagen del contenido (opcional) -->
+                            {% if contenido.imagen_conte %}
+                            <div class="divImagenContenido">
+                                <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+                            </div>
+                            {% endif %}
+            
+                            <!-- Descripción del contenido -->
+                            <div class="descripcion">
+                            <p class="contenido-descripcion">{{ contenido.texto_conte|truncatechars:550|safe }}</p>
+                            </div>
+            
+                            <!-- Información adicional del contenido -->
+                            <div class="info-contenido">
+                                <p>
+                                    <i class="fas fa-user"></i> 
+                                    <strong>Autor:</strong> 
+                                    {% if contenido.autor %}
+                                        {{ contenido.autor.get_full_name }}
+                                    {% else %}
+                                        (Autor desconocido)
+                                    {% endif %}
+                                </p>
+                            
+                                <p>
+                                    <i class="fas fa-folder"></i> 
+                                    <strong>Categoría:</strong>
+                                    {% if contenido.categoria %}
+                                        {{ contenido.categoria.nombre }}
+                                    {% else %}
+                                        Sin categoría
+                                    {% endif %}
+                                </p>
+                            
+                                <p>
+                                    <i class="fas fa-calendar-alt"></i> 
+                                    <strong>Fecha de publicación:</strong> 
+                                    {% if contenido.fecha_publicacion %}
+                                        {{ contenido.fecha_publicacion|date:"d M, Y H:i" }}
+                                    {% else %}
+                                        No publicada
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                                 <div class="contenedor_info">
+
+                                    <!-- Sección de likes y unlikes -->
+                                    <div class="likes-container">
+                                        <button class="like-button" data-id="{{ contenido.id_conte }}" onclick="likeContenido({{ contenido.id_conte }})">👍 Like</button>
+                                        <span id="like-count-{{ contenido.id_conte }}">{{ contenido.likes }}</span>
+                                        
+                                        <button class="unlike-button" data-id="{{ contenido.id_conte }}" onclick="unlikeContenido({{ contenido.id_conte }})">👎 Unlike</button>
+                                        <span id="unlike-count-{{ contenido.id_conte }}">{{ contenido.unlikes }}</span>
+                                    </div>
+                    
+                                    <!-- Enlace para leer más -->
+                                    <div class="btn-container">
+                                        <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                                    </div>
+                                    
+                                </div>
+            
+
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-content">
+                        <h3>¡Ups! No hay contenido aquí.</h3>
+                        <p>Vuelve más tarde para ver actualizaciones o usa los filtros para explorar otros contenidos.</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+
         </main>
 
         <!-- Listado lateral derecho -->
@@ -288,7 +375,6 @@
                 Mostrar todos los contenidos
             </button>
             
-            
         </aside>
         
     </div>
@@ -297,6 +383,95 @@
         {% csrf_token %}
     </form>
     <script id="dsq-count-scr" src="//polchi.disqus.com/count.js" async></script>
+    <!-- Botón flotante en la esquina inferior derecha -->
+    <script>
+        // Mostrar u ocultar la ventana de notificaciones
+        document.getElementById("icono_notificaciones").onclick = function() {
+            var contenedor = document.getElementById("notificaciones_contenedor");
+            var overlay = document.getElementById("overlay");
+            var mainContent = document.querySelector('.main-content-wrapper');  // Selecciona el contenido principal
+
+            if (contenedor.style.display === "none") {
+                contenedor.style.display = "block";  // Mostrar notificaciones
+                overlay.style.display = "block";     // Mostrar overlay
+
+                // Compensar el ancho de la barra de scroll solo para el contenido principal
+                var scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+                mainContent.style.marginRight = scrollBarWidth + "px";
+
+                document.body.classList.add('overlay-active');  // Desactivar scroll
+            } else {
+                contenedor.style.display = "none";   // Ocultar notificaciones
+                overlay.style.display = "none";      // Ocultar overlay
+
+                // Restaurar el margen en el contenido principal
+                mainContent.style.marginRight = "0";
+
+                document.body.classList.remove('overlay-active');  // Habilitar scroll
+            }
+        };
+
+        // Cerrar la ventana flotante si se hace clic fuera de ella
+        document.addEventListener("click", function(event) {
+            var contenedor = document.getElementById("notificaciones_contenedor");
+            var overlay = document.getElementById("overlay");
+            var icono = document.getElementById("icono_notificaciones");
+            var mainContent = document.querySelector('.main-content-wrapper');  // Selecciona el contenido principal
+
+            // Si se hace clic fuera de la ventana de notificaciones y del icono de la campanita
+            if (!contenedor.contains(event.target) && event.target !== icono) {
+                contenedor.style.display = "none";   // Ocultar ventana de notificaciones
+                overlay.style.display = "none";      // Ocultar overlay
+
+                // Restaurar el margen en el contenido principal
+                mainContent.style.marginRight = "0";
+
+                document.body.classList.remove('overlay-active');  // Habilitar scroll
+            }
+        });
+
+
+
+    </script>
+    <script>
+        function marcarLeida(id) {
+            console.log("Marcando como leída la notificación con id:", id);
+            var url = "/users/notificacion/leida/" + id + "/";  // Asegúrate de que la URL sea correcta
+
+            fetch(url, {
+                method: "POST",  // Asegúrate de que sea una solicitud POST
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    // Ocultar la notificación marcada como leída
+                    var notificacion = document.getElementById("notificacion-" + id);
+                    notificacion.style.display = "none"; 
+
+                    // Actualizar el contador de notificaciones
+                    var contador = document.getElementById("contador_notificaciones");
+                    contador.innerText = parseInt(contador.innerText) - 1;
+
+                    // Revisar si quedan notificaciones visibles
+                    var notificacionesRestantes = document.querySelectorAll('.notificacion-item:not([style*="display: none"])');
+
+                    // Si no hay notificaciones restantes, mostrar el mensaje "No tienes notificaciones pendientes"
+                    if (notificacionesRestantes.length === 0) {
+                        var listaNotificaciones = document.getElementById("lista-notificaciones");
+                        listaNotificaciones.innerHTML = '<li>No tienes notificaciones pendientes.</li>';
+                    }
+                }
+            })
+            .catch(error => console.log('Error en la solicitud:', error));
+        }
+
+
+    </script>       
 </body>
 
 </html>
+

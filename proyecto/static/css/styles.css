@@ -286,3 +286,28 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background-color: #0e5b5b;
 }
+
+
+.nav-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.nav-list li {
+    margin: 20px 0;
+}
+
+.nav-list li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+}
+/* Asegura que el contenedor principal esté centrado y tenga un ancho máximo */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+

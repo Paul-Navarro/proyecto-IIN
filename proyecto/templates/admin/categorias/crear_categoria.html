@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Crear Categoría{% endblock %}</title>
-    
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/crear_categoria.css' %}">
 </head>
@@ -32,5 +32,29 @@
             {% endblock %}
         </div>
     </main>
+
+    <!-- Bloque de JavaScript -->
+    <script>
+        // Obtener los checkboxes por sus IDs
+        const esPagadaCheckbox = document.getElementById('id_es_pagada');
+        const paraSuscriptoresCheckbox = document.getElementById('id_para_suscriptores');
+
+        // Añadir eventos de cambio a los checkboxes
+        esPagadaCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                paraSuscriptoresCheckbox.disabled = true;
+            } else {
+                paraSuscriptoresCheckbox.disabled = false;
+            }
+        });
+
+        paraSuscriptoresCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                esPagadaCheckbox.disabled = true;
+            } else {
+                esPagadaCheckbox.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

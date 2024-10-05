@@ -18,6 +18,7 @@ from users.views import (
     user_list,    # Vista para listar los usuarios
     home,
     role_based_redirect_choice,
+    editar_perfil
 )
 
 urlpatterns = [
@@ -50,6 +51,10 @@ urlpatterns = [
     # Rutas para seleccionar roles
     path('choose-role/', role_based_redirect, name='role_based_redirect'),
     path('choose-role/<str:role_name>/', role_based_redirect_choice, name='role_based_redirect_choice'),
+    
+    path('admin/', admin.site.urls),
+    path('users/', include('users.urls')), 
+     
 ]
 
 # Para servir archivos media en modo DEBUG (desarrollo)

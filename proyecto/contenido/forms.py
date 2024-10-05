@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contenido
+from .models import Contenido, ReporteContenido
 from categorias.models import Categoria
 from django.utils import timezone
 from django.forms.widgets import DateTimeInput
@@ -44,6 +44,11 @@ class ContenidoForm(forms.ModelForm):
 
         if primera_categoria_no_moderada:
             self.fields['categoria'].initial = primera_categoria_no_moderada
+            
+        if self.instance.pk:
+            self.fields['fecha_publicacion'].required = False  # Edición: no es requerido
+        else:
+            self.fields['fecha_publicacion'].required = True   # Creación: es requerido
 
         # Personalizar el queryset del campo categoría
         self.fields['categoria'].queryset = Categoria.objects.all()
@@ -51,11 +56,26 @@ class ContenidoForm(forms.ModelForm):
         # Establecer la fecha actual como fecha por defecto para el contenido, y hacer el campo readonly
         self.fields['fecha_conte'].initial = timezone.now().date()
         self.fields['fecha_conte'].widget.attrs['readonly'] = True  # Campo de solo lectura
-        
-        # Hacer que el campo 'fecha_publicacion' sea requerido explícitamente
-        self.fields['fecha_publicacion'].required = False  # Aquí lo hacemos obligatorio a la fecha_publicacion
-        
+         
         self.fields['imagen_conte'].required = True  # Aquí lo hacemos obligatorio a la imagen de portada
-        
+
+#formulario de contacto     
+class ContactForm(forms.Form):
+    nombre = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Nombre y apellido'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Correo electrónico'}))
+    asunto = forms.CharField(max_length=200, required=False, widget=forms.TextInput(attrs={'placeholder': 'Asunto'}))
+    mensaje = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Escribe tu mensaje...'}))
 
 
+
+#formulario para reporte de contenidos
+class ReporteContenidoForm(forms.ModelForm):
+    class Meta:
+        model = ReporteContenido
+        fields = ['razon']
+        widgets = {
+            'razon': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Explica el motivo del reporte...'}),
+        }
+        labels = {
+            'razon': 'Motivo del Reporte',
+        }

@@ -3,71 +3,162 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm,UserChangeForm, UserProfileChangeForm
 from django.contrib import messages
 from contenido.models import Contenido, Categoria
 from django.db.models import Q  # Para realizar búsquedas complejas con OR
 from contenido.cron import AutopublicarContenido
+from django.contrib.auth import update_session_auth_hash  # Para mantener la sesión después de cambiar la contraseña
+from django.contrib.auth.forms import PasswordChangeForm  # Para el formulario de cambio de contraseña
 
+
+# En tu vista, al procesar los datos
+
+
+from django.contrib.auth import update_session_auth_hash
 
 from django.shortcuts import render
 
+
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserChangeForm
+from django.contrib import messages
+
+from django.contrib.auth import get_user_model
+from datetime import datetime
+
+from django.contrib.auth import get_user_model
+from datetime import datetime, timedelta
+from django.utils.dateparse import parse_date
+
+
+from django.utils.dateparse import parse_date  # Import to handle date parsing
+
+#para las notificaciones
+from django.views.generic import ListView
+from .models import Notificacion
+from django.http import JsonResponse
+
 def home(request):
-    
-    #DISPARADOR DE CRON
+    # DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
     cronjob.do()
-    
-    # Obtener todas las categorías
+
+    # Obtener todas las categorías y autores
     categorias = Categoria.objects.all()
+    autores = User.objects.all()
 
-    # Filtrar los contenidos publicados
-    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')
+   # Filtrar los contenidos publicados y con autopublicar_conte en True
+    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True)
 
-    # Verificar si se ha enviado el parámetro de la categoría en el GET
+    # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')
-
-    # Si el parámetro está presente, filtrar los contenidos por esa categoría
     if categoria_id:
         contenidos = contenidos.filter(categoria_id=categoria_id)
 
-    # Verificar si se ha enviado el término de búsqueda
+    # Verificar si se ha enviado un término de búsqueda
     query = request.GET.get('q')
     if query:
-        # Filtrar los contenidos por título o por tags
         contenidos = contenidos.filter(
             Q(titulo_conte__icontains=query) |  # Buscar por título
             Q(tags__nombre__icontains=query)    # Buscar por tags
-        ).distinct()  # Evitar duplicados si coinciden con ambos
+        ).distinct()
 
-    # Verificamos si los filtros adicionales están aplicados
-    if 'moderadas' in request.GET:
-        categorias = categorias.filter(es_moderada=True)
-    if 'no_moderadas' in request.GET:
-        categorias = categorias.filter(es_moderada=False)
-    if 'pagadas' in request.GET:
-        categorias = categorias.filter(es_pagada=True)
-    if 'suscriptores' in request.GET:
-        categorias = categorias.filter(para_suscriptores=True)
+    # Aplicar los filtros adicionales
+    moderadas = 'moderadas' in request.GET
+    no_moderadas = 'no_moderadas' in request.GET
+    pagadas = 'pagadas' in request.GET
+    suscriptores = 'suscriptores' in request.GET
+
+    # Filtrar contenidos por moderación
+    if moderadas and no_moderadas:
+        # Mostrar tanto moderadas como no moderadas
+        contenidos = contenidos.filter(
+            Q(categoria__es_moderada=True) | Q(categoria__es_moderada=False)
+        )
+    elif moderadas:
+        # Mostrar solo moderadas
+        contenidos = contenidos.filter(categoria__es_moderada=True)
+    elif no_moderadas:
+        # Mostrar solo no moderadas
+        contenidos = contenidos.filter(categoria__es_moderada=False)
+
+    # Filtrar contenidos por pagadas
+    if pagadas:
+        contenidos = contenidos.filter(categoria__es_pagada=True)
+
+    # Filtrar contenidos para suscriptores
+    if suscriptores:
+        contenidos = contenidos.filter(categoria__para_suscriptores=True)
+
+    # Filtrar por rango de fechas
+    fecha_desde = request.GET.get('fecha_desde')
+    fecha_hasta = request.GET.get('fecha_hasta')
+    
+    if fecha_desde:
+        contenidos = contenidos.filter(fecha_publicacion__gte=parse_date(fecha_desde))
+    if fecha_hasta:
+        contenidos = contenidos.filter(fecha_publicacion__lte=parse_date(fecha_hasta))
+
+    # Filtrar por autor
+    autor_id = request.GET.get('autor')
+    if autor_id:
+        contenidos = contenidos.filter(autor_id=autor_id)
 
     # Obtener el usuario y sus roles
     user = request.user
     roles_count = user.roles.count() if user.is_authenticated else 0
 
-    # Lógica de roles
+    # Obtener las notificaciones no leídas del usuario autenticado
+    notificaciones_no_leidas = 0
+    notificaciones = []
+    if user.is_authenticated:
+        notificaciones = Notificacion.objects.filter(usuario=user, leida=False)
+        notificaciones_no_leidas = notificaciones.count()
+
+    # Contexto para pasar a la plantilla
     context = {
         'contenidos': contenidos,
         'categorias': categorias,
+        'autores': autores,  # Pasamos los autores al contexto
         'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
         'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
         'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
         'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
         'has_multiple_roles': roles_count > 1,
         'has_single_role': roles_count == 1,
-        'query': query  # Pasar el término de búsqueda al contexto
+        'query': query,  # Pasar el término de búsqueda al contexto
+        'notificaciones': notificaciones,  # Añadir las notificaciones al contexto
+        'notificaciones_no_leidas': notificaciones_no_leidas,  # Añadir el conteo de no leídas
     }
 
     return render(request, 'home/index.html', context)
+
+
+#para marcar notificaciones como leidas
+def marcar_como_leida(request, id):
+    # Verificar que el método sea POST y que el usuario esté autenticado
+    if request.method == 'POST' and request.user.is_authenticated:
+        # Obtener la notificación del usuario autenticado
+        notificacion = get_object_or_404(Notificacion, id=id, usuario=request.user)
+        
+        # Marcar la notificación como leída
+        notificacion.leida = True
+        notificacion.save()
+        
+        # Devolver una respuesta JSON con estado 'ok'
+        return JsonResponse({'status': 'ok'})
+    
+    # Si falla, devolver una respuesta de error
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+
+
+
+
+
 
 @login_required
 def role_based_redirect(request):
@@ -211,6 +302,45 @@ def edit_user(request, user_id):
     else:
         form = CustomUserChangeForm(instance=user)
     return render(request, 'admin/users/edit_user.html', {'form': form, 'user': user})
+
+@login_required
+def editar_perfil(request):
+    user = request.user
+
+    # Initialize both forms with user instance data
+    form = UserProfileChangeForm(instance=user)
+    password_form = PasswordChangeForm(user)
+
+    if request.method == 'POST':
+        # Handle profile image upload or personal information changes
+        if 'first_name' in request.POST or 'profile_image' in request.FILES:
+            form = UserProfileChangeForm(request.POST, request.FILES, instance=user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Información personal actualizada exitosamente.')
+                return redirect('editar_perfil')
+            else:
+                messages.error(request, 'Hubo un error al actualizar la información personal.')
+
+        # Handle password change
+        elif 'old_password' in request.POST:
+            password_form = PasswordChangeForm(user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Prevents logout after password change
+                messages.success(request, 'Contraseña cambiada exitosamente.')
+                return redirect('editar_perfil')
+            else:
+                messages.error(request, 'Hubo un error al cambiar la contraseña. Por favor, revisa los campos.')
+
+    # Render the template with both forms
+    return render(request, 'account/configurar_perfil.html', {
+        'form': form,
+        'password_form': password_form,
+    })
+
+
+
 
 
 @login_required

@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import CustomUser, Role
 from allauth.account.forms import SignupForm
+from django.contrib.auth import get_user_model
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -70,12 +71,27 @@ class CustomSignupForm(SignupForm):
     @extends SignupForm
     @description Formulario de registro personalizado que extiende el formulario de registro de `allauth`. Incluye los campos de nombre y apellido, además de los campos estándar de registro.
     """
-    first_name = forms.CharField(max_length=30, label='Nombre')
-    last_name = forms.CharField(max_length=30, label='Apellido')
-
+    first_name = forms.CharField(
+        max_length=30, 
+        label='Nombre',
+        widget=forms.TextInput(attrs={'placeholder': 'Nombre'})  # Adding placeholder here
+    )
+    
+    last_name = forms.CharField(
+        max_length=30, 
+        label='Apellido',
+        widget=forms.TextInput(attrs={'placeholder': 'Apellido'})  # Adding placeholder here
+    )    
     def save(self, request):
         user = super(CustomSignupForm, self).save(request)
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.save()
         return user
+    
+
+User = get_user_model()
+class UserProfileChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'profile_image']  # Incluye el campo de imagen

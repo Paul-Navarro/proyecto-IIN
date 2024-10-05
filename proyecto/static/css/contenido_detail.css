@@ -185,3 +185,70 @@ body {
         font-size: 1rem;
     }
 }
+
+.version-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.version-item {
+    margin-bottom: 20px;  /* Incrementamos un poco más el espacio */
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;  /* Alineamos los elementos al inicio */
+}
+
+.version-item strong {
+    display: block;
+    width: 15%;
+}
+
+.version-item i {
+    margin-right: 8px;  /* Espacio entre el ícono y el texto */
+    color: #3498db;
+}
+
+.version-item .btn-view-version {
+    margin-left: 20px;  /* Separación del botón de la descripción */
+    text-decoration: none;
+    color: #3498db;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.version-item .btn-view-version i {
+    margin-right: 5px;
+}
+
+.version-item .btn-view-version:hover {
+    color: #2c3e50;
+}
+
+
+/* Estilos para el botón de reportar contenido */
+.btn-reportar {
+    color: #1abc9c;  /* Color verde brillante para mantener consistencia */
+    font-weight: bold;  /* Negrita */
+    text-decoration: none;  /* Elimina el subrayado predeterminado */
+    border: 2px solid #1abc9c;  /* Borde verde alrededor del botón */
+    padding: 10px 15px;  /* Relleno interno */
+    border-radius: 5px;  /* Bordes redondeados */
+    display: inline-block;  /* Asegura que se vea como un botón */
+    transition: all 0.3s ease;  /* Transición suave para hover */
+}
+
+.btn-reportar:hover {
+    background-color: #1abc9c;  /* Fondo verde brillante en hover */
+    color: white;  /* Texto blanco al pasar el ratón */
+    text-decoration: none;  /* Sin subrayado en hover */
+    cursor: pointer;  /* Cambia el cursor a pointer en hover */
+}
+
+/* Ajusta el espacio entre el ícono y el texto */
+.btn-reportar i {
+    margin-right: 5px;  /* Añade espacio entre el ícono y el texto */
+}
+

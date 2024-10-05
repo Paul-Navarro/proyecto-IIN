@@ -7,6 +7,8 @@ function toggleFilters() {
     }
 }
 
+
+
 // Cierra el menú si se hace clic fuera de él
 window.onclick = function(event) {
     if (!event.target.matches('.filter-button') && !event.target.closest('.filter-options')) {
