@@ -10,6 +10,8 @@ urlpatterns = [
     
     path('contenido_admin', views.administrador_KANBAN, name='administrador_KANBAN'),
     
+    path('contenido/seleccionar_version/<int:pk>/<int:version_id>/', views.seleccionar_version, name='seleccionar_version'),
+
     
     path('contenido_editor/<int:pk>/', views.contenido_detail_editor, name='contenido_detail_editor'),
     path('contenido_publicador/<int:pk>/', views.contenido_detail_publicador, name='contenido_detail_publicador'),

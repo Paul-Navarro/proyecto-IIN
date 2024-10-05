@@ -51,9 +51,23 @@ class Contenido(models.Model):
         blank=True
     )
     fecha_publicacion = models.DateTimeField(null=True, blank=True)
+    
+     # Campo para almacenar la versión actual seleccionada
+    version_actual = models.ForeignKey(
+        'VersionContenido',  # Relacionado con el modelo de versiones
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='contenido_version_actual'
+    )
 
     def __str__(self):
         return self.titulo_conte
+    
+    def establecer_version_actual(self, version):
+        """Establece una versión específica como la versión actual del contenido."""
+        self.version_actual = version
+        self.save()
     
         # Método para verificar si el contenido debe ser publicado
     def autopublicar(self):

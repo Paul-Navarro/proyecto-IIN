@@ -347,7 +347,7 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 contenido.save()
                 # Obtener la razón más reciente si es "BORRADOR"
                 ultima_razon_cambio = CambioBorrador.objects.filter(contenido=contenido).last()
-                razon_cambio_text = ultima_razon_cambio.razon if ultima_razon_cambio else "No especificada"
+                razon_cambio_text = ultima_razon_cambio.razon if ultima_razon_cambio else ''
                 
                 return JsonResponse({
                 'success': True,
@@ -433,6 +433,17 @@ def unlike_contenido(request, id_conte):
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+
+def seleccionar_version(request, pk, version_id):
+    contenido = get_object_or_404(Contenido, pk=pk)
+    version = get_object_or_404(VersionContenido, id=version_id, contenido_original=contenido)
+
+    # Establecer esta versión como la versión actual
+    contenido.establecer_version_actual(version)
+    
+    messages.success(request, f'La versión {version.version_num} ha sido seleccionada como la versión actual.')
+    
+    return redirect('contenido_detail_autor', pk=contenido.id_conte)
 
 #--------------------------------------
 

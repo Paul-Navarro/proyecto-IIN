@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ contenido.titulo_conte }}</title>
+    <title>{{ contenido.version_actual.texto_conte|default:contenido.texto_conte|safe }}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/contenido_detail.css' %}">
 </head>
@@ -28,7 +28,7 @@
 
         <!-- Cuerpo del Contenido -->
         <div class="content-body">
-            <p>{{ contenido.texto_conte|safe }}</p>
+            <p>{{ contenido.version_actual.texto_conte|default:contenido.texto_conte|safe }}</p>
         </div>
 
         <!-- Metadatos del Contenido -->
@@ -43,21 +43,32 @@
             <h3><i class="fas fa-history"></i> Versiones Anteriores</h3>
 
             {% if versiones %}
-                <ul class="version-list">
-                    {% for version in versiones %}
-                        <li class="version-item">
-                            <i class="fas fa-file-alt"></i> 
-                            <strong>Versión {{ version.version_num }}:</strong> {{ version.fecha_version }} - {{ version.titulo_conte }}
-                            <a href="{% url 'contenido_version_detail' pk=contenido.pk version_num=version.version_num %}" class="btn-view-version">
-                                <i class="fas fa-eye"></i> Ver esta versión
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p><i class="fas fa-info-circle"></i> No hay versiones anteriores disponibles para este contenido.</p>
-            {% endif %}
-            
+            <ul class="version-list">
+                {% for version in versiones %}
+                    <li class="version-item">
+                        <i class="fas fa-file-alt"></i> 
+                        <strong>Versión {{ version.version_num }}:</strong> {{ version.fecha_version }} - {{ version.titulo_conte }}
+        
+                        <!-- Botón para ver la versión -->
+                        <a href="{% url 'contenido_version_detail' pk=contenido.pk version_num=version.version_num %}" class="btn-view-version">
+                            <i class="fas fa-eye"></i> Ver esta versión
+                        </a>
+        
+                        <!-- Botón para seleccionar esta versión como la actual -->
+                        <a href="{% url 'seleccionar_version' pk=contenido.pk version_id=version.id %}" class="btn-select-version">
+                            <i class="fas fa-check-circle"></i> Seleccionar esta versión
+                        </a>
+        
+                        <!-- Mostrar si esta versión es la actual -->
+                        {% if contenido.version_actual == version %}
+                            <span class="badge badge-success">Versión actual</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p><i class="fas fa-info-circle"></i> No hay versiones anteriores disponibles para este contenido.</p>
+        {% endif %}
             
             <!-- Cargar Font Awesome -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
