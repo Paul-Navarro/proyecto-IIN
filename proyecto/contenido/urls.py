@@ -6,14 +6,31 @@ urlpatterns = [
     #Urls de los contenidos
     path('', views.contenido_list, name='contenido_list'),
     path('contenido/<int:pk>/', views.contenido_detail, name='contenido_detail'),
+    
+    path('contenido_editor/<int:pk>/', views.contenido_detail_editor, name='contenido_detail_editor'),
+    path('contenido_publicador/<int:pk>/', views.contenido_detail_publicador, name='contenido_detail_publicador'),
+    path('contenido_autor/<int:pk>/', views.contenido_detail_autor, name='contenido_detail_autor'),
     path('contenido/new/', views.contenido_create, name='contenido_create'),
+    
     path('contenido/<int:pk>/edit/', views.contenido_update, name='contenido_update'),
+    path('contenido/<int:pk>/edit_editor/', views.contenido_update_editor, name='contenido_update_editor'),
+    
     path('contenido/<int:pk>/delete/', views.contenido_delete, name='contenido_delete'),
     path('contenido/<int:id>/', views.contenido_detail, name='contenido_detail'),
+    
     path('contenido/cambiar-estado/<int:id_conte>/', views.contenido_cambiar_estado, name='contenido_cambiar_estado'),
+
+    path('contenido/cambiar_estado/<int:id_conte>/', views.contenido_cambiar_estado_KANBAN, name='contenido_cambiar_estado_KANBAN'),
     
     #Urls del PUBLICADOR para administrar contenidos
      path('publicador/gestionar/', views.gestionar_contenido, name='gestionar_contenido'),
+     
+     
+     path('contenido/<int:id_conte>/like/', views.like_contenido, name='like_contenido'),
+     path('contenido/<int:id_conte>/unlike/', views.unlike_contenido, name='unlike_contenido'),
+
+    #Url para suscripcion
+    path('suscripciones/', views.suscripciones_view, name='suscripciones'),
 ]
 
 '''

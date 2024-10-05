@@ -2,6 +2,7 @@ from django import forms
 from .models import Contenido
 from categorias.models import Categoria
 from django.utils import timezone
+from django.forms.widgets import DateTimeInput
 
 class ContenidoForm(forms.ModelForm):
     '''
@@ -17,28 +18,22 @@ class ContenidoForm(forms.ModelForm):
         label='Categoría'
     )
 
-    # Campo para eliminar la imagen actual
-    clear_image = forms.BooleanField(
-        required=False,
-        label="Eliminar la imagen actual",
-        widget=forms.CheckboxInput()
-    )
-
     class Meta:
         model = Contenido
-        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags']
+        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags','fecha_publicacion']
         labels = {
-            'titulo_conte': 'Título del Contenido',
-            'tipo_conte': 'Tipo de Contenido',
-            'texto_conte': 'Texto del Contenido',
-            'fecha_conte': 'Fecha del Contenido',
-            'imagen_conte': 'Imagen de Portada (opcional)',
+            'titulo_conte': 'Título del contenido',
+            'tipo_conte': 'Tipo de contenido',
+            'texto_conte': 'Texto del contenido',
+            'fecha_conte': 'Fecha creacion del contenido',
+            'imagen_conte': 'Imagen de Portada (Obligatorio)',
             'categoria': 'Categoría',
             'tags': 'Tags',
         }
         
         widgets = {
             'tags': forms.CheckboxSelectMultiple(),  # Mostrar los tags como checkboxes
+            'fecha_publicacion': DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -56,5 +51,11 @@ class ContenidoForm(forms.ModelForm):
         # Establecer la fecha actual como fecha por defecto para el contenido, y hacer el campo readonly
         self.fields['fecha_conte'].initial = timezone.now().date()
         self.fields['fecha_conte'].widget.attrs['readonly'] = True  # Campo de solo lectura
+        
+        # Hacer que el campo 'fecha_publicacion' sea requerido explícitamente
+        self.fields['fecha_publicacion'].required = False  # Aquí lo hacemos obligatorio a la fecha_publicacion
+        
+        self.fields['imagen_conte'].required = True  # Aquí lo hacemos obligatorio a la imagen de portada
+        
 
 

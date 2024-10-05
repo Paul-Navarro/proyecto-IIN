@@ -42,3 +42,38 @@ const redirigirRegistro=()=>{
     window.location.href = "./accounts/signup/";
 }
 
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+function likeContenido(id_conte) {
+    fetch(`/contenido/contenido/${id_conte}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(`like-count-${id_conte}`).textContent = data.likes;
+        document.getElementById(`unlike-count-${id_conte}`).textContent = data.unlikes;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function unlikeContenido(id_conte) {
+    fetch(`/contenido/contenido/${id_conte}/unlike/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(`like-count-${id_conte}`).textContent = data.likes;
+        document.getElementById(`unlike-count-${id_conte}`).textContent = data.unlikes;
+    })
+    .catch(error => console.error('Error:', error));
+}

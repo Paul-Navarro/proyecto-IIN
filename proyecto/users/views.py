@@ -7,11 +7,17 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib import messages
 from contenido.models import Contenido, Categoria
 from django.db.models import Q  # Para realizar búsquedas complejas con OR
+from contenido.cron import AutopublicarContenido
 
 
 from django.shortcuts import render
 
 def home(request):
+    
+    #DISPARADOR DE CRON
+    cronjob = AutopublicarContenido()
+    cronjob.do()
+    
     # Obtener todas las categorías
     categorias = Categoria.objects.all()
 
@@ -62,8 +68,6 @@ def home(request):
     }
 
     return render(request, 'home/index.html', context)
-
-
 
 @login_required
 def role_based_redirect(request):
@@ -129,15 +133,24 @@ def editor_dashboard(request):
     @function editor_dashboard
     @description Renderiza el panel de administración para usuarios con el rol de Editor.
     """
-    return render(request, '../templates/editor/dashboard.html')
+    
+    contenidos = Contenido.objects.all() 
+    return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})
 
 @login_required
 def publicador_dashboard(request):
+    
+    #DISPARADOR DE CRON
+    cronjob = AutopublicarContenido()
+    cronjob.do()
     """
     @function publicador_dashboard
     @description Renderiza el panel de administración para usuarios con el rol de Publicador.
     """
-    return render(request, '../templates/publicador/dashboard.html')
+    contenidos = Contenido.objects.all()  
+    user_role = 'Publicador'
+    
+    return render(request, '../templates/publicador/dashboard.html',{'contenidos': contenidos,'user_role': user_role})
 
 @login_required
 def suscriptor_dashboard(request):
@@ -153,7 +166,9 @@ def autor_dashboard(request):
     @function autor_dashboard
     @description Renderiza el panel de administración para usuarios con el rol de Autor.
     """
-    return render(request, '../templates/autor/dashboard.html')
+    
+    contenidos = Contenido.objects.filter(autor=request.user)
+    return render(request, '../templates/autor/dashboard.html',{'contenidos': contenidos})
 
 
 User = get_user_model()

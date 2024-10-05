@@ -2,6 +2,7 @@ from django.db import models
 from categorias.models import Categoria  # Importa el modelo Categoria
 from ckeditor.fields import RichTextField
 from django.conf import settings
+from django.utils import timezone
 
 
 class Tag(models.Model):
@@ -19,7 +20,9 @@ class Contenido(models.Model):
     '''
     
     ESTADOS = [
-        ('EN_REVISION', 'En Revisión'),
+        ('BORRADOR', 'Borrador'),
+        ('EDITADO', 'EDITADO'),
+        ('A_PUBLICAR', 'A Publicar'),
         ('PUBLICADO', 'Publicado'),
         ('RECHAZADO', 'Rechazado'),
     ]
@@ -36,6 +39,8 @@ class Contenido(models.Model):
     imagen_conte = models.ImageField(upload_to="images/", blank=True, null=True) #Nuevo para almacenar en pictshare
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
+    likes = models.IntegerField(default=0)
+    unlikes = models.IntegerField(default=0)
 
     # Relación con el autor del contenido
     autor = models.ForeignKey(
@@ -44,7 +49,45 @@ class Contenido(models.Model):
         null=True, 
         blank=True
     )
+    fecha_publicacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.titulo_conte
     
+        # Método para verificar si el contenido debe ser publicado
+    def autopublicar(self):
+        if self.fecha_publicacion and self.fecha_publicacion <= timezone.now() and self.estado_conte == 'A_PUBLICAR':
+            self.estado_conte = 'PUBLICADO'
+            self.save()
+    
+
+
+class Rechazo(models.Model):
+    '''
+    @class Rechazo
+    @extends models.Model
+    @description Modelo que representa el rechazo de un contenido, incluyendo la razón y la fecha.
+    '''
+    
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='rechazos')
+    razon = models.TextField()  # La razón del rechazo
+    fecha = models.DateTimeField(auto_now_add=True)  # Fecha y hora del rechazo
+
+    def __str__(self):
+        return f"Rechazo de {self.contenido.titulo_conte} en {self.fecha.strftime('%Y-%m-%d')}"
+    
+    
+    
+class VotoContenido(models.Model):
+    VOTOS = [
+        ('LIKE', 'Like'),
+        ('UNLIKE', 'Unlike')
+    ]
+    
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
+    tipo_voto = models.CharField(max_length=6, choices=VOTOS)
+    fecha_voto = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('usuario', 'contenido')  # Evita duplicados de votos

@@ -69,9 +69,8 @@
                                     {% csrf_token %}
                                     <div class="estado-options">
                                         <select name="nuevo_estado">
-                                            <option value="PUBLICADO" {% if contenido.estado_conte == 'PUBLICADO' %}selected{% endif %}>Publicar</option>
-                                            <option value="RECHAZADO" {% if contenido.estado_conte == 'RECHAZADO' %}selected{% endif %}>Rechazar</option>
-                                            <option value="EN_REVISION" {% if contenido.estado_conte == 'EN_REVISION' %}selected{% endif %}>En Revisión</option>
+                                            <option value="A_PUBLICAR" {% if contenido.estado_conte == 'A_PUBLICAR' %}selected{% endif %}>A Publicar</option>
+                                            <option value="EDITADO" {% if contenido.estado_conte == 'EDITADO' %}selected{% endif %}>Editado</option>
                                         </select>
                                         <button type="submit" class="btn btn-primary">Actualizar Estado</button>
                                     </div>

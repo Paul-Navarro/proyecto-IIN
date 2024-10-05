@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+        
     'ckeditor',
         
     'django.contrib.sites',  # Necesario para allauth
@@ -142,7 +142,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Asuncion'  # Ajusta según tu zona horaria
 
 USE_I18N = True
 
@@ -163,3 +163,27 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#CONFIGURACION DEL CRON(Automatizacion de Publicaciones)
+
+CRON_CLASSES = [
+    "contenido.cron.AutopublicarContenido",
+]
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django_cron': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}

@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Editor</title>
     
-    {% load static %}  <!-- Cargar archivos estáticos -->
-    <link rel="stylesheet" href="{% static 'css/editor_dashboard.css' %}">  <!-- Enlace al archivo CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/editor_dashboard.css' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
@@ -14,23 +17,238 @@
         <nav>
             <ul>
                 <li class="btn btn-home"><a href="{% url 'home' %}">Inicio</a></li>
-                <li><a href="#">Crear Nuevo Contenido</a></li>
-                <li><a href="#">Gestionar Contenido Existente</a></li>
-                <li><a href="#">Revisar Comentarios</a></li>
+                <li><a href="#">Gestionar Contenidos</a></li>
                 <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
-                
             </ul>
         </nav>
     </header>
+
+    <!-- Aviso de Cambio de Estado -->
+    <div id="stateChangeAlert" class="alert alert-success alert-dismissible fade show" role="alert" style="display: none;">
+        <span id="stateChangeMessage"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
     <main>
         <section>
-            <h2>Herramientas de Edición</h2>
-            <p>Aquí puedes gestionar el contenido de la plataforma, crear nuevos artículos, y revisar los comentarios de los usuarios.</p>
-        </section>
-        <section>
-            <h2>Últimos Artículos Publicados</h2>
-            <p>Revisa los artículos más recientes y realiza ediciones si es necesario.</p>
+            <h2>Tablero Kanban</h2>
+            <div class="kanban-board">
+                <!-- Columna Borrador -->
+                <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3><i class="fas fa-pencil-alt"></i> Borrador</h3> <!-- Icono para Borrador -->
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'BORRADOR' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_update_editor' contenido.id_conte %}" class="btn btn-ver">Editar</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna En revisión/EDITADO -->
+                <div class="kanban-column" id="editado" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3><i class="fas fa-edit"></i> Editado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'EDITADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail_editor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Columna Rechazado -->
+                <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3><i class="fas fa-times-circle"></i> Rechazado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'RECHAZADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_update_editor' contenido.pk %}" class="btn btn-ver">Editar</a>
+                                    <!-- Mostrar la razón del rechazo si existe -->
+                                    {% if contenido.rechazos.exists %}
+                                    <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
+                                    {% else %}
+                                    <span class="razon-rechazo">Razón: No especificada</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
+
+    <script>
+        // Permitir que los elementos sean arrastrables
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        // Empezar a arrastrar
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        // Soltar el elemento en la nueva columna y cambiar su estado
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var draggedItem = document.getElementById(data);
+
+            // Asegurarse de que se suelte en el área correcta (columna)
+            if (ev.target.classList.contains('kanban-items')) {
+                var targetColumn = ev.target.closest('.kanban-column').id;
+
+                // No permitir que se arrastre contenido a la columna "Rechazado" desde otra columna
+                if (targetColumn === 'rechazado') {
+                    $('#warningModal').modal('show');  // Mostrar modal si se intenta arrastrar a "Rechazado"
+                    return;  // Detener el proceso de arrastre
+                }
+
+                // Mover el contenido visualmente a la nueva columna
+                ev.target.appendChild(draggedItem);
+
+                // Si el contenido fue movido a una columna diferente de "Rechazado", eliminar la razón de rechazo si existe
+                var reasonElement = draggedItem.querySelector('.razon-rechazo');
+                if (reasonElement) {
+                    reasonElement.remove();
+                }
+
+                // Cambiar dinámicamente el botón dependiendo de la columna a la que fue movido
+                var button = draggedItem.querySelector('a.btn');
+                if (targetColumn === 'borrador') {
+                    button.textContent = 'Editar';
+                    button.href = `/contenido/contenido/${data.replace('item', '')}/edit_editor/`;
+
+                } else if (targetColumn === 'editado') {
+                    button.textContent = 'Ver';
+                    button.href = `/contenido/contenido_editor/${data.replace('item', '')}/`;
+
+                }
+
+                // Llamada AJAX para actualizar el estado en el servidor
+                fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
+                    },
+                    body: JSON.stringify({
+                        'nuevo_estado': targetColumn.toUpperCase()  // Enviar el nuevo estado
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar el mensaje de cambio de estado
+                        showStateChangeMessage(data.titulo, data.old_state, targetColumn);
+                    } else {
+                        alert('Error al actualizar el estado.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        // Mostrar mensaje de cambio de estado
+        function showStateChangeMessage(titulo, oldState, newState) {
+            const readableOldState = transformState(oldState);  // Transformar oldState
+            const readableNewState = transformState(newState);  // Transformar newState
+            const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
+
+            // Insertar el mensaje en el contenedor de la alerta
+            document.getElementById('stateChangeMessage').textContent = message;
+
+            // Mostrar la alerta
+            const alertElement = document.getElementById('stateChangeAlert');
+            alertElement.style.display = 'block';  // Mostrar la alerta
+
+            // Ocultar la alerta después de 10 segundos
+            setTimeout(function() {
+                alertElement.style.display = 'none';  // Ocultar la alerta
+            }, 10000);
+        }
+
+        // Función para transformar los estados en nombres más legibles
+        function transformState(state) {
+            switch (state.toUpperCase()) {
+                case 'EDITADO':
+                    return 'Editado';
+                case 'RECHAZADO':
+                    return 'Rechazado';
+                case 'A_PUBLICAR':
+                    return 'A Publicar';
+                case 'BORRADOR':
+                    return 'Borrador';
+                default:
+                    return state;  // Retorna el estado original si no hay transformación
+            }
+        }
+    </script>
+
+    <!-- Modal de advertencia -->
+    <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="warningModalLabel">Advertencia</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ¡Solo el Publicador puede rechazar un contenido!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ingresar la razón de rechazo -->
+    <div class="modal fade" id="razonRechazoModal" tabindex="-1" role="dialog" aria-labelledby="razonRechazoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title" id="razonRechazoModalLabel">Razón del Rechazo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="razonRechazoInput">Por favor, ingresa la razón del rechazo:</label>
+                            <textarea class="form-control" id="razonRechazoInput" rows="3" placeholder="Escribe la razón..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="guardarRechazoBtn" class="btn btn-danger">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

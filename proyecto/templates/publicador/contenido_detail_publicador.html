@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ contenido.titulo_conte }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/contenido_detail.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <h1 class="header__title">Gestión de Contenidos</h1>
+            <a href="{% url 'publicador_dashboard' %}" class="btn">Volver a Kanban Publicador</a>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <!-- Título del Contenido -->
+        <h1 class="content-title">{{ contenido.titulo_conte }}</h1>
+
+        <!-- Imagen de Portada -->
+        <div class="cover-image">
+            {% if contenido.imagen_conte %}
+            <img src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+            {% endif %}
+        </div>
+
+        <!-- Cuerpo del Contenido -->
+        <div class="content-body">
+            <p>{{ contenido.texto_conte|safe }}</p>
+        </div>
+
+        <!-- Metadatos del Contenido -->
+        <div class="content-meta">
+            <p><strong>Publicado el:</strong> {{ contenido.fecha_conte }}</p>
+            <p><strong>Autor:</strong> {{ contenido.autor.first_name }} {{ contenido.autor.last_name }}</p>
+            <!-- Mostrar la fecha de publicación programada si existe -->
+            {% if contenido.fecha_publicacion %}
+            <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
+            {% endif %}
+        </div>
+        
+    </div>
+</body>
+</html>

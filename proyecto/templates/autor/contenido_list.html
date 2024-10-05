@@ -63,9 +63,11 @@
                             <td><div class="table-cell">{{ contenido.cant_visualiz_conte }}</div></td>
                             <td><div class="table-cell">{{ contenido.cant_coment_conte }}</div></td>
                             <td class="content-table__actions">
+                                {% if contenido.estado_conte == 'BORRADOR' %}
                                 <a href="{% url 'contenido_update' contenido.id_conte %}" class="btn btn-edit">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
+                                {% endif %}
                                 <a href="{% url 'contenido_delete' contenido.id_conte %}" class="btn btn-delete">
                                     <i class="fas fa-trash-alt"></i> Eliminar
                                 </a>

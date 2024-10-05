@@ -1,11 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido
+from .models import Contenido,Rechazo,VotoContenido
 from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
 from .forms import ContenidoForm
 from categorias.models import Categoria
 from django.contrib import messages
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 
 def contenido_list(request):
@@ -32,8 +36,40 @@ def contenido_detail(request, pk):
     @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
     '''
     contenido = get_object_or_404(Contenido, pk=pk)
-    return render(request, 'autor/contenido_detail.html', {'contenido': contenido})
+    return render(request, 'home/contenido_detail.html', {'contenido': contenido})
 
+def contenido_detail_editor(request, pk):
+    '''
+    @function contenido_detail
+    @description Muestra los detalles de un contenido específico.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a mostrar.
+    @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    return render(request, 'editor/contenido_detail_editor.html', {'contenido': contenido})
+
+def contenido_detail_publicador(request, pk):
+    '''
+    @function contenido_detail
+    @description Muestra los detalles de un contenido específico.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a mostrar.
+    @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    return render(request, 'publicador/contenido_detail_publicador.html', {'contenido': contenido})
+
+def contenido_detail_autor(request, pk):
+    '''
+    @function contenido_detail
+    @description Muestra los detalles de un contenido específico.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a mostrar.
+    @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    return render(request, 'autor/contenido_detail_autor.html', {'contenido': contenido})
 
 def contenido_create(request):
     '''
@@ -64,7 +100,7 @@ def contenido_create(request):
             if contenido.categoria and not contenido.categoria.es_moderada:
                 contenido.estado_conte = 'PUBLICADO'
             else:
-                contenido.estado_conte = 'EN_REVISION'
+                contenido.estado_conte = 'BORRADOR'
 
             
             contenido.save()  # Guardar el contenido con el estado ajustado y el autor
@@ -126,6 +162,56 @@ def contenido_update(request, pk):
         'categorias_suscriptores': categorias_suscriptores,
     })
 
+def contenido_update_editor(request, pk):
+    '''
+    @function contenido_update
+    @description Actualiza un contenido existente. Maneja la validación del formulario y guarda los cambios.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a actualizar.
+    @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    rechazos = contenido.rechazos.all()  # Obtener todos los rechazos asociados a este contenido
+    
+    # Obtener las categorías agrupadas
+    categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
+    categorias_moderadas = Categoria.objects.filter(es_moderada=True)
+    categorias_pagadas = Categoria.objects.filter(es_pagada=True)
+    categorias_suscriptores = Categoria.objects.filter(para_suscriptores=True)
+
+    if request.method == 'POST':
+        form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Se añade request.FILES
+        if form.is_valid():
+            # Guardar el contenido pero no las relaciones many-to-many (como los tags)
+            contenido = form.save(commit=False)
+
+            # Si el campo clear_image está marcado, eliminar la imagen
+            if form.cleaned_data.get('clear_image'):
+                contenido.imagen_conte.delete()  # Eliminar la imagen del campo
+                
+            #La fecha de programacion de publicacion del contenido se mantiene intacta.    
+            contenido.fecha_publicacion = Contenido.objects.get(pk=pk).fecha_publicacion
+            contenido.estado_conte = 'EDITADO'  # Cambiar el estado a "EDITADO"
+
+            # Guardar el contenido con los campos actualizados
+            contenido.save()
+
+            # Guardar los tags (relaciones many-to-many)
+            form.save_m2m()
+
+            return redirect('editor_dashboard')
+    else:
+        form = ContenidoForm(instance=contenido)
+
+    return render(request, 'editor/contenido_update_editor.html', {
+        'form': form,
+        'categorias_no_moderadas': categorias_no_moderadas,
+        'categorias_moderadas': categorias_moderadas,
+        'categorias_pagadas': categorias_pagadas,
+        'categorias_suscriptores': categorias_suscriptores,
+        'rechazos': rechazos
+    })
+
 
 def contenido_delete(request, pk):
     '''
@@ -149,7 +235,7 @@ def contenido_cambiar_estado(request, id_conte):
         # Obtener el nuevo estado desde el formulario
         nuevo_estado = request.POST.get('nuevo_estado')
 
-        if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EN_REVISION']:
+        if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO','BORRADOR','A_PUBLICAR']:
             # Actualizar el estado del contenido
             contenido.estado_conte = nuevo_estado
             contenido.save()
@@ -168,3 +254,116 @@ def gestionar_contenido(request):
     """
     contenidos = Contenido.objects.all()
     return render(request, 'publicador/contenido_gestion.html', {'contenidos': contenidos})
+
+
+@csrf_exempt
+def contenido_cambiar_estado_KANBAN(request, id_conte):
+    # Obtener el contenido por su ID
+    contenido = get_object_or_404(Contenido, pk=id_conte)
+
+    if request.method == 'POST':
+        try:
+            # Obtener el nuevo estado desde la solicitud AJAX
+            data = json.loads(request.body)
+            nuevo_estado = data.get('nuevo_estado')
+
+            if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO', 'BORRADOR', 'A_PUBLICAR']:
+                
+                if nuevo_estado == 'RECHAZADO':
+                    razon_rechazo = data.get('razon_rechazo', '')
+                    Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
+                
+                # Actualizar el estado del contenido
+                old_state = contenido.estado_conte
+                contenido.estado_conte = nuevo_estado
+                
+                contenido.save()
+                
+                return JsonResponse({
+                'success': True,
+                'old_state': old_state,
+                'new_state': nuevo_estado,
+                'titulo': contenido.titulo_conte,
+                'fecha_publicacion': contenido.fecha_publicacion
+ })
+            else:
+                return JsonResponse({'success': False, 'error': 'Estado no válido'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Error al procesar los datos'}, status=400)
+    else:
+        return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+    
+
+def editor_dashboard(request):
+    """
+    @function editor_dashboard
+    @description Renderiza el panel de administración para usuarios con el rol de Editor.
+    """
+    
+    contenidos = Contenido.objects.all() 
+    return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})
+
+@csrf_exempt
+@login_required
+def like_contenido(request, id_conte):
+    contenido = get_object_or_404(Contenido, id_conte=id_conte)
+    usuario = request.user
+
+    if request.method == 'POST':
+        # Verificar si el usuario ya ha dado like o unlike
+        voto, created = VotoContenido.objects.get_or_create(usuario=usuario, contenido=contenido)
+
+        if not created and voto.tipo_voto == 'LIKE':
+            # Si el usuario ya ha dado like, lo quitamos
+            contenido.likes -= 1
+            voto.delete()  # Eliminamos el voto
+        else:
+            if voto.tipo_voto == 'UNLIKE':
+                # Si tenía un unlike, reducimos el contador de unlikes
+                contenido.unlikes -= 1
+            # Aumentamos el contador de likes
+            voto.tipo_voto = 'LIKE'
+            contenido.likes += 1
+            voto.save()
+
+        contenido.save()
+        return JsonResponse({'likes': contenido.likes, 'unlikes': contenido.unlikes})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt
+@login_required
+def unlike_contenido(request, id_conte):
+    contenido = get_object_or_404(Contenido, id_conte=id_conte)
+    usuario = request.user
+
+    if request.method == 'POST':
+        # Verificar si el usuario ya ha dado unlike o like
+        voto, created = VotoContenido.objects.get_or_create(usuario=usuario, contenido=contenido)
+
+        if not created and voto.tipo_voto == 'UNLIKE':
+            # Si ya ha dado unlike, lo quitamos
+            contenido.unlikes -= 1
+            voto.delete()  # Eliminamos el voto
+        else:
+            if voto.tipo_voto == 'LIKE':
+                # Si tenía un like, reducimos el contador de likes
+                contenido.likes -= 1
+            # Aumentamos el contador de unlikes
+            voto.tipo_voto = 'UNLIKE'
+            contenido.unlikes += 1
+            voto.save()
+
+        contenido.save()
+        return JsonResponse({'likes': contenido.likes, 'unlikes': contenido.unlikes})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+#--------------------------------------
+
+def suscripciones_view(request):
+    return render(request, 'suscripciones/inicio_suscripcion.html')
+
