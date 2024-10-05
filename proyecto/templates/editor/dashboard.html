@@ -382,6 +382,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 borradorColumn.appendChild(borradorItem);  // Mover a la columna Borrador inmediatamente
 
+                // Actualizar la razón en el DOM
+                let existingReason = borradorItem.querySelector('.razon-borrador');
+                if (!existingReason) {
+                    var reasonSpan = document.createElement('span');
+                    reasonSpan.classList.add('razon-borrador');
+                    reasonSpan.textContent = 'Razón: ' + razon;
+                    borradorItem.appendChild(reasonSpan);
+                } else {
+                    existingReason.textContent = 'Razón: ' + razon;
+                }
+                 //Desactivar el atributo draggable para el contenido en "Borrador"**
+                borradorItem.setAttribute('draggable', 'false');
+
                 // Ocultar el modal
                 $('#razonBorradorModal').modal('hide');
 
