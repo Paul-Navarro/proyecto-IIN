@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contenido
+from .models import Contenido, ReporteContenido
 from categorias.models import Categoria
 from django.utils import timezone
 from django.forms.widgets import DateTimeInput
@@ -66,3 +66,16 @@ class ContactForm(forms.Form):
     asunto = forms.CharField(max_length=200, required=False, widget=forms.TextInput(attrs={'placeholder': 'Asunto'}))
     mensaje = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Escribe tu mensaje...'}))
 
+
+
+#formulario para reporte de contenidos
+class ReporteContenidoForm(forms.ModelForm):
+    class Meta:
+        model = ReporteContenido
+        fields = ['razon']
+        widgets = {
+            'razon': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Explica el motivo del reporte...'}),
+        }
+        labels = {
+            'razon': 'Motivo del Reporte',
+        }

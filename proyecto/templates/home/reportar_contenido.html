@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportar Contenido: {{ contenido.titulo_conte }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/reporte_contenido.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div><a href="{% url 'home' %}"class="btn">Inicio</a></div>
+        <div class="header-container">
+            <h1 class="header__title">Reporte de Contenido</h1>
+        </div>
+        <div></div>
+    </header>
+
+    <main class="main-content">
+        <section class="report-section">
+            <h2 class="section-title">Reportar Contenido</h2>
+            <h3 class="content-title">{{ contenido.titulo_conte }}</h3>
+
+            <form method="POST" class="report-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="razon" class="form-label">Motivo del Reporte:</label>
+                    {{ form.razon }}
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Enviar Reporte</button>
+                </div>
+            </form>
+            
+            <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-secondary">Volver al contenido</a>
+        </section>
+    </main>
+</body>
+</html>

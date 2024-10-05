@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido,Rechazo,VotoContenido,VersionContenido,CambioBorrador
-from .forms import ContenidoForm
+from .models import Contenido,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido
+from .forms import ContenidoForm,ReporteContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
 from .forms import ContenidoForm
@@ -625,3 +625,39 @@ def suscribirse_no_pagadas(request):
                 Suscripcion.objects.get_or_create(usuario=usuario, categoria=categoria)
 
         return redirect('suscripciones_view')
+
+#para reportar contenidos
+def reportar_contenido(request, contenido_id_conte):  # Usamos contenido_id_conte en lugar de contenido_id
+    contenido = get_object_or_404(Contenido, id_conte=contenido_id_conte)  # Cambiar id a id_conte
+
+    if request.method == 'POST':
+        form = ReporteContenidoForm(request.POST)
+        if form.is_valid():
+            reporte = form.save(commit=False)
+            reporte.usuario = request.user
+            reporte.contenido = contenido
+            reporte.save()
+            # Redirigir a la página de detalle del contenido después de enviar el reporte
+            return redirect('contenido_detail', pk=contenido.id_conte)
+    else:
+        form = ReporteContenidoForm()
+
+    context = {
+        'contenido': contenido,
+        'form': form
+    }
+    return render(request, 'home/reportar_contenido.html', context)
+
+
+#para visualizar los reportes (admin)
+@login_required
+def ver_reportes(request):
+    # Verificar si el usuario es administrador (staff)
+    if not request.user.is_staff:
+        return redirect('home')  # Redirige si no es administrador
+
+    # Obtener todos los reportes y ordenarlos por la fecha más reciente
+    reportes = ReporteContenido.objects.all().order_by('-fecha_reporte')
+    
+    # Asegúrate de que la ruta coincide con la ubicación de la plantilla
+    return render(request, 'admin/contenido/ver_reportes.html', {'reportes': reportes})

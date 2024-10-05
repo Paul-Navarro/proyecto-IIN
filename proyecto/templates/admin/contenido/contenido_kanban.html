@@ -17,6 +17,10 @@
         <nav>
             <ul>
                 <li><a href="{% url 'home' %}" class="btn btn-home">Inicio</a></li>
+                <!-- Botón para ver reportes (solo visible para administradores) -->
+                {% if user.is_staff %}
+                    <li><a href="{% url 'ver_reportes' %}" class="btn btn-reports"><i class="fas fa-flag"></i> Ver Reportes</a></li>
+                {% endif %}
                 <li><a href="{% url 'account_logout' %}" class="btn btn-logout">Cerrar Sesión</a></li>
             </ul>
         </nav>

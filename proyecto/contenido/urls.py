@@ -50,7 +50,9 @@ urlpatterns = [
     path('desuscribir/<int:categoria_id>/', views.desuscribir_categoria, name='desuscribir_categoria'),
     path('contacto/', contacto, name='contacto'),
     path('suscripciones/no-pagadas/', views.suscribirse_no_pagadas, name='suscribirse_no_pagadas'),
-
+    #Url para reporte
+    path('contenido/<int:contenido_id_conte>/reportar/', views.reportar_contenido, name='reportar_contenido'),
+    path('admin/reportes/', views.ver_reportes, name='ver_reportes'),  # Ruta para ver los reportes
 ]
 
 '''

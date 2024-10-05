@@ -1,0 +1,129 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: #16a085;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+    font-size: 2.6em;
+}
+
+nav ul {
+    padding: 0;
+    list-style: none;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: white;
+    background-color: #1abc9c;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+    display: inline-block;
+}
+
+nav ul li a:hover {
+    background-color: #16a085;
+}
+
+main {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+table {
+    width: 80%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #16a085;
+    color: white;
+    font-weight: bold;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table a {
+    color: #1abc9c;
+    text-decoration: none;
+}
+
+.table a:hover {
+    text-decoration: underline;
+}
+
+/* Button Styles */
+.btn-home {
+    background-color: #1abc9c;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.btn-home:hover {
+    background-color: #16a085;
+}
+
+
+/* Botón Volver al Kanban */
+.btn-kanban {
+    background-color: #1abc9c;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.btn-kanban:hover {
+    background-color: #16a085;
+}
+
+
+/* Estilos para el enlace al contenido */
+.contenido-link {
+    padding:10px;
+    color: #158670;  /* Verde brillante para el enlace */
+    font-weight: bold;  /* Texto en negrita */
+    text-decoration: none;  /* Quita el subrayado */
+    transition: color 0.3s ease;  /* Añade una transición suave al cambiar de color */
+    background-color: #0001;
+    border-radius: 10px;
+}
+
+.contenido-link:hover {
+    text-decoration: underline;  /* Subrayado al pasar el cursor */
+}

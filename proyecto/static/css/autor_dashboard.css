@@ -204,3 +204,12 @@ a:hover, button:hover {
 #rechazado h3 i {
     color: #FF6347; /* Rojo */
 }
+/*para visualizar los reportes*/
+.btn-reports {
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    margin-left: 10px;
+}

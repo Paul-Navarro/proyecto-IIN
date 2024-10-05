@@ -6,6 +6,7 @@
     <title>{{ contenido.titulo_conte }}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/contenido_detail.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header class="header">
@@ -39,6 +40,11 @@
             {% if contenido.fecha_publicacion %}
             <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
             {% endif %}
+        </div>
+
+         <!-- Botón para reportar contenido -->
+        <div class="report-content">
+            <a href="{% url 'reportar_contenido' contenido.id_conte %}" class="btn-reportar"><i class="fas fa-exclamation-triangle"></i> Reportar Contenido</a>
         </div>
 
         <!-- Insertar sección de Disqus -->

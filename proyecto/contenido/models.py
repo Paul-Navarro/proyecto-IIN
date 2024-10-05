@@ -3,6 +3,7 @@ from categorias.models import Categoria  # Importa el modelo Categoria
 from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.utils import timezone
+from .models import Categoria
 
 
 class Tag(models.Model):
@@ -149,4 +150,13 @@ class Suscripcion(models.Model):
         unique_together = ('usuario', 'categoria')  # Evita duplicados de suscripciones
 
 
+#reporte de contenido
+class ReporteContenido(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Usuario que reporta
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)  # Contenido reportado
+    razon = models.TextField()  # Motivo del reporte
+    fecha_reporte = models.DateTimeField(auto_now_add=True)  # Fecha del reporte
+
+    def __str__(self):
+        return f'Reporte de {self.usuario.username} sobre {self.contenido.titulo_conte}'
 
