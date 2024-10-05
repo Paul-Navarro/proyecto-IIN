@@ -41,6 +41,7 @@ class Contenido(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     likes = models.IntegerField(default=0)
     unlikes = models.IntegerField(default=0)
+    autopublicar_conte = models.BooleanField(default=False)
 
     # Relación con el autor del contenido
     autor = models.ForeignKey(
@@ -56,8 +57,8 @@ class Contenido(models.Model):
     
         # Método para verificar si el contenido debe ser publicado
     def autopublicar(self):
-        if self.fecha_publicacion and self.fecha_publicacion <= timezone.now() and self.estado_conte == 'A_PUBLICAR':
-            self.estado_conte = 'PUBLICADO'
+        if self.fecha_publicacion and self.fecha_publicacion <= timezone.now() and self.estado_conte == 'PUBLICADO':
+            self.autopublicar_conte = True
             self.save()
             
     def save(self, *args, **kwargs):

@@ -209,7 +209,7 @@ def contenido_update_editor(request, pk):
                 
             #La fecha de programacion de publicacion del contenido se mantiene intacta.    
             contenido.fecha_publicacion = Contenido.objects.get(pk=pk).fecha_publicacion
-            contenido.estado_conte = 'EDITADO'  # Cambiar el estado a "EDITADO"
+            contenido.estado_conte = 'A_PUBLICAR'  # Cambiar el estado a "EDITADO"
 
             # Guardar el contenido con los campos actualizados
             contenido.save()

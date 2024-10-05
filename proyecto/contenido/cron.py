@@ -16,8 +16,9 @@ class AutopublicarContenido(CronJobBase):
 
         # Filtrar contenidos que estén programados para publicarse
         contenidos_a_publicar = Contenido.objects.filter(
-            estado_conte='A_PUBLICAR',
-            fecha_publicacion__lte=hora_actual  
+            estado_conte='PUBLICADO',
+            fecha_publicacion__lte=hora_actual,
+            autopublicar_conte=False
         )
 
         print(f"Contenidos a publicar: {contenidos_a_publicar.count()}")

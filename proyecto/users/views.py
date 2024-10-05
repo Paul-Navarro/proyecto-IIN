@@ -49,8 +49,8 @@ def home(request):
     categorias = Categoria.objects.all()
     autores = User.objects.all()
 
-    # Filtrar los contenidos publicados
-    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO')
+   # Filtrar los contenidos publicados y con autopublicar_conte en True
+    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True)
 
     # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')
