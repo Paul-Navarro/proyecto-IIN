@@ -35,6 +35,22 @@
             <h2>Tablero Kanban</h2>
             <div class="kanban-board">
 
+
+                <!-- Columna Borrador -->
+                <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3><i class="fas fa-pencil-alt"></i> Borrador</h3> <!-- Icono para Borrador -->
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'BORRADOR' %}
+                            <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail_publicador' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <!-- Columna Editado/En_Revision -->
                 <div class="kanban-column" id="editado" ondrop="drop(event)" ondragover="allowDrop(event)">
                     <h3><i class="fas fa-edit"></i> Editado</h3>
@@ -44,7 +60,14 @@
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                     <!-- Mostrar la razón del rechazo si existe -->
+                                     {% if contenido.rechazos.exists %}
+                                     <span class="razon-rechazo">Razon: {{ contenido.rechazos.last.razon }}</span>
+                                 {% else %}
+                                     <span class="razon-rechazo">Razón: No especificada</span>
+                                 {% endif %}
                                 </div>
+                                
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -58,7 +81,6 @@
                             {% if contenido.estado_conte == 'A_PUBLICAR' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <p>Fecha y hora a publicar: {{ contenido.fecha_publicacion|date:"d/m/Y H:i" }}</p>
                                     <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
@@ -67,9 +89,25 @@
                 </div>
 
 
+                <!-- Columna Publicado -->
+                <div class="kanban-column" id="publicado" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3><i class="fas fa-check-circle"></i> Publicado</h3>
+                    <div class="kanban-items">
+                        {% for contenido in contenidos %}
+                            {% if contenido.estado_conte == 'PUBLICADO' %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <p>Fecha y hora a publicar: {{ contenido.fecha_publicacion|date:"d/m/Y H:i" }}</p>
+                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <!-- Columna Rachazado -->
                 <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3><i class="fas fa-times-circle"></i> Rechazado</h3>
+                    <h3><i class="fas fa-times-circle"></i> Inactivo</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'RECHAZADO' %}
@@ -88,20 +126,6 @@
                     </div>
                 </div>
 
-                <!-- Columna Publicado -->
-                <div class="kanban-column" id="publicado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3><i class="fas fa-check-circle"></i> Publicado</h3>
-                    <div class="kanban-items">
-                        {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'PUBLICADO' %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
 
             </div>
         </section>
@@ -136,20 +160,26 @@
                 // Guardamos el item original y la columna original antes de cualquier acción
                 originalColumnId = draggedItem.closest('.kanban-column').id;
 
-                if (targetColumn === 'publicado') {
+                if (targetColumn === 'borrador') {
                     // Mostrar el modal de advertencia
                     $('#warningModal').modal('show');
                     return;  // Evitar que se complete el arrastre
                 }
+
+                if (targetColumn === 'rechazado') {
+                    // Mostrar el modal de advertencia
+                    $('#warningModal_2').modal('show');
+                    return;  // Evitar que se complete el arrastre
+                }
         
                 // Si el contenido es arrastrado a la columna de rechazado, mostrar el modal para ingresar la razón
-                if (targetColumn === 'rechazado') {
+                if (targetColumn === 'editado') {
                     contenidoRechazadoId = data.replace('item', ''); // Almacenar el ID del contenido
                     $('#razonRechazoModal').modal('show');  // Mostrar el modal para la razón de rechazo
                     return;  // No continuar el arrastre hasta que se guarde la razón
                 }
         
-                // Si el contenido es movido a una columna diferente a "Rechazado", eliminar la razón del rechazo
+                // Si el contenido es movido a una columna diferente a "Editado", eliminar la razón del rechazo
                 if (draggedItem.querySelector('.razon-rechazo')) {
                     draggedItem.querySelector('.razon-rechazo').remove();
                 }
@@ -173,9 +203,9 @@
                     if (data.success) {
                         // Mostrar el mensaje de cambio de estado
                         showStateChangeMessage(data.titulo, data.old_state, targetColumn);
-                        // Si el nuevo estado es "A_PUBLICAR", añade la fecha de publicación
+                        // Si el nuevo estado es "PUBLICADO", añade la fecha de publicación
                         var existingDateElement = draggedItem.querySelector('.fecha-publicacion');
-                        if (targetColumn === 'a_publicar') {
+                        if (targetColumn === 'publicado') { //CAMBIO
 
                             // Fecha de publicacion programada
                             if (!existingDateElement) {
@@ -257,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         // Mueve el contenido inmediatamente al DOM de la columna "Rechazado"
-        const rejectedColumn = document.getElementById('rechazado').querySelector('.kanban-items');
+        const rejectedColumn = document.getElementById('editado').querySelector('.kanban-items');
         const rejectedItem = document.getElementById('item' + contenidoRechazadoId);
         rejectedColumn.appendChild(rejectedItem);  // Mover a la columna Rechazado inmediatamente
     
@@ -292,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': '{{ csrf_token }}'
             },
             body: JSON.stringify({
-                'nuevo_estado': 'RECHAZADO',
+                'nuevo_estado': 'EDITADO',
                 'razon_rechazo': razon
             })
         })
@@ -300,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 // Mostrar el mensaje de éxito (opcional)
-                showStateChangeMessage(data.titulo, data.old_state, 'RECHAZADO');
+                showStateChangeMessage(data.titulo, data.old_state, 'EDITADO');
             } else {
                 alert('Error al rechazar el contenido.');
             }
@@ -368,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
     
 
-    <!-- Modal de advertencia -->
+    <!-- Modal de advertencia Borrador -->
     <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -379,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </button>
                 </div>
                 <div class="modal-body">
-                    ¡Solo puedes pasar a "A Publicar", no directamente a "Publicado"!
+                    ¡No puedes pasar a Borrador! Solo el Editor.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
@@ -387,6 +417,26 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </div>
+
+        <!-- Modal de advertencia Inactivo -->
+        <div class="modal fade" id="warningModal_2" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title" id="warningModalLabel">Advertencia</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        ¡No puedes pasar a Inactivo directamente!
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- Modal para ingresar la razón de rechazo -->
 <div class="modal fade" id="razonRechazoModal" tabindex="-1" role="dialog" aria-labelledby="razonRechazoModalLabel" aria-hidden="true">
