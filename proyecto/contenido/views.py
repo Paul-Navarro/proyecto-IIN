@@ -325,8 +325,11 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
             if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO', 'BORRADOR', 'A_PUBLICAR']:
                 
                 if nuevo_estado == 'EDITADO':
+                    
                     razon_rechazo = data.get('razon_rechazo', '')
-                    Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
+                    
+                    if razon_rechazo != '':
+                        Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
                     
                 # Lógica para mover a BORRADOR con la razón del cambio
                 if nuevo_estado == 'BORRADOR':
@@ -342,13 +345,17 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 contenido.estado_conte = nuevo_estado
                 
                 contenido.save()
+                # Obtener la razón más reciente si es "BORRADOR"
+                ultima_razon_cambio = CambioBorrador.objects.filter(contenido=contenido).last()
+                razon_cambio_text = ultima_razon_cambio.razon if ultima_razon_cambio else "No especificada"
                 
                 return JsonResponse({
                 'success': True,
                 'old_state': old_state,
                 'new_state': nuevo_estado,
                 'titulo': contenido.titulo_conte,
-                'fecha_publicacion': contenido.fecha_publicacion
+                'fecha_publicacion': contenido.fecha_publicacion,
+                'razon_cambio': razon_cambio_text
  })
             else:
                 return JsonResponse({'success': False, 'error': 'Estado no válido'}, status=400)

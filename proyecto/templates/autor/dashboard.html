@@ -153,6 +153,12 @@
             if (ev.target.classList.contains('kanban-items')) {
                 var targetColumn = ev.target.closest('.kanban-column').id;
 
+                // Si el contenido está siendo movido fuera de la columna "Borrador", eliminar el mensaje de rechazo
+            var mensajeRechazo = draggedItem.querySelector('.razon-borrador');
+            if (mensajeRechazo) {
+                mensajeRechazo.remove();  // Eliminar el mensaje de rechazo
+            }
+
                 // Permitir mover de "Editado" a "Borrador"
                 if (targetColumn === 'borrador' || targetColumn === 'editado') {
 
@@ -179,13 +185,37 @@
                     button.href = `/contenido/contenido/${data.replace('item', '')}/edit/`;
                     button.classList.add('btn', 'btn-edit');
                     draggedItem.appendChild(button);
-
-                     // Crear el botón "Ver"
+    
                     var viewButton = document.createElement('a');
                     viewButton.textContent = 'Ver';
                     viewButton.href = `/contenido/contenido/${data.replace('item', '')}/`;
                     viewButton.classList.add('btn', 'btn-ver');
                     draggedItem.appendChild(viewButton);
+    
+                    // Llamada AJAX para obtener la razón de rechazo
+                    fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
+                        },
+                        body: JSON.stringify({
+                            'nuevo_estado': 'BORRADOR',
+                            'razon_cambio': 'Rechazado por errores de formato'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.razon_cambio) {
+                            var razonRechazo = document.createElement('span');
+                            razonRechazo.textContent = `Razón del rechazo: ${data.razon_cambio}`;
+                            razonRechazo.classList.add('razon-borrador');
+                            draggedItem.appendChild(razonRechazo);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
                 }
 
                     // Llamada AJAX para actualizar el estado en el servidor
