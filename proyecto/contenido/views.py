@@ -324,14 +324,17 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
 
             if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO', 'BORRADOR', 'A_PUBLICAR']:
                 
-                if nuevo_estado == 'RECHAZADO':
+                if nuevo_estado == 'EDITADO':
                     razon_rechazo = data.get('razon_rechazo', '')
                     Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
                     
                 # Lógica para mover a BORRADOR con la razón del cambio
                 if nuevo_estado == 'BORRADOR':
+                    
                     razon_cambio = data.get('razon_cambio', '')  # Obtener la razón del cambio a Borrador
-                    CambioBorrador.objects.create(contenido=contenido, razon=razon_cambio)  # Guardar la razón del cambio
+                    
+                    if razon_cambio != '':
+                        CambioBorrador.objects.create(contenido=contenido, razon=razon_cambio)  # Guardar la razón del cambio
 
                 
                 # Actualizar el estado del contenido

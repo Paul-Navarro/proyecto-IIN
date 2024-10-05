@@ -213,3 +213,33 @@ a:hover, button:hover {
     display: inline-block;
     margin-left: 10px;
 }
+
+.razon-borrador {
+    display: inline-block;
+    background-color: #ffebee; /* Fondo rojo suave */
+    border-left: 5px solid #f44336; /* Borde rojo oscuro */
+    padding: 10px 15px;
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #d32f2f; /* Texto rojo oscuro */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Sombra para dar profundidad */
+    position: relative;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Estilo para agregar un ícono de advertencia al inicio */
+.razon-borrador::before {
+    content: "\26A0"; /* Unicode para el símbolo de advertencia ⚠ */
+    font-size: 20px;
+    color: #f44336; /* Rojo */
+    margin-right: 10px;
+}
+
+/* Hover effect */
+.razon-borrador:hover {
+    background-color: #ffcdd2; /* Color de fondo más claro al pasar el ratón */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Aumentar la sombra al pasar el ratón */
+    transform: translateY(-2px); /* Elevar ligeramente el mensaje */
+}
