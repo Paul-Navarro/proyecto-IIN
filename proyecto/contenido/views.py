@@ -134,7 +134,7 @@ def contenido_create(request):
             
             contenido.save()  # Guardar el contenido con el estado ajustado y el autor
             form.save_m2m()
-            return redirect('contenido_list')
+            return redirect('autor_dashboard')
     else:
         form = ContenidoForm(initial={'categoria': primera_categoria_no_moderada})  # Inicializar con categoría no moderada
 

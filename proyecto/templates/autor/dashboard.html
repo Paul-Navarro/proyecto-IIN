@@ -265,6 +265,17 @@
                 // Mover el contenido a la columna de "En revisión"
                 draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
 
+                // Limpiar todos los botones previos de la tarjeta
+                let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
+                buttons.forEach(button => button.remove());
+
+                // Crear y añadir el botón "Ver"
+                var viewButton = document.createElement('a');
+                viewButton.textContent = 'Ver';
+                viewButton.href = `/contenido/contenido_autor_FLAG/${draggedItemData.draggedItem.id.replace('item', '')}/`;
+                viewButton.classList.add('btn', 'btn-ver');
+                draggedItemData.draggedItem.appendChild(viewButton);
+
                 // Llamada AJAX para actualizar el estado en el servidor
                 fetch(`/contenido/contenido/cambiar_estado/${draggedItemData.draggedItem.id.replace('item', '')}/`, {
                     method: 'POST',
@@ -298,6 +309,23 @@
             if (draggedItemData) {
                 // Mover el contenido a la columna de "Borrador"
                 draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
+
+                // Limpiar todos los botones previos de la tarjeta
+                let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
+                buttons.forEach(button => button.remove());
+
+                // Añadir los botones "Editar" y "Ver"
+                var editButton = document.createElement('a');
+                editButton.textContent = 'Editar';
+                editButton.href = `/contenido/contenido/${draggedItemData.draggedItem.id.replace('item', '')}/edit/`;
+                editButton.classList.add('btn', 'btn-edit');
+                draggedItemData.draggedItem.appendChild(editButton);
+
+                var viewButton = document.createElement('a');
+                viewButton.textContent = 'Ver';
+                viewButton.href = `/contenido/contenido_autor/${draggedItemData.draggedItem.id.replace('item', '')}/`;
+                viewButton.classList.add('btn', 'btn-ver');
+                draggedItemData.draggedItem.appendChild(viewButton);
 
                 // Llamada AJAX para actualizar el estado en el servidor
                 fetch(`/contenido/contenido/cambiar_estado/${draggedItemData.draggedItem.id.replace('item', '')}/`, {
