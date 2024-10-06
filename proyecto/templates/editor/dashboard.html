@@ -257,6 +257,12 @@
             editButton.href = `/contenido/contenido/${draggedItem.id.replace('item', '')}/edit_editor/`;
             editButton.classList.add('btn', 'btn-edit');
             draggedItem.appendChild(editButton);
+
+             // Eliminar la fecha de publicación si existía
+            let fechaPublicacionParrafo = draggedItem.querySelector('p');
+            if (fechaPublicacionParrafo) {
+                fechaPublicacionParrafo.remove(); // Elimina el párrafo con la fecha de publicación
+    }
         }
 
         // Si el contenido es movido a "A Publicar", añadir el botón "Ver"
@@ -266,6 +272,13 @@
             viewButton.href = `/contenido/contenido_editor/${draggedItem.id.replace('item', '')}/`;
             viewButton.classList.add('btn', 'btn-ver');
             draggedItem.appendChild(viewButton);
+
+            // Agregar la fecha de publicación en la interfaz
+            var fechaPublicacion = new Date(); // Puedes reemplazar esto con la fecha desde el servidor si es necesario
+            var formattedDate = formatFechaPublicacion(fechaPublicacion);
+            var fechaParrafo = document.createElement('p');
+            fechaParrafo.textContent = `Fecha y hora a publicar: ${formattedDate}`;
+            draggedItem.appendChild(fechaParrafo);
         }
 
         // Si el contenido es movido a una columna diferente a "Rechazado", eliminar la razón del rechazo
@@ -353,6 +366,17 @@
             }
 
             borradorColumn.appendChild(borradorItem);  // Mover a la columna Borrador inmediatamente
+
+            // Eliminar el botón anterior (si tiene "Editar" en lugar de "Ver")
+            let buttons = borradorItem.querySelectorAll('a.btn');
+            buttons.forEach(button => button.remove());
+
+            // Añadir el botón "Ver" al mover a Borrador
+            var viewButton = document.createElement('a');
+            viewButton.textContent = 'Ver';
+            viewButton.href = `/contenido/contenido_editor/${contenidoBorradorId}/`;
+            viewButton.classList.add('btn', 'btn-ver');
+            borradorItem.appendChild(viewButton);
 
             // Actualizar la razón en el DOM
             let existingReason = borradorItem.querySelector('.razon-borrador');
