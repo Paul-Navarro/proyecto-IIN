@@ -86,6 +86,19 @@ def contenido_detail_autor(request, pk):
     
     return render(request, 'autor/contenido_detail_autor.html', {'contenido': contenido , 'versiones': versiones})
 
+def contenido_detail_autor_FLAG(request, pk):
+    '''
+    @function contenido_detail
+    @description Muestra los detalles de un contenido específico.
+    @param {HttpRequest} request - El objeto de solicitud HTTP.
+    @param {int} pk - El ID del contenido a mostrar.
+    @returns {HttpResponse} Respuesta renderizada con los detalles del contenido.
+    '''
+    contenido = get_object_or_404(Contenido, pk=pk)
+    versiones = contenido.versiones.all()
+    
+    return render(request, 'autor/contenido_detail_autor_FLAG.html', {'contenido': contenido , 'versiones': versiones})
+
 def contenido_create(request):
     '''
     @function contenido_create

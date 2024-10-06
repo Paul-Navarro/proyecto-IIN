@@ -65,7 +65,7 @@
                             {% if contenido.estado_conte == 'EDITADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -81,7 +81,7 @@
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <p>Fecha y hora a publicar: {{ contenido.fecha_publicacion|date:"d/m/Y H:i" }}</p>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -98,7 +98,7 @@
                             {% if contenido.estado_conte == 'PUBLICADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -113,7 +113,7 @@
                             {% if contenido.estado_conte == 'RECHAZADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                     <!-- Mostrar la razón del rechazo si existe -->
                                     {% if contenido.rechazos.exists %}
                                     <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
@@ -187,7 +187,7 @@
     
                     var viewButton = document.createElement('a');
                     viewButton.textContent = 'Ver';
-                    viewButton.href = `/contenido/contenido/${data.replace('item', '')}/`;
+                    viewButton.href = `/contenido/contenido_autor/${data.replace('item', '')}/`;
                     viewButton.classList.add('btn', 'btn-ver');
                     draggedItem.appendChild(viewButton);
     
