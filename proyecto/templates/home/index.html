@@ -54,9 +54,15 @@
             <ul id="lista-notificaciones">
                 {% if notificaciones %}
                     {% for notificacion in notificaciones %}
-                        <li id="notificacion-{{ notificacion.id }}" class="notificacion-item">
-                            {{ notificacion.titulo }} - {{ notificacion.descripcion }}
-                            <button title = "Marcar como leído" onclick="marcarLeida({{ notificacion.id }})">
+                        <li id="notificacion-{{ notificacion.id }}" class="notificacion-item" onclick="toggleNotificacion({{ notificacion.id }})">
+                            <strong>{{ notificacion.titulo }}</strong> <!-- Título separado -->
+                            <div class="mensaje-corto"> 
+                                {{ notificacion.descripcion|truncatewords:10 }} <!-- Mensaje truncado -->
+                            </div>
+                            <div class="mensaje-largo" style="display: none;">
+                                {{ notificacion.descripcion }} <!-- Mensaje completo -->
+                            </div>
+                            <button title="Marcar como leído" onclick="marcarLeida({{ notificacion.id }})">
                                 <i class="fas fa-check"></i> <!-- Ícono de check -->
                             </button>
                         </li>
@@ -66,6 +72,7 @@
                 {% endif %}
             </ul>
         </div>
+
         
         
         <!-- Sección de login -->
@@ -401,7 +408,7 @@
             var overlay = document.getElementById("overlay");
             var mainContent = document.querySelector('.main-content-wrapper');  // Selecciona el contenido principal
 
-            if (contenedor.style.display === "none") {
+            if (contenedor.style.display === "none" || contenedor.style.display === "") {
                 contenedor.style.display = "block";  // Mostrar notificaciones
                 overlay.style.display = "block";     // Mostrar overlay
 
@@ -439,6 +446,47 @@
                 document.body.classList.remove('overlay-active');  // Habilitar scroll
             }
         });
+
+        // Función para alternar entre mostrar el mensaje corto o largo
+        function toggleNotificacion(id) {
+            var notificacion = document.getElementById("notificacion-" + id);
+            notificacion.classList.toggle("expandido");
+
+            var mensajeLargo = notificacion.querySelector('.mensaje-largo');
+            var mensajeCorto = notificacion.querySelector('.mensaje-corto');
+
+            if (notificacion.classList.contains("expandido")) {
+                mensajeCorto.style.display = "none";
+                mensajeLargo.style.display = "block";
+            } else {
+                mensajeCorto.style.display = "block";
+                mensajeLargo.style.display = "none";
+            }
+
+            // Actualizar la altura máxima del contenedor de notificaciones
+            var contenedor = document.getElementById("notificaciones_contenedor");
+            contenedor.style.maxHeight = "none"; // Permitir que la ventana crezca al expandir notificaciones
+        }
+
+
+        // Función para marcar la notificación como leída
+        function marcarLeida(id) {
+            fetch(`/notificacion/marcar_leida/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',  // Agregar CSRF token si es necesario
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    document.getElementById(`notificacion-${id}`).remove();
+                }
+            })
+            .catch(error => console.error('Error al marcar la notificación como leída:', error));
+        }
+
 
 
 

@@ -19,6 +19,8 @@ from .models import Categoria, Suscripcion
 from django.core.mail import send_mail
 from .forms import ContactForm
 from .models import HistorialCompra
+from users.models import Notificacion
+from django.utils import timezone
 
 #para rol financiero
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -847,6 +849,15 @@ def enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado):
         fail_silently=False,
     )
 
+    # Crear una notificación para el autor
+    Notificacion.objects.create(
+        usuario=contenido.autor,
+        titulo=f"Cambio de estado: {contenido.titulo_conte}",
+        descripcion=f"El estado ha cambiado de {old_state} a {nuevo_estado}. Rol: Autor",
+        leida=False,  # La notificación no ha sido leída
+        fecha_creacion=timezone.now()
+    )
+
     # Solo notificamos a los editores si el contenido requiere revisión (ej. está en estado A_PUBLICAR o RECHAZADO)
     if nuevo_estado in ['A_PUBLICAR', 'RECHAZADO']:
         # Obtener todos los usuarios con rol de editor
@@ -877,3 +888,28 @@ def enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado):
                 [editor.email],
                 fail_silently=False,
             )
+        
+            # Crear una notificación para el editor
+            Notificacion.objects.create(
+                usuario=editor,
+                titulo=f"Revisión requerida: {contenido.titulo_conte}",
+                descripcion=f"El contenido titulado {contenido.titulo_conte} ha cambiado a {nuevo_estado}. Rol: Editor",
+                leida=False,
+                fecha_creacion=timezone.now()
+            )
+
+    if nuevo_estado == 'A_PUBLICAR':
+        # Obtener todos los usuarios con rol de publicador
+        User = get_user_model()
+        publicadores = User.objects.filter(roles__name='Publicador')
+
+        # Crear una notificación para cada editor
+        for publicador in publicadores:
+            Notificacion.objects.create(
+                usuario=publicador,
+                titulo=f"Contenido listo para publicar: {contenido.titulo_conte}",
+                descripcion=f"El contenido titulado {contenido.titulo_conte} está listo para ser publicado. Rol: Publicador",
+                leida=False,
+                fecha_creacion=timezone.now()
+            )
+    
