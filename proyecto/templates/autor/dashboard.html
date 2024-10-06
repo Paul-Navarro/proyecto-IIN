@@ -50,7 +50,7 @@
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_update' contenido.id_conte %}" class="btn btn-edit">Editar</a>
                                     <a href="{% url 'contenido_detail_autor' contenido.id_conte %}" class="btn btn-ver">Ver</a>
-                                     
+                                    <a href="{% url 'contenido_registro' contenido.id_conte %}" class="btn btn-ver">Registro</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -148,7 +148,7 @@
             ev.preventDefault();
             var data = ev.dataTransfer.getData("text");
             var draggedItem = document.getElementById(data);
-
+            console.log("Dragg:",draggedItem);
             // Asegurarse de que se suelte en el área correcta (columna)
             if (ev.target.classList.contains('kanban-items')) {
                 var targetColumn = ev.target.closest('.kanban-column').id;
@@ -186,6 +186,14 @@
                     viewButton.href = `/contenido/contenido/${data.replace('item', '')}/`;
                     viewButton.classList.add('btn', 'btn-ver');
                     draggedItem.appendChild(viewButton);
+
+                    //Crear el botón "registro"
+                    var registroButton = document.createElement('a');
+                    registroButton.textContent = 'Registro';
+                    console.log("Data: ",data);
+                    registroButton.href = `/contenido/contenido/registro/${data.replace('item', '')}/`;  // Asegúrate de que la URL sea correcta
+                    registroButton.classList.add('btn', 'btn-ver');
+                    draggedItem.appendChild(registroButton);
                 }
 
                     // Llamada AJAX para actualizar el estado en el servidor

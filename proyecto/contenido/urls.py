@@ -53,6 +53,7 @@ urlpatterns = [
     #Url para reporte
     path('contenido/<int:contenido_id_conte>/reportar/', views.reportar_contenido, name='reportar_contenido'),
     path('admin/reportes/', views.ver_reportes, name='ver_reportes'),  # Ruta para ver los reportes
+    path('contenido/registro/<int:pk>/', views.contenido_registro, name='contenido_registro'), 
 ]
 
 '''

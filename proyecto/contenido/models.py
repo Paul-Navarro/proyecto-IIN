@@ -161,3 +161,17 @@ class ReporteContenido(models.Model):
     def __str__(self):
         return f'Reporte de {self.usuario.username} sobre {self.contenido.titulo_conte}'
 
+
+
+#Para registrar los cambios de estados y sus detalles
+
+class CambioEstado(models.Model):
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='cambios_estado')
+    estado_anterior = models.CharField(max_length=50)
+    estado_nuevo = models.CharField(max_length=50)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    fecha_cambio = models.DateTimeField(auto_now_add=True)
+    razon_cambio = models.TextField(blank=True, null=True)  # Solo para cambios a "Borrador"
+
+    def __str__(self):
+        return f"Cambio en {self.contenido.titulo_conte} de {self.estado_anterior} a {self.estado_nuevo}"
