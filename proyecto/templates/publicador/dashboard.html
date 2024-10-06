@@ -156,14 +156,14 @@
                 // Guardamos el item original y la columna original antes de cualquier acción
                 originalColumnId = draggedItem.closest('.kanban-column').id;
 
+                // Popup de advertencia para intentar mover a "Borrador"
                 if (targetColumn === 'borrador') {
-                    // Mostrar el modal de advertencia
                     $('#warningModal').modal('show');
                     return;  // Evitar que se complete el arrastre
                 }
 
+                // Popup de advertencia para intentar mover a "Inactivo"
                 if (targetColumn === 'rechazado') {
-                    // Mostrar el modal de advertencia
                     $('#warningModal_2').modal('show');
                     return;  // Evitar que se complete el arrastre
                 }
