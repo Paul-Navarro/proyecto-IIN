@@ -4,6 +4,7 @@ from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.utils import timezone
 from .models import Categoria
+from django.utils.html import strip_tags
 
 
 class Tag(models.Model):
@@ -68,6 +69,30 @@ class Contenido(models.Model):
         """Establece una versión específica como la versión actual del contenido."""
         self.version_actual = version
         self.save()
+        
+    def establecer_version_anterior(self, version):
+        """
+        Este método permite establecer cualquier versión anterior como la versión actual.
+        Primero, guarda la versión actual antes de cambiarla para evitar perderla.
+        """
+        # Si hay una versión actual, guárdala como una nueva versión
+        if self.version_actual:
+            version_num = self.versiones.count() + 1  # Crear el siguiente número de versión
+            VersionContenido.objects.create(
+                contenido_original=self,
+                version_num=version_num,
+                titulo_conte=self.titulo_conte,
+                tipo_conte=self.tipo_conte,
+                texto_conte=self.texto_conte,
+                fecha_version=timezone.now(),
+            )
+
+        # Ahora, establece la versión seleccionada como la actual
+        self.titulo_conte = version.titulo_conte
+        self.tipo_conte = version.tipo_conte
+        self.texto_conte = version.texto_conte
+        self.version_actual = version  # Establecemos la nueva versión como la actual
+        self.save()  # Guardamos los cambios
     
         # Método para verificar si el contenido debe ser publicado
     def autopublicar(self):
@@ -76,26 +101,75 @@ class Contenido(models.Model):
             self.save()
             
     def save(self, *args, **kwargs):
-        # Detectar si el contenido ya existía en la base de datos
-        if self.pk:
-            # Obtener el contenido original desde la base de datos
-            original = Contenido.objects.get(pk=self.pk)
+        """
+        Sobrescribe el método save para asegurarse de que se cree una nueva versión 
+        cada vez que se guarde un contenido, ya sea al crearlo o editarlo.
+        """
 
-            # Comparar si hubo cambios significativos en los campos
-            if original.texto_conte != self.texto_conte or original.titulo_conte != self.titulo_conte:
+        is_new = self.pk is None  # Verificar si es un nuevo contenido
+
+        # Si es una edición, obtenemos el estado original antes de guardar
+        if not is_new:
+            try:
+                original = Contenido.objects.get(pk=self.pk)
+            except Contenido.DoesNotExist:
+                original = None
+        else:
+            original = None
+
+        # Guardamos el contenido primero (si es un nuevo contenido)
+        super(Contenido, self).save(*args, **kwargs)
+
+        if is_new:
+            # Si es un nuevo contenido, crear la versión 1
+            print("Creando la versión 1 del contenido")
+            version = VersionContenido.objects.create(
+                contenido_original=self,
+                version_num=1,
+                titulo_conte=self.titulo_conte,
+                tipo_conte=self.tipo_conte,
+                texto_conte=self.texto_conte,
+                fecha_version=timezone.now(),
+            )
+
+            # Establecer la versión 1 como la versión actual
+            self.version_actual = version
+            self.save()  # Guardar nuevamente para asignar la versión actual
+            print(f"Versión 1 creada y asignada como la versión actual: {self.version_actual}")
+
+        elif original:
+            # Comparamos los valores del contenido original antes de los cambios
+            print(f"Comparando texto_conte (sin HTML):")
+            print(f"Original (limpio): {strip_tags(original.texto_conte)}")
+            print(f"Nuevo (limpio): {strip_tags(self.texto_conte)}")
+
+            print(f"Comparando titulo_conte:")
+            print(f"Original: {original.titulo_conte}")
+            print(f"Nuevo: {self.titulo_conte}")
+
+            # Comparar si hubo cambios significativos en el título o texto sin HTML
+            if strip_tags(original.texto_conte) != strip_tags(self.texto_conte) or original.titulo_conte != self.titulo_conte:
+                print("Detectados cambios en el contenido, creando una nueva versión")
                 # Incrementar el número de versión basado en las versiones existentes
                 version_num = self.versiones.count() + 1
-                # Crear una nueva versión del contenido
-                VersionContenido.objects.create(
+                version = VersionContenido.objects.create(
                     contenido_original=self,
                     version_num=version_num,
-                    titulo_conte=original.titulo_conte,
-                    tipo_conte=original.tipo_conte,
-                    texto_conte=original.texto_conte,
-                    fecha_version=timezone.now(),
+                    titulo_conte=self.titulo_conte,  # Guardar el título editado
+                    tipo_conte=self.tipo_conte,      # Guardar el tipo editado
+                    texto_conte=self.texto_conte,    # Guardar el texto editado
+                    fecha_version=timezone.now(),    # Guardar la fecha de edición
                 )
-        
-        super(Contenido, self).save(*args, **kwargs)  # Guardar el contenido normalmente
+
+                # Establecer la nueva versión creada como la versión actual
+                self.version_actual = version
+                self.save()  # Guardar nuevamente para asignar la versión actual
+                print(f"Versión {version_num} creada y asignada como la versión actual: {self.version_actual}")
+            else:
+                print("No se detectaron cambios significativos, no se crea una nueva versión")
+
+
+
     
 class VersionContenido(models.Model):
     contenido_original = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='versiones')
