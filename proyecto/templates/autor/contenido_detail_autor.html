@@ -46,19 +46,13 @@
             <ul class="version-list">
                 {% for version in versiones %}
                     <li class="version-item">
-                        <i class="fas fa-file-alt"></i> 
                         <strong>Versión {{ version.version_num }}:</strong> {{ version.fecha_version }} - {{ version.titulo_conte }}
-        
-                        <!-- Botón para ver la versión -->
-                        <a href="{% url 'contenido_version_detail' pk=contenido.pk version_num=version.version_num %}" class="btn-view-version">
-                            <i class="fas fa-eye"></i> Ver esta versión
-                        </a>
-        
-                        <!-- Botón para seleccionar esta versión como la actual -->
+                        
+                        <!-- Botón para seleccionar esta versión -->
                         <a href="{% url 'seleccionar_version' pk=contenido.pk version_id=version.id %}" class="btn-select-version">
                             <i class="fas fa-check-circle"></i> Seleccionar esta versión
                         </a>
-        
+                        
                         <!-- Mostrar si esta versión es la actual -->
                         {% if contenido.version_actual == version %}
                             <span class="badge badge-success">Versión actual</span>
@@ -66,8 +60,14 @@
                     </li>
                 {% endfor %}
             </ul>
+        
+            <!-- Botón para volver a la versión original (Versión 1) -->
+            <a href="{% url 'seleccionar_version' pk=contenido.pk version_id=versiones.first.id %}" class="btn-select-version">
+                <i class="fas fa-undo"></i> Ir a Versión Original
+            </a>
+        
         {% else %}
-            <p><i class="fas fa-info-circle"></i> No hay versiones anteriores disponibles para este contenido.</p>
+            <p>No hay versiones anteriores disponibles.</p>
         {% endif %}
             
             <!-- Cargar Font Awesome -->
