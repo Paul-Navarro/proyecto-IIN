@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Sitio</title>
+</head>
+<body>
+    <nav>
+        <!-- Aquí agregamos el enlace al panel de ventas -->
+        <a href="{% url 'venta_list' %}">Panel de Ventas</a>
+    </nav>
+
+    <h1>Ventas</h1>
+
+    <!-- Formulario de filtros -->
+    <form method="GET">
+        <label for="fecha_inicio">Fecha inicio:</label>
+        <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
+
+        <label for="fecha_fin">Fecha fin:</label>
+        <input type="date" name="fecha_fin" id="fecha_fin" value="{{ request.GET.fecha_fin }}">
+
+        <label for="cliente">Cliente:</label>
+        <input type="text" name="cliente" id="cliente" value="{{ request.GET.cliente }}">
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <!-- Tabla de ventas -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Fecha</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.id }}</td>
+                <td>{{ venta.cliente }}</td>
+                <td>{{ venta.producto }}</td>
+                <td>{{ venta.fecha }}</td>
+                <td>{{ venta.total }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No hay ventas que mostrar.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>
