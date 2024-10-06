@@ -138,7 +138,7 @@ def contenido_create(request):
             
             contenido.save()  # Guardar el contenido con el estado ajustado y el autor
             form.save_m2m()
-            return redirect('contenido_list')
+            return redirect('autor_dashboard')
     else:
         form = ContenidoForm(initial={'categoria': primera_categoria_no_moderada})  # Inicializar con categoría no moderada
 
@@ -368,6 +368,8 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 contenido.estado_conte = nuevo_estado
                 
                 contenido.save()
+                # Enviar notificación de cambio de estado
+                enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado)
                 # Obtener la razón más reciente si es "BORRADOR"
                 ultima_razon_cambio = CambioBorrador.objects.filter(contenido=contenido).last()
                 razon_cambio_text = ultima_razon_cambio.razon if ultima_razon_cambio else ''
@@ -378,7 +380,7 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 'new_state': nuevo_estado,
                 'titulo': contenido.titulo_conte,
                 'fecha_publicacion': contenido.fecha_publicacion,
-                'razon_cambio': razon_cambio_text
+                'razon_rechazo': razon_cambio_text
  })
             else:
                 return JsonResponse({'success': False, 'error': 'Estado no válido'}, status=400)
@@ -808,3 +810,70 @@ class VentaListView(ListView):
             queryset = queryset.filter(usuario__username__icontains=cliente)  # Filtrar por usuario (cliente)
 
         return queryset
+#Notificación al correo
+from django.core.mail import send_mail
+from django.conf import settings
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+
+def enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado):
+    # Obtener la URL del contenido para que el autor y editor puedan revisarlo
+    contenido_url = reverse('contenido_detail', args=[contenido.pk])
+
+    # Construir la URL completa
+    url_completa = f"{settings.DOMAIN_NAME}{contenido_url}"
+
+    # Asunto del correo
+    subject = f"El estado de tu contenido '{contenido.titulo_conte}' ha cambiado a {nuevo_estado}"
+
+    # Mensaje para el autor
+    mensaje_autor = f"""
+    Hola {contenido.autor.username},
+
+    El estado de tu contenido titulado "{contenido.titulo_conte}" ha cambiado de {old_state} a {nuevo_estado}.
+    
+    Puedes revisar el contenido aquí: {url_completa}
+
+    Saludos,
+    El equipo editorial
+    """
+
+    # Enviar correo al autor
+    send_mail(
+        subject,
+        mensaje_autor,
+        settings.DEFAULT_FROM_EMAIL,
+        [contenido.autor.email],
+        fail_silently=False,
+    )
+
+    # Solo notificamos a los editores si el contenido requiere revisión (ej. está en estado A_PUBLICAR o RECHAZADO)
+    if nuevo_estado in ['A_PUBLICAR', 'RECHAZADO']:
+        # Obtener todos los usuarios con rol de editor
+        User = get_user_model()
+        editores = User.objects.filter(roles__name='Editor')
+
+        # Asunto del correo para los editores
+        subject_editor = f"Revisión requerida: {contenido.titulo_conte} ha cambiado a {nuevo_estado}"
+
+        # Mensaje para los editores
+        mensaje_editor = f"""
+        Hola Editor,
+
+        El contenido titulado "{contenido.titulo_conte}" creado por {contenido.autor.username} ha cambiado de estado a {nuevo_estado}.
+        
+        Puedes revisarlo aquí: {url_completa}
+
+        Saludos,
+        El equipo editorial
+        """
+
+        # Enviar correo a cada editor
+        for editor in editores:
+            send_mail(
+                subject_editor,
+                mensaje_editor,
+                settings.DEFAULT_FROM_EMAIL,
+                [editor.email],
+                fail_silently=False,
+            )
