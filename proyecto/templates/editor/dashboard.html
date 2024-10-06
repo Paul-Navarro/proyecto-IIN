@@ -42,13 +42,12 @@
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'BORRADOR' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
+                                    <!-- Mostrar la razón del cambio a Borrador solo si existe -->
+                                {% if contenido.cambios_borrador.count > 0 %}
+                                <span class="razon-borrador">Contenido rechazado: {{ contenido.cambios_borrador.last.razon }}</span>
+                            {% endif %}
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_editor' contenido.pk %}" class="btn btn-ver">Ver</a>
-
-                                        <!-- Mostrar la razón del cambio a Borrador solo si existe -->
-                                    {% if contenido.cambios_borrador.count > 0 %}
-                                    <span class="razon-borrador">Razón: {{ contenido.cambios_borrador.last.razon }}</span>
-                                {% endif %} 
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -264,7 +263,7 @@
         if (targetColumn === 'a_publicar') {
             var viewButton = document.createElement('a');
             viewButton.textContent = 'Ver';
-            viewButton.href = `/contenido/contenido/${draggedItem.id.replace('item', '')}/`;
+            viewButton.href = `/contenido/contenido_editor/${draggedItem.id.replace('item', '')}/`;
             viewButton.classList.add('btn', 'btn-ver');
             draggedItem.appendChild(viewButton);
         }

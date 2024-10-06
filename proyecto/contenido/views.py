@@ -376,7 +376,7 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 'new_state': nuevo_estado,
                 'titulo': contenido.titulo_conte,
                 'fecha_publicacion': contenido.fecha_publicacion,
-                'razon_cambio': razon_cambio_text
+                'razon_rechazo': razon_cambio_text
  })
             else:
                 return JsonResponse({'success': False, 'error': 'Estado no válido'}, status=400)

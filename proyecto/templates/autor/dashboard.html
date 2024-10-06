@@ -45,7 +45,7 @@
                             <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                 <!-- Mostrar la razón del cambio a Borrador solo si existe -->
                                 {% if contenido.cambios_borrador.count > 0 %}
-                                <span class="razon-borrador">Contenido rechazado: {{ contenido.cambios_borrador.last.razon }}</span>
+                                <span class="razon-borrador">Mensaje de Editor: {{ contenido.cambios_borrador.last.razon }}</span>
                             {% endif %} 
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_update' contenido.id_conte %}" class="btn btn-edit">Editar</a>
@@ -342,6 +342,16 @@
                 .then(data => {
                     if (data.success) {
                         showStateChangeMessage(data.titulo, data.old_state, 'borrador');
+
+                        // Verificar si hay una razón de rechazo en la respuesta del servidor
+                        if (data.razon_rechazo) {
+                            // Añadir el mensaje de "Contenido rechazado"
+                            var rejectedMessage = document.createElement('span');
+                            rejectedMessage.textContent = 'Mensaje de Editor: ' + data.razon_rechazo;
+                            rejectedMessage.classList.add('razon-borrador');
+                            draggedItemData.draggedItem.insertBefore(rejectedMessage, draggedItemData.draggedItem.firstChild);  // Insertar el mensaje antes del título
+                        }
+
                     } else {
                         alert('Error al actualizar el estado.');
                     }
