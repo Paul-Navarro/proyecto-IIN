@@ -57,14 +57,16 @@
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'EDITADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
+
                                     <!-- Mostrar la razón del rechazo si existe -->
                                     {% if contenido.rechazos.exists %}
-                                    <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
+                                    <span class="razon-rechazo">Mensaje del Publicador: {{ contenido.rechazos.last.razon }}</span>
                                     {% else %}
                                     <span class="razon-rechazo">Obs: No tuvo rechazos</span>
                                     {% endif %}
+                                    <h4>{{ contenido.titulo_conte }}</h4>
+                                    <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    
                                 </div>
                             {% endif %}
                         {% endfor %}
