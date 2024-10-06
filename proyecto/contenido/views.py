@@ -127,6 +127,7 @@ def contenido_create(request):
             # Verificar si la categoría seleccionada es no moderada
             if contenido.categoria and not contenido.categoria.es_moderada:
                 contenido.estado_conte = 'PUBLICADO'
+                contenido.autopublicar_conte = True
             else:
                 contenido.estado_conte = 'BORRADOR'
 
@@ -755,10 +756,7 @@ def reportar_contenido(request, contenido_id_conte):  # Usamos contenido_id_cont
 #para visualizar los reportes (admin)
 @login_required
 def ver_reportes(request):
-    # Verificar si el usuario es administrador (staff)
-    if not request.user.is_staff:
-        return redirect('home')  # Redirige si no es administrador
-
+   
     # Obtener todos los reportes y ordenarlos por la fecha más reciente
     reportes = ReporteContenido.objects.all().order_by('-fecha_reporte')
     
