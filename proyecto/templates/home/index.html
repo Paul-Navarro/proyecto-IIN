@@ -157,11 +157,10 @@
                     <ul><strong>Acceso a:</strong>
                         <li>
                             <a href="{% url 'historial_compras' %}">Historial de Compras</a>
-                        </li>   
-                        <li>
-                            <a href="{% url 'venta_list' %}">Panel de Ventas</a>
-
-                        </li>             
+                        </li>     
+                        {% if has_financiero_role %}
+                            <li><a href="{% url 'venta_list' %}">Historial de Ventas</a></li>
+                        {% endif %}          
                     </ul>
                 {% endif %}
                 {% if has_multiple_roles or has_single_role %}

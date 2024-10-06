@@ -20,6 +20,10 @@ from django.core.mail import send_mail
 from .forms import ContactForm
 from .models import HistorialCompra
 
+#para rol financiero
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import ListView
+
 def contenido_list(request):
     '''
     @function contenido_list
@@ -782,3 +786,25 @@ def historial_compras_view(request):
 
     return render(request, 'home/historial_compras.html', {'historial_compras': []})
 
+#para rol financiero
+
+class VentaListView(ListView):
+    model = HistorialCompra  # Modelo correcto para las compras
+    template_name = 'ventas/venta_list.html'  # Ruta de la plantilla correcta
+    context_object_name = 'ventas'
+    permission_required = 'users.view_sales'  # Asegura que solo roles con permiso puedan verlo
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Filtrar las ventas según los parámetros
+        fecha_inicio = self.request.GET.get('fecha_inicio')
+        fecha_fin = self.request.GET.get('fecha_fin')
+        cliente = self.request.GET.get('cliente')
+         # Depurar las fechas
+        print(f"Filtrando desde {fecha_inicio} hasta {fecha_fin}")
+        if fecha_inicio and fecha_fin:
+            queryset = queryset.filter(fecha_transaccion__range=[fecha_inicio, fecha_fin])  # Campo de fecha en HistorialCompra
+        if cliente:
+            queryset = queryset.filter(usuario__username__icontains=cliente)  # Filtrar por usuario (cliente)
+
+        return queryset

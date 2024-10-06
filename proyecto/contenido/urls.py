@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from .views import suscripciones_view, comprar_suscripcion, contacto, historial_compras_view
 
+from contenido.views import VentaListView
+
 urlpatterns = [
     
     #Urls de los contenidos
@@ -58,6 +60,7 @@ urlpatterns = [
     path('contenido/<int:contenido_id_conte>/reportar/', views.reportar_contenido, name='reportar_contenido'),
     path('admin/reportes/', views.ver_reportes, name='ver_reportes'),  # Ruta para ver los reportes
     path('historial-compras/', historial_compras_view, name='historial_compras'),
+    path('ventas/', VentaListView.as_view(), name='venta_list'),
 ]
 
 '''

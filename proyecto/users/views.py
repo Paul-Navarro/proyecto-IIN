@@ -41,10 +41,6 @@ from .models import Notificacion
 from django.http import JsonResponse
 
 
-#para rol financiero
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from .models import Venta
-
 
 def home(request):
     # DISPARADOR DE CRON
@@ -132,11 +128,13 @@ def home(request):
         'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
         'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
         'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
+        'has_financiero_role':user.has_role('Financiero') if user.is_authenticated else False,
         'has_multiple_roles': roles_count > 1,
         'has_single_role': roles_count == 1,
         'query': query,  # Pasar el término de búsqueda al contexto
         'notificaciones': notificaciones,  # Añadir las notificaciones al contexto
         'notificaciones_no_leidas': notificaciones_no_leidas,  # Añadir el conteo de no leídas
+    
     }
 
     return render(request, 'home/index.html', context)
@@ -377,25 +375,4 @@ def user_list(request):
     return render(request, 'admin/users/user_list.html', {'users': users})
 
 
-#para rol financiero
 
-class VentaListView(ListView):
-    model = Venta
-    template_name = 'ventas/venta_list.html'
-    context_object_name = 'ventas'
-    permission_required = 'users.view_sales'  # Aseguramos que solo puedan ver los que tienen el permiso
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        
-        # Filtrar por parámetros que el usuario haya proporcionado (si es necesario)
-        fecha_inicio = self.request.GET.get('fecha_inicio')
-        fecha_fin = self.request.GET.get('fecha_fin')
-        cliente = self.request.GET.get('cliente')
-
-        if fecha_inicio and fecha_fin:
-            queryset = queryset.filter(fecha__range=[fecha_inicio, fecha_fin])
-        if cliente:
-            queryset = queryset.filter(cliente__icontains=cliente)
-
-        return queryset
