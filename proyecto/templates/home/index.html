@@ -73,7 +73,7 @@
             <div>
                 <div class="botonesLogeo">
                     {% if user.is_authenticated %}
-                    <a style = "color: white;" href="{% url 'account_logout' %}" class="menu_link menu_link--logout"><i class="fas fa-arrow-left"></i> Cerrar Sesión</a>
+                    <a style = "color: white;" href="{% url 'account_logout' %}" class=" --logout"><i class="fas fa-arrow-left"></i> Cerrar Sesión</a>
                     {% else %}
                     <div>Accede o crea una cuenta</div>
                     <button onclick="redirigirLogin()" type="button">Log in</button>
@@ -155,7 +155,13 @@
             <ul>
                 {% if user.is_authenticated %}
                     <ul><strong>Acceso a:</strong>
-                        <li><a href="{% url 'historial_compras' %}">Historial de Compras</a></li>                
+                        <li>
+                            <a href="{% url 'historial_compras' %}">Historial de Compras</a>
+                        </li>   
+                        <li>
+                            <a href="{% url 'venta_list' %}">Panel de Ventas</a>
+
+                        </li>             
                     </ul>
                 {% endif %}
                 {% if has_multiple_roles or has_single_role %}
