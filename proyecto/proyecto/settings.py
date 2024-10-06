@@ -93,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'leticia',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'PASSWORD': '13100864',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -136,20 +136,27 @@ ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm'}
 # Configuración del modelo de usuario personalizado
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# Configuración del backend de correo para desarrollo
+# Configuración del backend de correo para desarrollo(ESTE NO ENVIA AL CORREO MUESTRA EN CONSOLA)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Configuración del backend de correo para PRODUCCION(ESTE ENVIA AL CORREO)
+# Configuración del backend de correo para desarrolloEMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+# Configuración de correo para envío de campos en contacto
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_HOST_USER = '2024g5is2@gmail.com'
+#EMAIL_HOST_PASSWORD = 'leti1168'
 # Configuración de correo para envío de campos en contacto
 EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_USE_SSL = True
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = '2024g5is2@gmail.com'
-EMAIL_HOST_PASSWORD = 'leti1168'
-# Configuración de correo para envío de campos en contacto
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '2024g5is2@gmail.com'
-EMAIL_HOST_PASSWORD = 'leti1168'
+EMAIL_HOST_PASSWORD = 'voocttmqpvrrxjsw'
+DOMAIN_NAME = 'http://localhost:8000'  
+DEFAULT_FROM_EMAIL = '2024g5is2@gmail.com'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
