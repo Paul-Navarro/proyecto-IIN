@@ -48,15 +48,26 @@
                     {{ form.fecha_conte }}  <!-- El campo se mostrará pero será de solo lectura -->
                 </div>
 
-                <div>
-                    <label for="fecha_publicacion">{{ form.fecha_publicacion.label }}</label>
-                    {{ form.fecha_publicacion }}  <!-- Campo para seleccionar fecha y hora -->
+
+                <div class="contenedor_w">
+
+                    <div>
+                        <label for="fecha_publicacion">{{ form.fecha_publicacion.label }}</label>
+                        {{ form.fecha_publicacion }}  <!-- Campo para seleccionar fecha y hora -->
+                    </div>
+    
+                    <div>
+                        <label for="fecha_vigencia">{{ form.fecha_vigencia.label }}</label>
+                        {{ form.fecha_vigencia }}  <!-- Campo para seleccionar fecha y hora -->
+                    </div>
+                    
+                    <div>
+                        <label for="imagen_conte">{{ form.imagen_conte.label }}</label>
+                        {{ form.imagen_conte }}
+                    </div>
+
                 </div>
                 
-                <div>
-                    <label for="imagen_conte">{{ form.imagen_conte.label }}</label>
-                    {{ form.imagen_conte }}
-                </div>
 
                 <!-- Campo de tags para seleccionar uno o varios tags -->
                 <h3>Selecciona uno o varios tags:</h3>

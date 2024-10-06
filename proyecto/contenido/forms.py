@@ -20,7 +20,7 @@ class ContenidoForm(forms.ModelForm):
 
     class Meta:
         model = Contenido
-        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags','fecha_publicacion']
+        fields = ['titulo_conte', 'tipo_conte', 'texto_conte', 'fecha_conte', 'imagen_conte', 'categoria', 'tags','fecha_publicacion', 'fecha_vigencia']
         labels = {
             'titulo_conte': 'Título del contenido',
             'tipo_conte': 'Tipo de contenido',
@@ -34,6 +34,8 @@ class ContenidoForm(forms.ModelForm):
         widgets = {
             'tags': forms.CheckboxSelectMultiple(),  # Mostrar los tags como checkboxes
             'fecha_publicacion': DateTimeInput(attrs={'type': 'datetime-local'}),
+            'fecha_vigencia': DateTimeInput(attrs={'type': 'datetime-local'}),
+            
         }
 
     def __init__(self, *args, **kwargs):
@@ -46,9 +48,11 @@ class ContenidoForm(forms.ModelForm):
             self.fields['categoria'].initial = primera_categoria_no_moderada
             
         if self.instance.pk:
-            self.fields['fecha_publicacion'].required = False  # Edición: no es requerido
+            self.fields['fecha_publicacion'].required = False
+            self.fields['fecha_vigencia'].required = False  # Edición: no es requerido
         else:
             self.fields['fecha_publicacion'].required = True   # Creación: es requerido
+            self.fields['fecha_vigencia'].required = True   # Creación: es requerido
 
         # Personalizar el queryset del campo categoría
         self.fields['categoria'].queryset = Categoria.objects.all()

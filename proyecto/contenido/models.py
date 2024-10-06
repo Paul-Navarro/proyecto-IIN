@@ -43,6 +43,8 @@ class Contenido(models.Model):
     likes = models.IntegerField(default=0)
     unlikes = models.IntegerField(default=0)
     autopublicar_conte = models.BooleanField(default=False)
+    vigencia_conte = models.BooleanField(default=False)
+    
 
     # Relación con el autor del contenido
     autor = models.ForeignKey(
@@ -52,6 +54,8 @@ class Contenido(models.Model):
         blank=True
     )
     fecha_publicacion = models.DateTimeField(null=True, blank=True)
+    fecha_vigencia = models.DateTimeField(null=True, blank=True)
+    
     
      # Campo para almacenar la versión actual seleccionada
     version_actual = models.ForeignKey(

@@ -20,8 +20,18 @@ class AutopublicarContenido(CronJobBase):
             fecha_publicacion__lte=hora_actual,
             autopublicar_conte=False
         )
+        
+        contenidos_con_vigencia = Contenido.objects.filter(fecha_vigencia__lte=hora_actual, vigencia_conte=False)
+        print(f"Contenidos cuya fecha de vigencia ha llegado: {contenidos_con_vigencia.count()}")
 
         print(f"Contenidos a publicar: {contenidos_a_publicar.count()}")
+        
+        # Mostrar detalles de cada contenido y actualizar su estado de vigencia
+        for contenido in contenidos_con_vigencia:
+            print(f"Fecha de vigencia de '{contenido.titulo_conte}': {contenido.fecha_vigencia}")
+            contenido.vigencia_conte = True  # Marcar el contenido como vigente
+            contenido.save()
+            print(f"Contenido '{contenido.titulo_conte}' marcado como vigente.")
 
         # Mostrar la fecha y hora de cada contenido
         for contenido in contenidos_a_publicar:
@@ -29,3 +39,4 @@ class AutopublicarContenido(CronJobBase):
             print(f"Hora actual: {hora_actual}")
             contenido.autopublicar()
             print(f"Contenido '{contenido.titulo_conte}' autopublicado.")
+

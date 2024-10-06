@@ -50,7 +50,7 @@ def home(request):
     autores = User.objects.all()
 
    # Filtrar los contenidos publicados y con autopublicar_conte en True
-    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True)
+    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True , vigencia_conte=False)
 
     # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')
