@@ -153,6 +153,11 @@
             </script>
             <!--##########################-->
             <ul>
+                {% if user.is_authenticated %}
+                    <ul><strong>Acceso a:</strong>
+                        <li><a href="{% url 'historial_compras' %}">Historial de Compras</a></li>                
+                    </ul>
+                {% endif %}
                 {% if has_multiple_roles or has_single_role %}
                 <li><strong>Acciones</strong></li>
                 {% endif %}

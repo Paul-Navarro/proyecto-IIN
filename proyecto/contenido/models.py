@@ -175,3 +175,15 @@ class ReporteContenido(models.Model):
     def __str__(self):
         return f'Reporte de {self.usuario.username} sobre {self.contenido.titulo_conte}'
 
+
+#historial de compra de categorías 
+class HistorialCompra(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    numero_compra = models.CharField(max_length=100)  # Número o ID de la compra de Stripe
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
+    fecha_transaccion = models.DateTimeField(auto_now_add=True)  # Fecha de la compra
+
+    def __str__(self):
+        return f"Compra {self.numero_compra} - {self.categoria.nombre}"
+
+

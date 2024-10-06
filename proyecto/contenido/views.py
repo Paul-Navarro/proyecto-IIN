@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Categoria, Suscripcion
 from django.core.mail import send_mail
 from .forms import ContactForm
+from .models import HistorialCompra
 
 def contenido_list(request):
     '''
@@ -509,13 +510,17 @@ stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 def comprar_suscripcion(request):
     if request.method == 'POST' and request.user.is_authenticated:
         usuario = request.user
+        # Debugging: Ver el usuario y sesión actual
+        print(f"Usuario autenticado antes del pago: {usuario.username}")
+        print(f"Session Key antes del pago: {request.session.session_key}")
+
         categorias_seleccionadas = request.POST.getlist('categorias')  # Recibe las categorías seleccionadas por el usuario
 
         if not categorias_seleccionadas:
             return JsonResponse({'error': 'No seleccionaste ninguna categoría.'}, status=400)
 
         line_items = []
-        precio_por_categoria = 1000  # Precio en centavos (10.00 USD por ejemplo)
+        precio_por_categoria = 250 * 100  #25000 GS por categoría
 
         # Crear los line_items para Stripe basado en las categorías seleccionadas
         for categoria_id in categorias_seleccionadas:
@@ -523,7 +528,7 @@ def comprar_suscripcion(request):
             if categoria.es_pagada:
                 line_items.append({
                     'price_data': {
-                        'currency': 'usd',
+                        'currency': 'pyg',
                         'product_data': {
                             'name': f'Suscripción a {categoria.nombre}',  # Nombre de la suscripción
                         },
@@ -545,6 +550,11 @@ def comprar_suscripcion(request):
                     'categorias_ids': ','.join(categorias_seleccionadas)  # Pasar los IDs de las categorías seleccionadas
                 }
             )
+            # Debugging: Ver el session_id de Stripe y la sesión actual de usuario
+            print(f"Stripe session_id: {session.id}")
+            print(f"Session Key después del pago: {request.session.session_key}")
+            # Guardar la compra en el historial
+            
             return JsonResponse({'id': session.id})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -553,6 +563,7 @@ def comprar_suscripcion(request):
 
 
 #@login_required(login_url='account_login')
+'''
 def suscripcion_exitosa(request):
     # Depurar el estado de request.user
     print(f"request.user: {request.user}")
@@ -580,6 +591,52 @@ def suscripcion_exitosa(request):
 
         return render(request, 'suscripciones/success.html')
 
+    return redirect('suscripciones_view')
+'''
+def suscripcion_exitosa(request):
+    # Depurar el estado de request.user
+    print(f"request.user: {request.user}")
+    print(f"request.user.is_authenticated: {request.user.is_authenticated}")
+    
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Obtener la sesión de Stripe
+        session = stripe.checkout.Session.retrieve(session_id)
+
+        # Obtener el usuario actual
+        usuario = request.user
+
+        # Verificar si el usuario es anónimo antes de proceder
+        if usuario.is_anonymous:
+            print("Error: Usuario anónimo detectado")
+            return redirect('account_login')
+
+        # Verificar que el pago ha sido completado antes de continuar
+        if session.payment_status == 'paid':
+            # Obtener los IDs de las categorías desde los metadatos de la sesión de Stripe
+            categorias_ids = session.metadata['categorias_ids'].split(',')
+
+            # Crear suscripciones para las categorías seleccionadas
+            categorias_seleccionadas = Categoria.objects.filter(id__in=categorias_ids)
+            for categoria in categorias_seleccionadas:
+                # Crear suscripciones
+                Suscripcion.objects.get_or_create(usuario=usuario, categoria=categoria)
+
+                # Guardar la compra en el historial
+                HistorialCompra.objects.create(
+                    usuario=usuario,
+                    numero_compra=session.id,  # Guardar el session.id de Stripe como número de compra
+                    categoria=categoria
+                )
+
+            # Renderizar el template de éxito
+            return render(request, 'suscripciones/success.html')
+
+        else:
+            print(f"Error: Pago no completado. Estado de pago: {session.payment_status}")
+            return redirect('suscripciones_view')
+
+    # Si no hay session_id o algo falla, redirigir a la vista de suscripciones
     return redirect('suscripciones_view')
 
 
@@ -682,3 +739,19 @@ def ver_reportes(request):
     
     # Asegúrate de que la ruta coincide con la ubicación de la plantilla
     return render(request, 'admin/contenido/ver_reportes.html', {'reportes': reportes})
+
+#vista par mostrar el historial de compra
+def historial_compras_view(request):
+    if request.user.is_authenticated:
+        usuario = request.user
+        # Ordenar las compras por fecha de transacción en orden descendente
+        historial_compras = HistorialCompra.objects.filter(usuario=usuario).order_by('-fecha_transaccion')
+
+        context = {
+            'historial_compras': historial_compras,
+        }
+
+        return render(request, 'home/historial_compras.html', context)
+
+    return render(request, 'home/historial_compras.html', {'historial_compras': []})
+

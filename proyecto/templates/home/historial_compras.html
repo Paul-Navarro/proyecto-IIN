@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Compras</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/historial_compras.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div><a class="boton_atras" href="{% url 'home' %}">Atras</a></div>
+        <h1>Historial de compras</h1>
+        <div></div>
+    </header>
+    <div class="contenedor">
+        <main>
+            <div class="historial-container">
+                {% if historial_compras %}
+                    {% for compra in historial_compras %}
+                        <div class="compra-card">
+                            <div class="compra-info">
+                                <div class="compra-detalle">
+                                    <h3>Compra N°</h3>
+                                    <p>{{ forloop.counter }}</p>
+                                </div>
+                                <div class="compra-detalle">
+                                    <h3>Suscripción a</h3>
+                                    <p>{{ compra.categoria.nombre }}</p>
+                                </div>
+                                <div class="compra-detalle">
+                                    <h3>Fecha de transacción</h3>
+                                    <p>{{ compra.fecha_transaccion|date:"d M Y H:i" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No tienes compras registradas.</p>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>
