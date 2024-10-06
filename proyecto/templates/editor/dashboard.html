@@ -42,13 +42,12 @@
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'BORRADOR' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
+                                    <!-- Mostrar la razón del cambio a Borrador solo si existe -->
+                                {% if contenido.cambios_borrador.count > 0 %}
+                                <span class="razon-borrador">Contenido rechazado: {{ contenido.cambios_borrador.last.razon }}</span>
+                            {% endif %}
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_editor' contenido.pk %}" class="btn btn-ver">Ver</a>
-
-                                        <!-- Mostrar la razón del cambio a Borrador solo si existe -->
-                                    {% if contenido.cambios_borrador.count > 0 %}
-                                    <span class="razon-borrador">Razón: {{ contenido.cambios_borrador.last.razon }}</span>
-                                {% endif %} 
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -128,307 +127,317 @@
             </div>
         </section>
     </main>
+<!-- Modal de Confirmación para A Publicar -->
+<div class="modal fade" id="confirmarPublicacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmarPublicacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarPublicacionModalLabel">Confirmar Cambio de Estado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas cambiar el estado a "A Publicar"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmarPublicacionBtn" class="btn btn-primary">Sí, Cambiar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script>
 
-        let contenidoRechazadoId = null;  // Almacena el ID del contenido a rechazar
-        let originalColumn = null; // Variable para almacenar la columna original(Cancelacion)
-        let contenidoBorradorId = null; 
-        // Permitir que los elementos sean arrastrables
-        function allowDrop(ev) {
-            ev.preventDefault();
-        }
+
+
+
     
-        // Empezar a arrastrar
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-            originalColumnId = ev.target.closest('.kanban-column').id;  // Almacenar la columna de origen
+<!-- Modal de Confirmación para A Publicar a En Revisión -->
+<div class="modal fade" id="confirmarRevisionModal" tabindex="-1" role="dialog" aria-labelledby="confirmarRevisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarRevisionModalLabel">Confirmar Cambio de Estado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas cambiar el estado de "A Publicar" a "En Revisión"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmarRevisionBtn" class="btn btn-primary">Sí, Cambiar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let contenidoRechazadoId = null;  // Almacena el ID del contenido a rechazar
+    let originalColumnId = null;      // Variable para almacenar la columna original (Cancelación)
+    let contenidoBorradorId = null; 
+    let draggedItemGlobal = null;     // Variable global para almacenar el contenido arrastrado
+    let targetColumnGlobal = null;    // Para manejar la columna objetivo globalmente
+    let evGlobal = null;              // Evento global
+
+    // Permitir que los elementos sean arrastrables
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    // Empezar a arrastrar
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        originalColumnId = ev.target.closest('.kanban-column').id;  // Almacenar la columna de origen
+    }
+
+    // Soltar el elemento en la nueva columna y cambiar su estado
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        draggedItemGlobal = document.getElementById(data); // Guardar el ítem arrastrado globalmente
+
+        // Asegurarse de que se suelte en el área correcta (columna)
+        if (ev.target.classList.contains('kanban-items')) {
+            targetColumnGlobal = ev.target.closest('.kanban-column').id;
+
+            // Guardamos el ítem original y la columna original antes de cualquier acción
+            originalColumnId = draggedItemGlobal.closest('.kanban-column').id;
+
+            if (targetColumnGlobal === 'publicado') {
+                // Mostrar el modal de advertencia
+                $('#warningModal').modal('show');
+                return;  // Evitar que se complete el arrastre
+            }
+
+            // Si el contenido es arrastrado a la columna de rechazado, mostrar el modal de advertencia
+            if (targetColumnGlobal === 'rechazado') {
+                $('#warningModal').modal('show');
+                return;  // No continuar el arrastre hasta que se guarde la razón
+            }
+
+            // Si el contenido se mueve a Borrador
+            if (targetColumnGlobal === 'borrador') {
+                contenidoBorradorId = data.replace('item', '');  // Almacenar el ID del contenido
+                $('#razonBorradorModal').modal('show');
+                return;  // No mover el contenido todavía
+            }
+
+            // Si se mueve de En Revisión a A Publicar
+            if (originalColumnId === 'editado' && targetColumnGlobal === 'a_publicar') {
+                $('#confirmarPublicacionModal').modal('show');
+                evGlobal = ev;  // Guardar el evento globalmente
+                return;  // Detener el movimiento hasta que el usuario confirme
+            }
+
+            // Si se mueve de A Publicar a En Revisión
+            if (originalColumnId === 'a_publicar' && targetColumnGlobal === 'editado') {
+                $('#confirmarRevisionModal').modal('show');
+                evGlobal = ev;  // Guardar el evento globalmente
+                return;  // Detener el movimiento hasta que el usuario confirme
+            }
+
+            // Mover el contenido directamente si no es a las columnas especiales
+            moveContent(draggedItemGlobal, targetColumnGlobal, ev);
         }
-    
-        // Soltar el elemento en la nueva columna y cambiar su estado
-        function drop(ev) {
-            ev.preventDefault();
-            var data = ev.dataTransfer.getData("text");
-            var draggedItem = document.getElementById(data);
-            
-            // Asegurarse de que se suelte en el área correcta (columna)
-            if (ev.target.classList.contains('kanban-items')) {
-                var targetColumn = ev.target.closest('.kanban-column').id;
-        
-                // Guardamos el item original y la columna original antes de cualquier acción
-                originalColumnId = draggedItem.closest('.kanban-column').id;
+    }
 
-                if (targetColumn === 'publicado') {
-                    // Mostrar el modal de advertencia
-                    $('#warningModal').modal('show');
-                    return;  // Evitar que se complete el arrastre
-                }
-        
-                // Si el contenido es arrastrado a la columna de rechazado, mostrar el modal para ingresar la razón
-                if (targetColumn === 'rechazado') {
-                    $('#warningModal').modal('show'); // Mostrar el modal para la razón de rechazo
-                    return;  // No continuar el arrastre hasta que se guarde la razón
-                }
+    // Función para mover el contenido a la nueva columna y actualizar el estado en el servidor
+    function moveContent(draggedItem, targetColumn, ev) {
+        // Eliminar los botones previos
+        let buttons = draggedItem.querySelectorAll('a.btn');
+        buttons.forEach(button => button.remove());
 
-                if (targetColumn === 'borrador') {
-                    // Mostrar el modal para ingresar la razón de mover a Borrador
-
-                    contenidoBorradorId = data.replace('item', ''); // Almacenar el ID del contenido
-                    $('#razonBorradorModal').modal('show');
-                    return;  // No mover el contenido todavía
-                }
-
-                 // Eliminar los botones previos
-                let buttons = draggedItem.querySelectorAll('a.btn');
-                buttons.forEach(button => button.remove());
-
-                    // Si el contenido es movido a "Editado", añadir el botón "Editar"
-                if (targetColumn === 'editado') {
-                    var editButton = document.createElement('a');
-                    editButton.textContent = 'Editar';
-                    editButton.href = `/contenido/contenido/${data.replace('item', '')}/edit_editor/`;
-                    editButton.classList.add('btn', 'btn-edit');
-                    draggedItem.appendChild(editButton);
-                }
-
-                // Si el contenido es movido a "A Publicar", añadir el botón "Ver"
-                if (targetColumn === 'a_publicar') {
-                    var viewButton = document.createElement('a');
-                    viewButton.textContent = 'Ver';
-                    viewButton.href = `/contenido/contenido/${data.replace('item', '')}/`;
-                    viewButton.classList.add('btn', 'btn-ver');
-                    draggedItem.appendChild(viewButton);
-                }
-        
-                // Si el contenido es movido a una columna diferente a "Rechazado", eliminar la razón del rechazo
-                if (draggedItem.querySelector('.razon-rechazo')) {
-                    draggedItem.querySelector('.razon-rechazo').remove();
-                }
-        
-                // Para otras columnas, simplemente mover el contenido
-                ev.target.appendChild(draggedItem);
-        
-                // Llamada AJAX para actualizar el estado en el servidor
-                fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
-                    },
-                    body: JSON.stringify({
-                        'nuevo_estado': targetColumn.toUpperCase()  // Enviar el nuevo estado
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Mostrar el mensaje de cambio de estado
-                        showStateChangeMessage(data.titulo, data.old_state, targetColumn);
-                        } else {
-                    // Si el contenido es movido a otra columna, eliminar la fecha de publicación
-                    var dateElement = draggedItem.querySelector('.fecha-publicacion');
-                    if (dateElement) {
-                        dateElement.remove();  // Eliminar el elemento de la fecha
-                    }
-                }
-                    }   else {
-                             alert('Error al actualizar el estado.');
-                            }   
-                })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
-            }   
+        // Si el contenido es movido a "Editado", añadir el botón "Editar"
+        if (targetColumn === 'editado') {
+            var editButton = document.createElement('a');
+            editButton.textContent = 'Editar';
+            editButton.href = `/contenido/contenido/${draggedItem.id.replace('item', '')}/edit_editor/`;
+            editButton.classList.add('btn', 'btn-edit');
+            draggedItem.appendChild(editButton);
         }
 
-        
-        
-    
-// Espera hasta que el DOM esté completamente cargado
-document.addEventListener('DOMContentLoaded', function() {
+        // Si el contenido es movido a "A Publicar", añadir el botón "Ver"
+        if (targetColumn === 'a_publicar') {
+            var viewButton = document.createElement('a');
+            viewButton.textContent = 'Ver';
+            viewButton.href = `/contenido/contenido_editor/${draggedItem.id.replace('item', '')}/`;
+            viewButton.classList.add('btn', 'btn-ver');
+            draggedItem.appendChild(viewButton);
+        }
 
-    // Función para manejar el rechazo
-    function manejarRechazo() {
-        // Selecciona el botón "Guardar" del modal de rechazo
-        var guardarRechazoBtn = document.getElementById('guardarRechazoBtn');
-        var modal = document.getElementById('razonRechazoModal');
-        var razonInput = document.getElementById('razonRechazoInput');
+        // Si el contenido es movido a una columna diferente a "Rechazado", eliminar la razón del rechazo
+        if (draggedItem.querySelector('.razon-rechazo')) {
+            draggedItem.querySelector('.razon-rechazo').remove();
+        }
 
-        if (guardarRechazoBtn) {
-            guardarRechazoBtn.addEventListener('click', function() {
-                var razon = razonInput.value.trim();
+        // Mover el contenido al DOM de la nueva columna
+        ev.target.appendChild(draggedItem);
 
-                if (!razon) {
-                    alert('Por favor, ingresa una razón válida para el rechazo.');
-                    return;
-                }
+        // Llamada AJAX para actualizar el estado en el servidor
+        fetch(`/contenido/contenido/cambiar_estado/${draggedItem.id.replace('item', '')}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
+            },
+            body: JSON.stringify({
+                'nuevo_estado': targetColumn.toUpperCase()  // Enviar el nuevo estado
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar el mensaje de cambio de estado
+                showStateChangeMessage(data.titulo, data.old_state, targetColumn);
+            } else {
+                alert('Error al actualizar el estado.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 
-                // Mueve el contenido inmediatamente al DOM de la columna "Rechazado"
-                const rejectedColumn = document.getElementById('rechazado').querySelector('.kanban-items');
-                const rejectedItem = document.getElementById('item' + contenidoRechazadoId);
-                rejectedColumn.appendChild(rejectedItem);  // Mover a la columna Rechazado inmediatamente
+    // Confirmar el cambio a "A Publicar"
+    document.getElementById('confirmarPublicacionBtn').addEventListener('click', function() {
+        $('#confirmarPublicacionModal').modal('hide');
+        moveContent(draggedItemGlobal, 'a_publicar', evGlobal);  // Mover a "A Publicar"
+    });
 
     // Confirmar el cambio a "En Revisión"
     document.getElementById('confirmarRevisionBtn').addEventListener('click', function() {
         $('#confirmarRevisionModal').modal('hide');
         moveContent(draggedItemGlobal, 'editado', evGlobal);  // Mover a "En Revisión"
     });
-            });
-        }
 
-        // Evento para el botón "Cancelar" en el modal de rechazo
-        document.querySelector('.btn-secondary').addEventListener('click', function() {
-            // Aquí no necesitamos mover de vuelta el contenido porque no ha sido movido todavía.
-            // Simplemente cerramos el modal.
-            $('#razonRechazoModal').modal('hide');
-        });
+    // Función para formatear la fecha de publicación
+    function formatFechaPublicacion(fechaPublicacion) {
+        var day = fechaPublicacion.getDate().toString().padStart(2, '0');
+        var month = (fechaPublicacion.getMonth() + 1).toString().padStart(2, '0');  // Los meses en JS son base 0
+        var year = fechaPublicacion.getFullYear();
+        var hours = fechaPublicacion.getHours().toString().padStart(2, '0');
+        var minutes = fechaPublicacion.getMinutes().toString().padStart(2, '0');
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
     }
 
-    // Función para manejar el cambio a Borrador
-    function manejarBorrador() {
+    // Manejar el cambio a Borrador
+    document.addEventListener('DOMContentLoaded', function() {
         // Seleccionar el botón "Guardar" del modal de Borrador
         var guardarBorradorBtn = document.getElementById('guardarBorradorBtn');
         var razonInputBorrador = document.getElementById('razonBorradorInput');
 
-        if (guardarBorradorBtn) {
-            guardarBorradorBtn.addEventListener('click', function() {
-                if (!contenidoBorradorId) {
-                    alert('No se ha seleccionado ningún contenido para mover a Borrador.');
-                    return;
-                }
+        guardarBorradorBtn.addEventListener('click', function() {
+            if (!contenidoBorradorId) {
+                alert('No se ha seleccionado ningún contenido para mover a Borrador.');
+                return;
+            }
 
-                var razon = razonInputBorrador.value.trim();
+            var razon = razonInputBorrador.value.trim();
 
-                if (!razon) {
-                    alert('Por favor, ingresa una razón válida para mover a Borrador.');
-                    return;
-                }
+            if (!razon) {
+                alert('Por favor, ingresa una razón válida para mover a Borrador.');
+                return;
+            }
 
-                // Mueve el contenido inmediatamente al DOM de la columna "Borrador"
-                const borradorColumn = document.getElementById('borrador').querySelector('.kanban-items');
-                const borradorItem = document.getElementById('item' + contenidoBorradorId);
+            // Mueve el contenido inmediatamente al DOM de la columna "Borrador"
+            const borradorColumn = document.getElementById('borrador').querySelector('.kanban-items');
+            const borradorItem = document.getElementById('item' + contenidoBorradorId);
 
-                // Verificar si borradorItem es un nodo válido antes de mover
-                if (!borradorItem) {
-                    alert('No se encontró el contenido en el DOM para moverlo a Borrador.');
-                    return;
-                }
+            // Verificar si borradorItem es un nodo válido antes de mover
+            if (!borradorItem) {
+                alert('No se encontró el contenido en el DOM para moverlo a Borrador.');
+                return;
+            }
 
-                borradorColumn.appendChild(borradorItem);  // Mover a la columna Borrador inmediatamente
+            borradorColumn.appendChild(borradorItem);  // Mover a la columna Borrador inmediatamente
 
-                // Actualizar la razón en el DOM
-                let existingReason = borradorItem.querySelector('.razon-borrador');
-                if (!existingReason) {
-                    var reasonSpan = document.createElement('span');
-                    reasonSpan.classList.add('razon-borrador');
-                    reasonSpan.textContent = 'Razón: ' + razon;
-                    borradorItem.appendChild(reasonSpan);
+            // Actualizar la razón en el DOM
+            let existingReason = borradorItem.querySelector('.razon-borrador');
+            if (!existingReason) {
+                var reasonSpan = document.createElement('span');
+                reasonSpan.classList.add('razon-borrador');
+                reasonSpan.textContent = 'Razón: ' + razon;
+                borradorItem.appendChild(reasonSpan);
+            } else {
+                existingReason.textContent = 'Razón: ' + razon;
+            }
+
+            // Desactivar el atributo draggable para el contenido en "Borrador"
+            borradorItem.setAttribute('draggable', 'false');
+
+            // Ocultar el modal
+            $('#razonBorradorModal').modal('hide');
+
+            // Llamada AJAX para informar al servidor
+            fetch(`/contenido/contenido/cambiar_estado/${contenidoBorradorId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'nuevo_estado': 'BORRADOR',
+                    'razon_cambio': razon  // Enviar la razón
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mostrar el mensaje de éxito (opcional)
+                    showStateChangeMessage(data.titulo, data.old_state, 'BORRADOR');
                 } else {
-                    existingReason.textContent = 'Razón: ' + razon;
+                    alert('Error al mover el contenido a Borrador.');
                 }
-                 //Desactivar el atributo draggable para el contenido en "Borrador"**
-                borradorItem.setAttribute('draggable', 'false');
-
-                // Ocultar el modal
-                $('#razonBorradorModal').modal('hide');
-
-                // Realizar la llamada AJAX para informar al servidor
-                fetch(`/contenido/contenido/cambiar_estado/${contenidoBorradorId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({
-                        'nuevo_estado': 'BORRADOR',
-                        'razon_cambio': razon  // Enviar la razón
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Mostrar el mensaje de éxito (opcional)
-                        showStateChangeMessage(data.titulo, data.old_state, 'BORRADOR');
-                    } else {
-                        alert('Error al mover el contenido a Borrador.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-        }
+        });
+    });
+
+    // Función para mostrar mensaje de cambio de estado
+    function showStateChangeMessage(titulo, oldState, newState) {
+        const readableOldState = transformState(oldState);  // Transformar oldState
+        const readableNewState = transformState(newState);  // Transformar newState
+        const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
+
+        // Insertar el mensaje en el contenedor de la alerta
+        document.getElementById('stateChangeMessage').textContent = message;
+
+        // Mostrar la alerta
+        const alertElement = document.getElementById('stateChangeAlert');
+        alertElement.style.display = 'block';  // Mostrar la alerta
+
+        // Ocultar la alerta después de 10 segundos
+        setTimeout(function() {
+            alertElement.style.display = 'none';  // Ocultar la alerta
+        }, 10000);
     }
 
-    // Llamar ambas funciones para ejecutarlas cuando el DOM esté listo
-    manejarRechazo();
-    manejarBorrador();
-    });
-    });
-
-    // Función para mostrar mensaje de cambio de estado
-    function showStateChangeMessage(titulo, oldState, newState) {
-        const readableOldState = transformState(oldState);  // Transformar oldState
-        const readableNewState = transformState(newState);  // Transformar newState
-        const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
-});
-
-    // Función para mostrar mensaje de cambio de estado
-    function showStateChangeMessage(titulo, oldState, newState) {
-        const readableOldState = transformState(oldState);  // Transformar oldState
-        const readableNewState = transformState(newState);  // Transformar newState
-        const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
-
-
-
-
-        // Función para transformar los estados en nombres más legibles
-        function transformState(state) {
-            switch(state.toUpperCase()) {
-                case 'EN_REVISION':
-                    return 'Editado';
-                case 'EDITADO':
-                    return 'Editado';
-                case 'A_PUBLICAR':
-                    return 'A Publicar';
-                case 'RECHAZADO':
-                    return 'Rechazado';
-                default:
-                    return state;  // Retorna el estado original si no hay transformación
-            }
+    // Función para transformar los estados en nombres más legibles
+    function transformState(state) {
+        switch(state.toUpperCase()) {
+            case 'EN_REVISION':
+                return 'Editado';
+            case 'EDITADO':
+                return 'Editado';
+            case 'A_PUBLICAR':
+                return 'A Publicar';
+            case 'RECHAZADO':
+                return 'Rechazado';
+            default:
+                return state;  // Retorna el estado original si no hay transformación
         }
-    
-        // Mostrar mensaje de cambio de estado
-        function showStateChangeMessage(titulo, oldState, newState) {
-            const readableOldState = transformState(oldState);  // Transformar oldState
-            const readableNewState = transformState(newState);  // Transformar newState
-            const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
-    
-            // Insertar el mensaje en el contenedor de la alerta
-            document.getElementById('stateChangeMessage').textContent = message;
-    
-            // Mostrar la alerta
-            const alertElement = document.getElementById('stateChangeAlert');
-            alertElement.style.display = 'block';  // Mostrar la alerta
-    
-            // Ocultar la alerta después de 10 segundos
-            setTimeout(function() {
-                alertElement.style.display = 'none';  // Ocultar la alerta
-            }, 10000);
-        }
+    }
+</script>
 
-        // Mostrar el modal de rechazo manualmente
-        function mostrarModalRechazo() {
-            var modal = document.getElementById('razonRechazoModal');
-            modal.style.display = 'block';  // Mostrar el modal
-        }
 
-        // Ocultar el modal de rechazo manualmente
-        function ocultarModalRechazo() {
-            var modal = document.getElementById('razonRechazoModal');
-            modal.style.display = 'none';  // Ocultar el modal
-        }
-    </script>
+
+
+
     
 
     <!-- Modal de advertencia -->
@@ -480,9 +489,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
-
-   
-    
    
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
