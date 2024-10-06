@@ -436,14 +436,26 @@ def unlike_contenido(request, id_conte):
 
 
 def seleccionar_version(request, pk, version_id):
+    """
+    Vista para seleccionar una versión específica de un contenido.
+    Cuando seleccionas una versión, el contenido principal se actualiza con los datos de la versión seleccionada
+    sin crear una nueva versión.
+    """
     contenido = get_object_or_404(Contenido, pk=pk)
     version = get_object_or_404(VersionContenido, id=version_id, contenido_original=contenido)
 
-    # Establecer esta versión como la versión actual
-    contenido.establecer_version_actual(version)
-    
+    # Actualizar el contenido principal con los datos de la versión seleccionada
+    contenido.titulo_conte = version.titulo_conte
+    contenido.tipo_conte = version.tipo_conte
+    contenido.texto_conte = version.texto_conte
+
+    # Establecer la versión seleccionada como la versión actual
+    contenido.version_actual = version
+    # Guardar el contenido sin crear una nueva versión
+    contenido.save(crear_version=False)  # Guardar sin crear una nueva versión
+
     messages.success(request, f'La versión {version.version_num} ha sido seleccionada como la versión actual.')
-    
+
     return redirect('contenido_detail_autor', pk=contenido.id_conte)
 
 #--------------------------------------

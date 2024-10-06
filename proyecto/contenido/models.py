@@ -100,12 +100,10 @@ class Contenido(models.Model):
             self.autopublicar_conte = True
             self.save()
             
-    def save(self, *args, **kwargs):
+    def save(self, *args, crear_version=True, **kwargs):
         """
-        Sobrescribe el método save para asegurarse de que se cree una nueva versión 
-        cada vez que se guarde un contenido, ya sea al crearlo o editarlo.
+        Sobrescribe el método save para crear una nueva versión solo cuando `crear_version` es True.
         """
-
         is_new = self.pk is None  # Verificar si es un nuevo contenido
 
         # Si es una edición, obtenemos el estado original antes de guardar
@@ -137,8 +135,8 @@ class Contenido(models.Model):
             self.save()  # Guardar nuevamente para asignar la versión actual
             print(f"Versión 1 creada y asignada como la versión actual: {self.version_actual}")
 
-        elif original:
-            # Comparamos los valores del contenido original antes de los cambios
+        elif original and crear_version:
+            # Solo creamos una nueva versión si `crear_version` es True
             print(f"Comparando texto_conte (sin HTML):")
             print(f"Original (limpio): {strip_tags(original.texto_conte)}")
             print(f"Nuevo (limpio): {strip_tags(self.texto_conte)}")
