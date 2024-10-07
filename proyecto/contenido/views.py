@@ -428,6 +428,8 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 )
 
                 contenido.save()
+                # Enviar notificación de cambio de estado
+                enviar_notificaciones_cambio_estado(contenido, estado_anterior, nuevo_estado)
 
                 return JsonResponse({
                     'success': True,
