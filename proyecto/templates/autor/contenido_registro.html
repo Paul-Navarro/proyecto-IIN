@@ -51,8 +51,8 @@
                     <td>{{ cambio.estado_anterior }}</td>
                     <td>{{ cambio.estado_nuevo }}</td>
                     <td>{{ cambio.usuario.username }}</td>
-                    <td>{{ cambio.razon_cambio }}</td>
-                    <td>{{ cambio.razon_revision }}</td>
+                    <td>{{ cambio.razon_cambio|default_if_none:"" }}</td>
+                    <td>{{ cambio.razon_revision|default_if_none:"" }}</td>
 
                 </tr>
                 {% endfor %}
