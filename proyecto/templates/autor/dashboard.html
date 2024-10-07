@@ -106,25 +106,56 @@
                     </div>
                 </div>
 
-                <!-- Columna Rachazado -->
-                <div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3><i class="fas fa-times-circle"></i> Inactivo</h3>
-                    <div class="kanban-items">
-                        {% for contenido in contenidos %}
-                            {% if contenido.vigencia_conte %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
-                                    <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
-                                    <!-- Mostrar la razón del rechazo si existe -->
-                                    
-                                    <span class="razon-rechazo">Fecha de vigencia: {{ contenido.fecha_vigencia }}</span>
-                                
-                                
+
+
+<!-- Columna Inactivo (Rechazado) -->
+<div class="kanban-column" id="rechazado" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h3><i class="fas fa-times-circle"></i> Inactivo</h3>
+    <div class="kanban-items">
+        {% for contenido in contenidos %}
+            {% if contenido.vigencia_conte %}
+                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
+                    <h4>{{ contenido.titulo_conte }}</h4>
+                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
+                    
+                    <!-- Mostrar la razón del rechazo si existe -->
+                    <span class="razon-rechazo">Fecha de vigencia: {{ contenido.fecha_vigencia }}</span>
+
+                    <!-- Botón para abrir el modal y asignar nueva fecha_publicacion -->
+                    <button class="btn btn-edit" data-toggle="modal" data-target="#editFechaModal{{ contenido.pk }}">
+                        Editar fecha de vigencia
+                    </button>
+                </div>
+
+                <!-- Modal para editar la fecha_publicacion -->
+                <div class="modal fade" id="editFechaModal{{ contenido.pk }}" tabindex="-1" role="dialog" aria-labelledby="editFechaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editFechaModalLabel">Asignar nueva fecha de vigencia</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form action="{% url 'asignar_fecha_publicacion' contenido.pk %}" method="POST">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <label for="fecha_publicacion">Nueva Fecha de vigencia:</label>
+                                    <input type="datetime-local" id="fecha_publicacion" name="fecha_publicacion" class="form-control" required>
                                 </div>
-                            {% endif %}
-                        {% endfor %}
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
 
             </div>
         </section>

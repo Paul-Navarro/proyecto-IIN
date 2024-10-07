@@ -1099,3 +1099,19 @@ def contenido_registro(request, pk):
         'contenido': contenido,
         'cambios_estado': cambios_estado
     })
+    
+    
+def asignar_fecha_publicacion(request, pk):
+    contenido = get_object_or_404(Contenido, pk=pk)
+
+    if request.method == 'POST':
+        nueva_fecha_publicacion = request.POST.get('fecha_publicacion')
+        if nueva_fecha_publicacion:
+            contenido.fecha_vigencia = nueva_fecha_publicacion
+            contenido.vigencia_conte = False  # Cambiar vigencia_conte a False
+            contenido.estado_conte = 'BORRADOR'
+            contenido.save()
+            messages.success(request, f'La fecha de publicación ha sido actualizada para el contenido "{contenido.titulo_conte}".')
+            return redirect('autor_dashboard')  # Redirigir al tablero de autor
+
+    return render(request, 'tu_template.html', {'contenido': contenido})

@@ -63,6 +63,8 @@ urlpatterns = [
     path('ventas/', VentaListView.as_view(), name='venta_list'),
     
     path('contenido/registro/<int:pk>/', views.contenido_registro, name='contenido_registro'),   
+    
+    path('contenido/asignar_fecha_publicacion/<int:pk>/', views.asignar_fecha_publicacion, name='asignar_fecha_publicacion'),
 ]
 
 '''
