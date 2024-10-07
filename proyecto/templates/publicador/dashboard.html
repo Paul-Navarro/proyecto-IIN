@@ -93,7 +93,7 @@
                     <h3><i class="fas fa-check-circle"></i> Publicado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'PUBLICADO' %}
+                            {% if contenido.estado_conte == 'PUBLICADO' and not contenido.vigencia_conte %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <p>Fecha y hora a publicar: {{ contenido.fecha_publicacion|date:"d/m/Y H:i" }}</p>
