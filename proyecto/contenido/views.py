@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido
+from .models import Contenido,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado
 from .forms import ContenidoForm,ReporteContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -345,16 +345,14 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
         try:
             # Obtener el nuevo estado desde la solicitud AJAX
             data = json.loads(request.body)
+            print("Datos recibidos:", data.get('razon_cambio', ''))
             nuevo_estado = data.get('nuevo_estado')
-
+            """"
             if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO', 'BORRADOR', 'A_PUBLICAR']:
                 
                 if nuevo_estado == 'EDITADO':
-                    
                     razon_rechazo = data.get('razon_rechazo', '')
-                    
-                    if razon_rechazo != '':
-                        Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
+                    Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
                     
                 # Lógica para mover a BORRADOR con la razón del cambio
                 if nuevo_estado == 'BORRADOR':
@@ -370,20 +368,43 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
                 contenido.estado_conte = nuevo_estado
                 
                 contenido.save()
-                # Enviar notificación de cambio de estado
-                enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado)
-                # Obtener la razón más reciente si es "BORRADOR"
-                ultima_razon_cambio = CambioBorrador.objects.filter(contenido=contenido).last()
-                razon_cambio_text = ultima_razon_cambio.razon if ultima_razon_cambio else ''
                 
                 return JsonResponse({
                 'success': True,
                 'old_state': old_state,
                 'new_state': nuevo_estado,
                 'titulo': contenido.titulo_conte,
-                'fecha_publicacion': contenido.fecha_publicacion,
-                'razon_rechazo': razon_cambio_text
- })
+                'fecha_publicacion': contenido.fecha_publicacion
+})"""
+            
+            razon_cambio = data.get('razon_cambio', '')  # Obtener la razón si existe
+            razon_revision = data.get('razon_rechazo', '')  # Obtener la razón si existe
+            
+
+            if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO', 'BORRADOR', 'A_PUBLICAR']:
+                estado_anterior = contenido.estado_conte
+                contenido.estado_conte = nuevo_estado
+
+                # Registrar el cambio de estado con la razón cuando sea Borrador o Rechazado
+                CambioEstado.objects.create(
+                    contenido=contenido,
+                    estado_anterior=estado_anterior,
+                    estado_nuevo=nuevo_estado,
+                    usuario=request.user if request.user.is_authenticated else None,
+                    razon_cambio=razon_cambio if nuevo_estado in ['BORRADOR', 'RECHAZADO'] else None,  # Registrar razón solo si es Borrador o Rechazado
+                    razon_revision=razon_revision if nuevo_estado in ['BORRADOR', 'EDITADO'] else None  # Registrar razón solo si es Borrador o EDITADO
+                    
+                )
+
+                contenido.save()
+
+                return JsonResponse({
+                    'success': True,
+                    'old_state': estado_anterior,
+                    'new_state': nuevo_estado,
+                    'titulo': contenido.titulo_conte,
+                    'fecha_publicacion': contenido.fecha_publicacion
+                })
             else:
                 return JsonResponse({'success': False, 'error': 'Estado no válido'}, status=400)
 
@@ -391,7 +412,7 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
             return JsonResponse({'success': False, 'error': 'Error al procesar los datos'}, status=400)
     else:
         return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
-    
+
 
 def editor_dashboard(request):
     """
@@ -913,3 +934,16 @@ def enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado):
                 fecha_creacion=timezone.now()
             )
     
+
+#Para visulizar registros de los estados de cada contenido
+def contenido_registro(request, pk):
+    """
+    Vista para mostrar el registro de cambios de un contenido específico.
+    """
+    contenido = get_object_or_404(Contenido, pk=pk)
+    cambios_estado = contenido.cambios_estado.all()  # Obtener todos los cambios de estado
+    
+    return render(request, 'autor/contenido_registro.html', {
+        'contenido': contenido,
+        'cambios_estado': cambios_estado
+    })

@@ -50,6 +50,7 @@
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_update' contenido.id_conte %}" class="btn btn-edit">Editar</a>
                                     <a href="{% url 'contenido_detail_autor' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_registro' contenido.id_conte %}" class="btn btn-ver">Registro</a>
                                      
                                 </div>
                             {% endif %}
@@ -228,6 +229,14 @@
                     viewButton.href = `/contenido/contenido_autor/${data.replace('item', '')}/`;
                     viewButton.classList.add('btn', 'btn-ver');
                     draggedItem.appendChild(viewButton);
+
+                    // Crear el botón "registro"
+                    var registroButton = document.createElement('a');
+                    registroButton.textContent = 'Registro';
+                    registroButton.href = `/contenido/registro/${data.replace('item', '')}/`;  // Asegúrate de que la URL sea correcta
+                    registroButton.classList.add('btn', 'btn-ver');
+                    draggedItem.appendChild(registroButton);
+
                 }
 
                 // Llamada AJAX para actualizar el estado en el servidor

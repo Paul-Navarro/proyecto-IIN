@@ -1,0 +1,38 @@
+h2{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/*
+table{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+tr{
+    display: flex;    
+}
+*/
+table {
+    width: 100%; /* Asegura que la tabla ocupe el 100% del ancho del contenedor */
+    border-collapse: collapse; /* Colapsa los bordes de las celdas para que aparezcan como un solo borde */
+}
+
+th, td {
+    border: 1px solid #ddd; /* Borde gris claro para las celdas */
+    padding: 10px; /* Espaciado interno de las celdas */
+    text-align: center; /* Centra el texto en las celdas */
+}
+
+th {
+    background-color: #f2f2f2; /* Color de fondo para los encabezados */
+    font-weight: bold; /* Hace que el texto de los encabezados sea negrita */
+}
+
+/* Establece un ancho fijo para cada columna */
+th:nth-child(1), td:nth-child(1) { width: 20%; } /* Fecha de Cambio */
+th:nth-child(2), td:nth-child(2) { width: 20%; } /* Estado Anterior */
+th:nth-child(3), td:nth-child(3) { width: 20%; } /* Estado Nuevo */
+th:nth-child(4), td:nth-child(4) { width: 20%; } /* Usuario */
+th:nth-child(5), td:nth-child(5) { width: 20%; } /* Razón */

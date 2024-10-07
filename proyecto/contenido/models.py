@@ -263,3 +263,15 @@ class HistorialCompra(models.Model):
         return f"Compra {self.numero_compra} - {self.categoria.nombre}"
 
 
+class CambioEstado(models.Model):
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='cambios_estado')
+    estado_anterior = models.CharField(max_length=50)
+    estado_nuevo = models.CharField(max_length=50)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    fecha_cambio = models.DateTimeField(auto_now_add=True)
+    razon_cambio = models.TextField(blank=True, null=True)  # Solo para cambios a "Borrador"
+    razon_revision = models.TextField(blank=True, null=True)  # Solo para cambios a "En revision"
+    
+
+    def _str_(self):
+        return f"Cambio en {self.contenido.titulo_conte} de {self.estado_anterior} a {self.estado_nuevo}"
