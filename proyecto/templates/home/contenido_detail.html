@@ -43,9 +43,11 @@
         </div>
 
          <!-- Botón para reportar contenido -->
-        <div class="report-content">
-            <a href="{% url 'reportar_contenido' contenido.id_conte %}" class="btn-reportar"><i class="fas fa-exclamation-triangle"></i> Reportar Contenido</a>
-        </div>
+         {% if user.is_authenticated %}
+            <div class="report-content">
+                <a href="{% url 'reportar_contenido' contenido.id_conte %}" class="btn-reportar"><i class="fas fa-exclamation-triangle"></i> Reportar Contenido</a>
+            </div>
+        {% endif %}
 
         <!-- Insertar sección de Disqus -->
         <div id="disqus_thread"></div>
