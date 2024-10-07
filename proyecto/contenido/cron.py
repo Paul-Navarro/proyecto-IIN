@@ -31,7 +31,7 @@ class AutopublicarContenido(CronJobBase):
             autopublicar_conte=False
         )
         
-        contenidos_con_vigencia = Contenido.objects.filter(fecha_vigencia__lte=hora_actual, vigencia_conte=False)
+        contenidos_con_vigencia = Contenido.objects.filter(fecha_vigencia__lte=hora_actual, vigencia_conte=False , estado_conte='PUBLICADO')
         print(f"Contenidos cuya fecha de vigencia ha llegado: {contenidos_con_vigencia.count()}")
 
         print(f"Contenidos a publicar: {contenidos_a_publicar.count()}")
