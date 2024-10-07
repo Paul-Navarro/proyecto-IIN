@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
-from .views import suscripciones_view, comprar_suscripcion, contacto
+from .views import suscripciones_view, comprar_suscripcion, contacto, historial_compras_view
+
+from contenido.views import VentaListView
 
 urlpatterns = [
     
@@ -10,10 +12,14 @@ urlpatterns = [
     
     path('contenido_admin', views.administrador_KANBAN, name='administrador_KANBAN'),
     
+    path('contenido/seleccionar_version/<int:pk>/<int:version_id>/', views.seleccionar_version, name='seleccionar_version'),
+
     
     path('contenido_editor/<int:pk>/', views.contenido_detail_editor, name='contenido_detail_editor'),
     path('contenido_publicador/<int:pk>/', views.contenido_detail_publicador, name='contenido_detail_publicador'),
     path('contenido_autor/<int:pk>/', views.contenido_detail_autor, name='contenido_detail_autor'),
+    path('contenido_autor_FLAG/<int:pk>/', views.contenido_detail_autor_FLAG, name='contenido_detail_autor_FLAG'),
+    
     path('contenido/new/', views.contenido_create, name='contenido_create'),
     
     path('contenido/<int:pk>/version/<int:version_num>/', views.contenido_version_detail, name='contenido_version_detail'),
@@ -53,6 +59,10 @@ urlpatterns = [
     #Url para reporte
     path('contenido/<int:contenido_id_conte>/reportar/', views.reportar_contenido, name='reportar_contenido'),
     path('admin/reportes/', views.ver_reportes, name='ver_reportes'),  # Ruta para ver los reportes
+    path('historial-compras/', historial_compras_view, name='historial_compras'),
+    path('ventas/', VentaListView.as_view(), name='venta_list'),
+    
+    path('contenido/registro/<int:pk>/', views.contenido_registro, name='contenido_registro'),   
 ]
 
 '''

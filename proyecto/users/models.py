@@ -64,6 +64,7 @@ class CustomUser(AbstractUser):
         for role in self.roles.all():
             permissions |= set(role.permissions.values_list('codename', flat=True))
         return permissions
+
     
 
 #clase de notificaciones
@@ -79,15 +80,11 @@ class Notificacion(models.Model):
     
 
 
+class Venta(models.Model):
+    # Definir los campos de tu modelo de ventas
 
-
-
-    
-
-
-
-
-
-
-
-
+    class Meta:
+        permissions = [
+            ('view_sales', 'Can view sales'),
+            ('filter_sales', 'Can filter sales'),
+        ]

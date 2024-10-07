@@ -198,4 +198,10 @@ nav ul li a:hover {
     margin-right: 8px; /* Espacio entre el checkbox y el texto */
 }
 
+.contenedor_w {
+    display: flex;
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center;     /* Alinea los elementos verticalmente */
+    gap: 60px;               /* Espaciado entre los elementos (ajusta según lo que prefieras) */
+}
 

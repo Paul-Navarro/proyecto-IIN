@@ -645,19 +645,49 @@ body {
 /* Ventana flotante de notificaciones */
 .notificaciones-contenedor {
     position: absolute;
-    top: 60px; /* Ajusta la distancia desde el ícono de notificaciones */
-    right: 20px; /* Alineado a la derecha junto con las notificaciones */
-    background-color: #ffffff; /* Fondo blanco para un aspecto más limpio */
-    color: #333; /* Color del texto */
-    border: 1px solid #ddd; /* Borde gris claro */
-    border-radius: 8px; /* Bordes más redondeados para un look más moderno */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Sombra suave y profunda */
-    width: 320px; /* Ajusta el ancho */
-    z-index: 1000; /* Asegura que esté por encima de otros elementos */
-    padding: 15px; /* Espaciado interno más amplio */
-    font-size: 0.9rem; /* Tamaño de texto */
-    transition: opacity 0.3s ease-in-out; /* Animación de suavidad al aparecer */
+    top: 60px; /* Ajusta según el diseño */
+    right: 20px;
+    width: 420px; /* Mantén un ancho fijo */
+    max-height: 400px; /* Establece una altura máxima */
+    overflow-y: auto; /* Permitir desplazamiento vertical solo si es necesario */
+    overflow-x: hidden; /* Evita el desplazamiento horizontal */
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1000;
+    white-space: normal; /* Permitir que el texto largo se ajuste automáticamente */
 }
+
+.notificacion-item {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 10px;
+    word-wrap: break-word; /* Asegura que las palabras largas se ajusten */
+}
+
+.mensaje-corto {
+    margin-left: 10px;
+    white-space: nowrap; /* Mantener el texto en una línea */
+    overflow: hidden; /* Ocultar el texto desbordado */
+    text-overflow: ellipsis; /* Mostrar "..." si el texto es largo */
+    display: block;
+}
+
+.mensaje-largo {
+    margin-left: 20px;
+    display: none; /* Ocultar por defecto */
+    word-wrap: break-word; /* Ajustar palabras largas al ancho del contenedor */
+}
+
+.notificacion-item.expandido .mensaje-corto {
+    display: none; /* Ocultar el mensaje corto cuando se expande */
+}
+
+.notificacion-item.expandido .mensaje-largo {
+    display: block; /* Mostrar el mensaje largo cuando se expande */
+}
+
 
 .notificaciones-contenedor h4 {
     margin-top: 0;

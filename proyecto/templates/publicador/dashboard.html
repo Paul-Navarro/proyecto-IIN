@@ -15,10 +15,10 @@
     <header>
         <h1>Bienvenido, Publicador</h1>
         <nav>
-            <ul>
+            <ul class = "botonces-direccion">
                 <li class="btn btn-home"><a href="{% url 'home' %}">Inicio</a></li>
-                <li><a href="{% url 'gestionar_contenido' %}">Gestionar Contenidos</a></li>
-                <li><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
+                <li class="btn btn-home"><a href="{% url 'gestionar_contenido' %}">Gestionar Contenidos</a></li>
+                <li class="btn btn-home"><a href="{% url 'account_logout' %}">Cerrar Sesión</a></li>
             </ul>
         </nav>
     </header>
@@ -34,7 +34,6 @@
         <section>
             <h2>Tablero Kanban</h2>
             <div class="kanban-board">
-
 
                 <!-- Columna Borrador -->
                 <div class="kanban-column" id="borrador" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -53,27 +52,28 @@
 
                 <!-- Columna Editado/En_Revision -->
                 <div class="kanban-column" id="editado" ondrop="drop(event)" ondragover="allowDrop(event)">
-                    <h3><i class="fas fa-edit"></i> En revision</h3>
+                    <h3><i class="fas fa-edit"></i> En revisión</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'EDITADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
+
+                                    <!-- Mostrar la razón del rechazo si existe -->
+                                    {% if contenido.rechazos.exists %}
+                                    <span class="razon-rechazo">Mensaje del Publicador: {{ contenido.rechazos.last.razon }}</span>
+                                    {% else %}
+                                    <span class="razon-rechazo">Obs: No tuvo rechazos</span>
+                                    {% endif %}
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
-                                     <!-- Mostrar la razón del rechazo si existe -->
-                                     {% if contenido.rechazos.exists %}
-                                     <span class="razon-rechazo">Razon: {{ contenido.rechazos.last.razon }}</span>
-                                 {% else %}
-                                     <span class="razon-rechazo">Obs: No tuvo rechazos</span>
-                                 {% endif %}
+                                    
                                 </div>
-                                
                             {% endif %}
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- Columna A publicar -->
+                <!-- Columna A Publicar -->
                 <div class="kanban-column" id="a_publicar" ondrop="drop(event)" ondragover="allowDrop(event)">
                     <h3><i class="fas fa-upload"></i> A Publicar</h3>
                     <div class="kanban-items">
@@ -87,7 +87,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
 
                 <!-- Columna Publicado -->
                 <div class="kanban-column" id="publicado" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -110,246 +109,216 @@
                     <h3><i class="fas fa-times-circle"></i> Inactivo</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'RECHAZADO' %}
-                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
+                            {% if contenido.vigencia_conte %}
+                                <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_publicador' contenido.pk %}" class="btn btn-ver">Ver</a>
                                     <!-- Mostrar la razón del rechazo si existe -->
-                                    {% if contenido.rechazos.exists %}
-                                    <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
-                                {% else %}
-                                    <span class="razon-rechazo">Razón: No especificada</span>
-                                {% endif %}
+                                    <span class="razon-rechazo">Fecha de vigencia: {{ contenido.fecha_vigencia }}</span>
                                 </div>
                             {% endif %}
                         {% endfor %}
                     </div>
                 </div>
 
-
             </div>
         </section>
     </main>
 
     <script>
-
         let contenidoRechazadoId = null;  // Almacena el ID del contenido a rechazar
-        let originalColumn = null; // Variable para almacenar la columna original(Cancelacion)
-    
+        let originalColumn = null; // Variable para almacenar la columna original
+        let draggedItem = null; // Variable para almacenar el elemento arrastrado
+
         // Permitir que los elementos sean arrastrables
         function allowDrop(ev) {
             ev.preventDefault();
         }
-    
+
         // Empezar a arrastrar
         function drag(ev) {
             ev.dataTransfer.setData("text", ev.target.id);
             originalColumnId = ev.target.closest('.kanban-column').id;  // Almacenar la columna de origen
         }
-    
+
         // Soltar el elemento en la nueva columna y cambiar su estado
         function drop(ev) {
             ev.preventDefault();
             var data = ev.dataTransfer.getData("text");
-            var draggedItem = document.getElementById(data);
-            
+            draggedItem = document.getElementById(data);
+
             // Asegurarse de que se suelte en el área correcta (columna)
             if (ev.target.classList.contains('kanban-items')) {
                 var targetColumn = ev.target.closest('.kanban-column').id;
-        
+
                 // Guardamos el item original y la columna original antes de cualquier acción
                 originalColumnId = draggedItem.closest('.kanban-column').id;
 
+                // Popup de advertencia para intentar mover a "Borrador"
                 if (targetColumn === 'borrador') {
-                    // Mostrar el modal de advertencia
                     $('#warningModal').modal('show');
                     return;  // Evitar que se complete el arrastre
                 }
 
+                // Popup de advertencia para intentar mover a "Inactivo"
                 if (targetColumn === 'rechazado') {
-                    // Mostrar el modal de advertencia
                     $('#warningModal_2').modal('show');
                     return;  // Evitar que se complete el arrastre
                 }
-        
+
+                // Si se mueve de "A Publicar" a "Publicado" o viceversa, mostrar confirmación
+                if ((originalColumnId === 'a_publicar' && targetColumn === 'publicado') || 
+                    (originalColumnId === 'publicado' && targetColumn === 'a_publicar')) {
+                    $('#confirmarCambioEstadoModal').modal('show'); // Mostrar el modal de confirmación
+                    return;  // Evitar que se complete el arrastre hasta que se confirme
+                }
+
                 // Si el contenido es arrastrado a la columna de rechazado, mostrar el modal para ingresar la razón
                 if (targetColumn === 'editado') {
-
                     draggedItem.setAttribute('draggable', 'false');
                     contenidoRechazadoId = data.replace('item', ''); // Almacenar el ID del contenido
                     $('#razonRechazoModal').modal('show');  // Mostrar el modal para la razón de rechazo
                     return;  // No continuar el arrastre hasta que se guarde la razón
                 }
-        
+
                 // Si el contenido es movido a una columna diferente a "Editado", eliminar la razón del rechazo
                 if (draggedItem.querySelector('.razon-rechazo')) {
                     draggedItem.querySelector('.razon-rechazo').remove();
                 }
-        
+
                 // Para otras columnas, simplemente mover el contenido
                 ev.target.appendChild(draggedItem);
-        
                 // Llamada AJAX para actualizar el estado en el servidor
-                fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
+                cambiarEstado(draggedItem, targetColumn);
+            }
+        }
+
+        // Función para cambiar el estado del contenido
+        function cambiarEstado(item, nuevoEstado) {
+            fetch(`/contenido/contenido/cambiar_estado/${item.id.replace('item', '')}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'nuevo_estado': nuevoEstado.toUpperCase()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStateChangeMessage(data.titulo, data.old_state, nuevoEstado);
+                    // Si el estado es "PUBLICADO", añadir la fecha de publicación
+                    var existingDateElement = item.querySelector('.fecha-publicacion');
+                    if (nuevoEstado === 'publicado' && !existingDateElement) {
+                        var fechaPublicacion = new Date(data.fecha_publicacion);
+                        var formattedDate = `${fechaPublicacion.getDate().toString().padStart(2, '0')}-${(fechaPublicacion.getMonth() + 1).toString().padStart(2, '0')}-${fechaPublicacion.getFullYear()} ${fechaPublicacion.getHours().toString().padStart(2, '0')}:${fechaPublicacion.getMinutes().toString().padStart(2, '0')}`;
+                        var dateElement = document.createElement('p');
+                        dateElement.classList.add('fecha-publicacion');
+                        dateElement.textContent = 'Fecha a publicar: ' + formattedDate;
+                        item.appendChild(dateElement);
+                    }
+                } else {
+                    alert('Error al actualizar el estado.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Asignar eventos una vez que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Evento de confirmación de cambio de estado
+            document.getElementById('confirmarCambioBtn').addEventListener('click', function() {
+                // Proceder con el cambio de estado a "PUBLICADO" o "A PUBLICAR"
+                const targetColumn = originalColumnId === 'a_publicar' ? 'publicado' : 'a_publicar';
+                document.querySelector(`#${targetColumn} .kanban-items`).appendChild(draggedItem); // Mover el contenido al DOM
+                cambiarEstado(draggedItem, targetColumn); // Hacer la llamada AJAX para actualizar el estado
+                $('#confirmarCambioEstadoModal').modal('hide');  // Ocultar el modal
+            });
+
+            // Cancelar el movimiento si el usuario cierra el modal
+            document.querySelector('.btn-secondary').addEventListener('click', function() {
+                console.log("Cambio de estado cancelado");
+            });
+
+            // Evento para el botón "Guardar" en el modal de razón de rechazo
+            document.getElementById('guardarRechazoBtn').addEventListener('click', function() {
+                var razon = document.getElementById('razonRechazoInput').value.trim();
+
+                if (!razon) {
+                    alert('Por favor, ingresa una razón válida para el rechazo.');
+                    return;
+                }
+
+                // Mover el contenido inmediatamente al DOM de la columna "Editado"
+                const editadoColumn = document.getElementById('editado').querySelector('.kanban-items');
+                editadoColumn.appendChild(draggedItem);  // Mover a la columna Editado inmediatamente
+
+                // Añadir la razón del rechazo al DOM inmediatamente
+                if (draggedItem) {
+                    let existingReason = draggedItem.querySelector('.razon-rechazo');
+                    if (!existingReason) {
+                        var reasonSpan = document.createElement('span');
+                        reasonSpan.classList.add('razon-rechazo');
+                        reasonSpan.textContent = 'Razón: ' + razon;
+                        draggedItem.appendChild(reasonSpan);
+                    } else {
+                        existingReason.textContent = 'Razón: ' + razon;
+                    }
+                }
+
+                // Ocultar el modal inmediatamente
+                $('#razonRechazoModal').modal('hide');
+
+                // Realiza la llamada AJAX en segundo plano para informar al servidor
+                fetch(`/contenido/contenido/cambiar_estado/${contenidoRechazadoId}/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
+                        'X-CSRFToken': '{{ csrf_token }}'
                     },
                     body: JSON.stringify({
-                        'nuevo_estado': targetColumn.toUpperCase()  // Enviar el nuevo estado
+                        'nuevo_estado': 'EDITADO',
+                        'razon_rechazo': razon
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Mostrar el mensaje de cambio de estado
-                        showStateChangeMessage(data.titulo, data.old_state, targetColumn);
-                        // Si el nuevo estado es "PUBLICADO", añade la fecha de publicación
-                        var existingDateElement = draggedItem.querySelector('.fecha-publicacion');
-                        if (targetColumn === 'publicado') { //CAMBIO
-
-                            // Fecha de publicacion programada
-                            if (!existingDateElement) {
-                                // Usar la fecha de publicación proporcionada por el servidor (formato ISO)
-                                var fechaPublicacion = new Date(data.fecha_publicacion);
-                            
-                                // Formatear la fecha a "dd-mm-yyyy hh:mm"
-                                var day = fechaPublicacion.getDate().toString().padStart(2, '0');
-                                var month = (fechaPublicacion.getMonth() + 1).toString().padStart(2, '0'); // Los meses en JS son base 0
-                                var year = fechaPublicacion.getFullYear();
-                                var hours = fechaPublicacion.getHours().toString().padStart(2, '0');
-                                var minutes = fechaPublicacion.getMinutes().toString().padStart(2, '0');
-                            
-                                var formattedDate = day + '-' + month + '-' + year + ' ' + hours + ':' + minutes;
-                            
-                                // Añadir la fecha de publicación al DOM
-                                var dateElement = document.createElement('p');
-                                dateElement.classList.add('fecha-publicacion');  // Añadir una clase para identificarlo
-                                dateElement.textContent = 'Fecha a publicar: ' + formattedDate;
-                                draggedItem.appendChild(dateElement);
-                            }
-                            
-
-                            // Hacer una segunda llamada para actualizar la fecha de publicación en el servidor
-                            fetch(`/contenido/contenido/cambiar_fecha_publicacion/${data.replace('item', '')}/`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRFToken': '{{ csrf_token }}'
-                                },
-                                body: JSON.stringify({
-                                    'fecha_publicacion': currentDate.toISOString()  // Enviar la fecha en formato ISO
-                                })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.success) {
-                                    alert('Error al actualizar la fecha de publicación.');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
-                        } else {
-                    // Si el contenido es movido a otra columna, eliminar la fecha de publicación
-                    var dateElement = draggedItem.querySelector('.fecha-publicacion');
-                    if (dateElement) {
-                        dateElement.remove();  // Eliminar el elemento de la fecha
+                        showStateChangeMessage(data.titulo, data.old_state, 'EDITADO');
+                    } else {
+                        alert('Error al rechazar el contenido.');
                     }
-                }
-                    }   else {
-                             alert('Error al actualizar el estado.');
-                            }   
                 })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
-            }   
-        }
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
 
-        
-        
-    
-// Espera hasta que el DOM esté completamente cargado
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Selecciona el botón "Guardar" del modal de rechazo
-    var guardarRechazoBtn = document.getElementById('guardarRechazoBtn');
-    var modal = document.getElementById('razonRechazoModal');
-    var razonInput = document.getElementById('razonRechazoInput');
-
-    // Evento para el botón "Guardar"
-    guardarRechazoBtn.addEventListener('click', function() {
-        var razon = razonInput.value.trim();
-    
-        if (!razon) {
-            alert('Por favor, ingresa una razón válida para el rechazo.');
-            return;
-        }
-    
-        // Mueve el contenido inmediatamente al DOM de la columna "Rechazado"
-        const rejectedColumn = document.getElementById('editado').querySelector('.kanban-items');
-        const rejectedItem = document.getElementById('item' + contenidoRechazadoId);
-        rejectedColumn.appendChild(rejectedItem);  // Mover a la columna Rechazado inmediatamente
-    
-        // Añadir la razón del rechazo al DOM inmediatamente
-        if (rejectedItem) {
-            let existingReason = rejectedItem.querySelector('.razon-rechazo');
-
-            var dateElement = rejectedItem.querySelector('.fecha-publicacion');
-
-            if (dateElement) {
-                dateElement.remove();  // Eliminar el elemento de la fecha
-            }
-
-            if (!existingReason) {
-                var reasonSpan = document.createElement('span');
-                reasonSpan.classList.add('razon-rechazo');
-                reasonSpan.textContent = 'Razón: ' + razon;
-                rejectedItem.appendChild(reasonSpan);
-            } else {
-                existingReason.textContent = 'Razón: ' + razon;
-            }
-        }
-    
-        // Ocultar el modal inmediatamente
-        $('#razonRechazoModal').modal('hide');
-    
-        // Realiza la llamada AJAX en segundo plano para informar al servidor
-        fetch(`/contenido/contenido/cambiar_estado/${contenidoRechazadoId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                'nuevo_estado': 'EDITADO',
-                'razon_rechazo': razon
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Mostrar el mensaje de éxito (opcional)
-                showStateChangeMessage(data.titulo, data.old_state, 'EDITADO');
-            } else {
-                alert('Error al rechazar el contenido.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-    
-        // Evento para el botón "Cancelar" en el modal de rechazo
-        document.querySelector('.btn-secondary').addEventListener('click', function() {
-            // Aquí no necesitamos mover de vuelta el contenido porque no ha sido movido todavía.
-            // Simplemente cerramos el modal.
-            $('#razonRechazoModal').modal('hide');
         });
 
-});
+        // Mostrar mensaje de cambio de estado
+        function showStateChangeMessage(titulo, oldState, newState) {
+            const readableOldState = transformState(oldState);  // Transformar oldState
+            const readableNewState = transformState(newState);  // Transformar newState
+            const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
+
+            // Insertar el mensaje en el contenedor de la alerta
+            document.getElementById('stateChangeMessage').textContent = message;
+
+            // Mostrar la alerta
+            const alertElement = document.getElementById('stateChangeAlert');
+            alertElement.style.display = 'block';  // Mostrar la alerta
+
+            // Ocultar la alerta después de 10 segundos
+            setTimeout(function() {
+                alertElement.style.display = 'none';  // Ocultar la alerta
+            }, 10000);
+        }
 
         // Función para transformar los estados en nombres más legibles
         function transformState(state) {
@@ -366,39 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return state;  // Retorna el estado original si no hay transformación
             }
         }
-    
-        // Mostrar mensaje de cambio de estado
-        function showStateChangeMessage(titulo, oldState, newState) {
-            const readableOldState = transformState(oldState);  // Transformar oldState
-            const readableNewState = transformState(newState);  // Transformar newState
-            const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
-    
-            // Insertar el mensaje en el contenedor de la alerta
-            document.getElementById('stateChangeMessage').textContent = message;
-    
-            // Mostrar la alerta
-            const alertElement = document.getElementById('stateChangeAlert');
-            alertElement.style.display = 'block';  // Mostrar la alerta
-    
-            // Ocultar la alerta después de 10 segundos
-            setTimeout(function() {
-                alertElement.style.display = 'none';  // Ocultar la alerta
-            }, 10000);
-        }
-
-        // Mostrar el modal de rechazo manualmente
-        function mostrarModalRechazo() {
-            var modal = document.getElementById('razonRechazoModal');
-            modal.style.display = 'block';  // Mostrar el modal
-        }
-
-        // Ocultar el modal de rechazo manualmente
-        function ocultarModalRechazo() {
-            var modal = document.getElementById('razonRechazoModal');
-            modal.style.display = 'none';  // Ocultar el modal
-        }
     </script>
-    
 
     <!-- Modal de advertencia Borrador -->
     <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
@@ -420,58 +357,77 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
-        <!-- Modal de advertencia Inactivo -->
-        <div class="modal fade" id="warningModal_2" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-warning">
-                        <h5 class="modal-title" id="warningModalLabel">Advertencia</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        ¡No puedes pasar a Inactivo directamente!
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    </div>
+    <!-- Modal de advertencia Inactivo -->
+    <div class="modal fade" id="warningModal_2" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="warningModalLabel">Advertencia</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ¡No puedes pasar a Inactivo directamente!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
+    </div>
 
     <!-- Modal para ingresar la razón de rechazo -->
-<div class="modal fade" id="razonRechazoModal" tabindex="-1" role="dialog" aria-labelledby="razonRechazoModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-danger">
-                <h5 class="modal-title" id="razonRechazoModalLabel">Razón del Rechazo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="razonRechazoInput">Por favor, ingresa la razón del rechazo:</label>
-                        <textarea class="form-control" id="razonRechazoInput" rows="3" placeholder="Escribe la razón..."></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" id="guardarRechazoBtn" class="btn btn-danger">Guardar</button>
+    <div class="modal fade" id="razonRechazoModal" tabindex="-1" role="dialog" aria-labelledby="razonRechazoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title" id="razonRechazoModalLabel">Razón del Rechazo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="razonRechazoInput">Por favor, ingresa la razón del rechazo:</label>
+                            <textarea class="form-control" id="razonRechazoInput" rows="3" placeholder="Escribe la razón..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="guardarRechazoBtn" class="btn btn-danger">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+    <!-- Modal para confirmar el cambio de estado de A Publicar a Publicado -->
+    <div class="modal fade" id="confirmarCambioEstadoModal" tabindex="-1" role="dialog" aria-labelledby="confirmarCambioEstadoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title" id="confirmarCambioEstadoModalLabel">Confirmar cambio de estado</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas cambiar el estado a "Publicado" o "A Publicar"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="confirmarCambioBtn" class="btn btn-primary">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
-    
+
 </body>
 </html>

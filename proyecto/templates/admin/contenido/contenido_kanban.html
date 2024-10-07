@@ -17,10 +17,9 @@
         <nav>
             <ul>
                 <li><a href="{% url 'home' %}" class="btn btn-home">Inicio</a></li>
-                <!-- Botón para ver reportes (solo visible para administradores) -->
-                {% if user.is_staff %}
-                    <li><a href="{% url 'ver_reportes' %}" class="btn btn-reports"><i class="fas fa-flag"></i> Ver Reportes</a></li>
-                {% endif %}
+
+                <li><a href="{% url 'ver_reportes' %}" class="btn btn-reports"><i class="fas fa-flag"></i> Ver Reportes</a></li>
+           
                 <li><a href="{% url 'account_logout' %}" class="btn btn-logout">Cerrar Sesión</a></li>
             </ul>
         </nav>
@@ -92,7 +91,7 @@
 
                 <!-- Columna Rechazado -->
                 <div class="kanban-column" id="rechazado">
-                    <h3><i class="fas fa-times-circle"></i> Rechazado</h3>
+                    <h3><i class="fas fa-times-circle"></i> Inactivo</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
                             {% if contenido.estado_conte == 'RECHAZADO' %}

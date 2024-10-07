@@ -45,11 +45,12 @@
                             <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                 <!-- Mostrar la razón del cambio a Borrador solo si existe -->
                                 {% if contenido.cambios_borrador.count > 0 %}
-                                <span class="razon-borrador">Contenido rechazado: {{ contenido.cambios_borrador.last.razon }}</span>
+                                <span class="razon-borrador">Mensaje de Editor: {{ contenido.cambios_borrador.last.razon }}</span>
                             {% endif %} 
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_update' contenido.id_conte %}" class="btn btn-edit">Editar</a>
                                     <a href="{% url 'contenido_detail_autor' contenido.id_conte %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_registro' contenido.id_conte %}" class="btn btn-ver">Registro</a>
                                      
                                 </div>
                             {% endif %}
@@ -65,7 +66,7 @@
                             {% if contenido.estado_conte == 'EDITADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="true" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -81,7 +82,7 @@
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <p>Fecha y hora a publicar: {{ contenido.fecha_publicacion|date:"d/m/Y H:i" }}</p>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -98,7 +99,7 @@
                             {% if contenido.estado_conte == 'PUBLICADO' %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -110,16 +111,15 @@
                     <h3><i class="fas fa-times-circle"></i> Inactivo</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'RECHAZADO' %}
+                            {% if contenido.vigencia_conte %}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
-                                    <a href="{% url 'contenido_detail_autor' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                    <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                     <!-- Mostrar la razón del rechazo si existe -->
-                                    {% if contenido.rechazos.exists %}
-                                    <span class="razon-rechazo">Razón: {{ contenido.rechazos.last.razon }}</span>
-                                {% else %}
-                                    <span class="razon-rechazo">Razón: No especificada</span>
-                                {% endif %}
+                                    
+                                    <span class="razon-rechazo">Fecha de vigencia: {{ contenido.fecha_vigencia }}</span>
+                                
+                                
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -130,40 +130,85 @@
         </section>
     </main>
 
-    <script>
-       // Permitir que los elementos sean arrastrables
-        function allowDrop(ev) {
-            ev.preventDefault();
-        }
+    <!-- Modal de Confirmación para cambio a "En revisión" -->
+<div class="modal fade" id="confirmRevisionModal" tabindex="-1" role="dialog" aria-labelledby="confirmRevisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="confirmRevisionModalLabel">Confirmar cambio de estado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que quieres cambiar el estado de este contenido a "En revisión"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmRevisionBtn" class="btn btn-warning">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Empezar a arrastrar
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-        }
+<script>
+    let contenidoBorradorId = null;
+    let draggedItemData = null; // Almacenar temporalmente el contenido arrastrado
 
-        let contenidoBorradorId = null; 
+    // Permitir que los elementos sean arrastrables
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
 
-        // Soltar el elemento en la nueva columna y cambiar su estado
-        function drop(ev) {
-            ev.preventDefault();
-            var data = ev.dataTransfer.getData("text");
-            var draggedItem = document.getElementById(data);
+    // Empezar a arrastrar
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
 
-            // Asegurarse de que se suelte en el área correcta (columna)
-            if (ev.target.classList.contains('kanban-items')) {
-                var targetColumn = ev.target.closest('.kanban-column').id;
+    // Soltar el elemento en la nueva columna y cambiar su estado
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var draggedItem = document.getElementById(data);
 
-                // Permitir mover de "Editado" a "Borrador"
-                if (targetColumn === 'borrador' || targetColumn === 'editado') {
+        if (ev.target.classList.contains('kanban-items')) {
+            var targetColumn = ev.target.closest('.kanban-column').id;
+            var originalColumn = draggedItem.closest('.kanban-column').id;
 
-                // Mover el contenido visualmente a la nueva columna
+            // Si el contenido está siendo movido fuera de la columna "Borrador", eliminar el mensaje de rechazo
+            var mensajeRechazo = draggedItem.querySelector('.razon-borrador');
+            if (mensajeRechazo) {
+                mensajeRechazo.remove();  // Eliminar el mensaje de rechazo
+            }
+
+            // Verificar si se está moviendo de "Borrador" a "En revisión"
+            if (originalColumn === 'borrador' && targetColumn === 'editado') {
+                // Guardar los datos del arrastre para usarlos después de la confirmación
+                draggedItemData = { draggedItem, ev };
+
+                // Mostrar el modal de confirmación para pasar a "En revisión"
+                $('#confirmRevisionModal').modal('show');
+                return;  // Detener el flujo aquí hasta que el usuario confirme
+            }
+
+            // Verificar si se está moviendo de "En revisión" a "Borrador"
+            if (originalColumn === 'editado' && targetColumn === 'borrador') {
+                // Guardar los datos del arrastre para usarlos después de la confirmación
+                draggedItemData = { draggedItem, ev };
+
+                // Mostrar el modal de confirmación para pasar a "Borrador"
+                $('#confirmBorradorModal').modal('show');
+                return;  // Detener el flujo aquí hasta que el usuario confirme
+            }
+
+            // Lógica existente para mover a "Borrador" o "Editado"
+            if (targetColumn === 'borrador' || targetColumn === 'editado') {
                 ev.target.appendChild(draggedItem);
 
-                 // Limpiar todos los botones previos de la tarjeta
+                // Limpiar todos los botones previos de la tarjeta
                 let buttons = draggedItem.querySelectorAll('a.btn');
                 buttons.forEach(button => button.remove());
 
-                // Solo mostrar el botón "Ver" cuando el contenido esté en la columna "Editado"
                 if (targetColumn === 'editado') {
                     var button = document.createElement('a');
                     button.textContent = 'Ver';
@@ -172,7 +217,6 @@
                     draggedItem.appendChild(button);
                 }
 
-                // Si se mueve a "Borrador", mostrar el botón "Editar"
                 if (targetColumn === 'borrador') {
                     var button = document.createElement('a');
                     button.textContent = 'Editar';
@@ -180,110 +224,210 @@
                     button.classList.add('btn', 'btn-edit');
                     draggedItem.appendChild(button);
 
-                     // Crear el botón "Ver"
                     var viewButton = document.createElement('a');
                     viewButton.textContent = 'Ver';
-                    viewButton.href = `/contenido/contenido/${data.replace('item', '')}/`;
+                    viewButton.href = `/contenido/contenido_autor/${data.replace('item', '')}/`;
                     viewButton.classList.add('btn', 'btn-ver');
                     draggedItem.appendChild(viewButton);
+
+                    // Crear el botón "registro"
+                    var registroButton = document.createElement('a');
+                    registroButton.textContent = 'Registro';
+                    registroButton.href = `/contenido/registro/${data.replace('item', '')}/`;  // Asegúrate de que la URL sea correcta
+                    registroButton.classList.add('btn', 'btn-ver');
+                    draggedItem.appendChild(registroButton);
+
                 }
 
-                    // Llamada AJAX para actualizar el estado en el servidor
-                    fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'  // Asegúrate de que el token CSRF esté presente
-                        },
-                        body: JSON.stringify({
-                            'nuevo_estado': targetColumn.toUpperCase()  // Enviar el nuevo estado
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Mostrar el mensaje de cambio de estado
-                            showStateChangeMessage(data.titulo, data.old_state, targetColumn);
-                        } else {
-                            alert('Error al actualizar el estado.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                } else {
-                    $('#warningModal').modal('show');
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // No es necesario seleccionar ni escuchar el botón del modal, ya que la razón ya no es relevante
-        
-            // Al mover el contenido, se hace la llamada AJAX directamente para cambiar el estado
-            if (contenidoBorradorId) {
-                // Realizar la llamada AJAX para informar al servidor sobre el cambio de estado a "BORRADOR"
-                fetch(`/contenido/contenido/cambiar_estado/${contenidoBorradorId}/`, {
+                // Llamada AJAX para actualizar el estado en el servidor
+                fetch(`/contenido/contenido/cambiar_estado/${data.replace('item', '')}/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': '{{ csrf_token }}'
                     },
                     body: JSON.stringify({
-                        'nuevo_estado': 'BORRADOR',
+                        'nuevo_estado': targetColumn.toUpperCase()
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Mostrar el mensaje de éxito (opcional)
-                        showStateChangeMessage(data.titulo, data.old_state, 'BORRADOR');
+                        showStateChangeMessage(data.titulo, data.old_state, targetColumn);
                     } else {
-                        alert('Error al mover el contenido a Borrador.');
+                        alert('Error al actualizar el estado.');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
+            } else {
+                $('#warningModal').modal('show');
+            }
+        }
+    }
+
+    // Confirmación de cambio de estado a "En revisión"
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('confirmRevisionBtn').addEventListener('click', function() {
+            if (draggedItemData) {
+                // Mover el contenido a la columna de "En revisión"
+                draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
+
+                // Limpiar todos los botones previos de la tarjeta
+                let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
+                buttons.forEach(button => button.remove());
+
+                // Crear y añadir el botón "Ver"
+                var viewButton = document.createElement('a');
+                viewButton.textContent = 'Ver';
+                viewButton.href = `/contenido/contenido_autor_FLAG/${draggedItemData.draggedItem.id.replace('item', '')}/`;
+                viewButton.classList.add('btn', 'btn-ver');
+                draggedItemData.draggedItem.appendChild(viewButton);
+
+                // Llamada AJAX para actualizar el estado en el servidor
+                fetch(`/contenido/contenido/cambiar_estado/${draggedItemData.draggedItem.id.replace('item', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'nuevo_estado': 'EDITADO'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStateChangeMessage(data.titulo, data.old_state, 'editado');
+                    } else {
+                        alert('Error al actualizar el estado.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+                // Cerrar el modal después de la confirmación
+                $('#confirmRevisionModal').modal('hide');
             }
         });
-        
 
-        // Mostrar mensaje de cambio de estado
-        function showStateChangeMessage(titulo, oldState, newState) {
-            const readableOldState = transformState(oldState);  // Transformar oldState
-            const readableNewState = transformState(newState);  // Transformar newState
-            const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
+        // Confirmación de cambio de estado a "Borrador"
+        document.getElementById('confirmBorradorBtn').addEventListener('click', function() {
+            if (draggedItemData) {
+                // Mover el contenido a la columna de "Borrador"
+                draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
 
-            // Insertar el mensaje en el contenedor de la alerta
-            document.getElementById('stateChangeMessage').textContent = message;
+                // Limpiar todos los botones previos de la tarjeta
+                let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
+                buttons.forEach(button => button.remove());
 
-            // Mostrar la alerta
-            const alertElement = document.getElementById('stateChangeAlert');
-            alertElement.style.display = 'block';  // Mostrar la alerta
+                // Añadir los botones "Editar" y "Ver"
+                var editButton = document.createElement('a');
+                editButton.textContent = 'Editar';
+                editButton.href = `/contenido/contenido/${draggedItemData.draggedItem.id.replace('item', '')}/edit/`;
+                editButton.classList.add('btn', 'btn-edit');
+                draggedItemData.draggedItem.appendChild(editButton);
 
-            // Ocultar la alerta después de 10 segundos
-            setTimeout(function() {
-                alertElement.style.display = 'none';  // Ocultar la alerta
-            }, 10000);
-        }
+                var viewButton = document.createElement('a');
+                viewButton.textContent = 'Ver';
+                viewButton.href = `/contenido/contenido_autor/${draggedItemData.draggedItem.id.replace('item', '')}/`;
+                viewButton.classList.add('btn', 'btn-ver');
+                draggedItemData.draggedItem.appendChild(viewButton);
 
-        // Función para transformar los estados en nombres más legibles
-        function transformState(state) {
-            switch (state.toUpperCase()) {
-                case 'EDITADO':
-                    return 'Editado';
-                case 'RECHAZADO':
-                    return 'Rechazado';
-                case 'A_PUBLICAR':
-                    return 'A Publicar';
-                case 'BORRADOR':
-                    return 'Borrador';
-                default:
-                    return state;  // Retorna el estado original si no hay transformación
+                // Llamada AJAX para actualizar el estado en el servidor
+                fetch(`/contenido/contenido/cambiar_estado/${draggedItemData.draggedItem.id.replace('item', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'nuevo_estado': 'BORRADOR'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStateChangeMessage(data.titulo, data.old_state, 'borrador');
+
+                        // Verificar si hay una razón de rechazo en la respuesta del servidor
+                        if (data.razon_rechazo) {
+                            // Añadir el mensaje de "Contenido rechazado"
+                            var rejectedMessage = document.createElement('span');
+                            rejectedMessage.textContent = 'Mensaje de Editor: ' + data.razon_rechazo;
+                            rejectedMessage.classList.add('razon-borrador');
+                            draggedItemData.draggedItem.insertBefore(rejectedMessage, draggedItemData.draggedItem.firstChild);  // Insertar el mensaje antes del título
+                        }
+
+                    } else {
+                        alert('Error al actualizar el estado.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+                // Cerrar el modal después de la confirmación
+                $('#confirmBorradorModal').modal('hide');
             }
+        });
+    });
+
+    // Mostrar mensaje de cambio de estado
+    function showStateChangeMessage(titulo, oldState, newState) {
+        const readableOldState = transformState(oldState);
+        const readableNewState = transformState(newState);
+        const message = `El contenido "${titulo}" ha pasado de "${readableOldState}" a "${readableNewState}"`;
+
+        document.getElementById('stateChangeMessage').textContent = message;
+        const alertElement = document.getElementById('stateChangeAlert');
+        alertElement.style.display = 'block';
+
+        setTimeout(function() {
+            alertElement.style.display = 'none';
+        }, 10000);
+    }
+
+    // Función para transformar los estados en nombres más legibles
+    function transformState(state) {
+        switch (state.toUpperCase()) {
+            case 'EDITADO':
+                return 'Editado';
+            case 'RECHAZADO':
+                return 'Rechazado';
+            case 'A_PUBLICAR':
+                return 'A Publicar';
+            case 'BORRADOR':
+                return 'Borrador';
+            default:
+                return state;
         }
-    </script>
+    }
+</script>
+<!-- Modal de Confirmación para cambio a "Borrador" -->
+<div class="modal fade" id="confirmBorradorModal" tabindex="-1" role="dialog" aria-labelledby="confirmBorradorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="confirmBorradorModalLabel">Confirmar cambio de estado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que quieres cambiar el estado de este contenido a "Borrador"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmBorradorBtn" class="btn btn-warning">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 

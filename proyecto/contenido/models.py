@@ -4,6 +4,7 @@ from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.utils import timezone
 from .models import Categoria
+from django.utils.html import strip_tags
 
 
 class Tag(models.Model):
@@ -43,6 +44,8 @@ class Contenido(models.Model):
     likes = models.IntegerField(default=0)
     unlikes = models.IntegerField(default=0)
     autopublicar_conte = models.BooleanField(default=False)
+    vigencia_conte = models.BooleanField(default=False)
+    
 
     # Relación con el autor del contenido
     autor = models.ForeignKey(
@@ -52,9 +55,49 @@ class Contenido(models.Model):
         blank=True
     )
     fecha_publicacion = models.DateTimeField(null=True, blank=True)
+    fecha_vigencia = models.DateTimeField(null=True, blank=True)
+    
+    
+     # Campo para almacenar la versión actual seleccionada
+    version_actual = models.ForeignKey(
+        'VersionContenido',  # Relacionado con el modelo de versiones
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='contenido_version_actual'
+    )
 
     def __str__(self):
         return self.titulo_conte
+    
+    def establecer_version_actual(self, version):
+        """Establece una versión específica como la versión actual del contenido."""
+        self.version_actual = version
+        self.save()
+        
+    def establecer_version_anterior(self, version):
+        """
+        Este método permite establecer cualquier versión anterior como la versión actual.
+        Primero, guarda la versión actual antes de cambiarla para evitar perderla.
+        """
+        # Si hay una versión actual, guárdala como una nueva versión
+        if self.version_actual:
+            version_num = self.versiones.count() + 1  # Crear el siguiente número de versión
+            VersionContenido.objects.create(
+                contenido_original=self,
+                version_num=version_num,
+                titulo_conte=self.titulo_conte,
+                tipo_conte=self.tipo_conte,
+                texto_conte=self.texto_conte,
+                fecha_version=timezone.now(),
+            )
+
+        # Ahora, establece la versión seleccionada como la actual
+        self.titulo_conte = version.titulo_conte
+        self.tipo_conte = version.tipo_conte
+        self.texto_conte = version.texto_conte
+        self.version_actual = version  # Establecemos la nueva versión como la actual
+        self.save()  # Guardamos los cambios
     
         # Método para verificar si el contenido debe ser publicado
     def autopublicar(self):
@@ -62,27 +105,74 @@ class Contenido(models.Model):
             self.autopublicar_conte = True
             self.save()
             
-    def save(self, *args, **kwargs):
-        # Detectar si el contenido ya existía en la base de datos
-        if self.pk:
-            # Obtener el contenido original desde la base de datos
-            original = Contenido.objects.get(pk=self.pk)
+    def save(self, *args, crear_version=True, **kwargs):
+        """
+        Sobrescribe el método save para crear una nueva versión solo cuando `crear_version` es True.
+        """
+        is_new = self.pk is None  # Verificar si es un nuevo contenido
 
-            # Comparar si hubo cambios significativos en los campos
-            if original.texto_conte != self.texto_conte or original.titulo_conte != self.titulo_conte:
+        # Si es una edición, obtenemos el estado original antes de guardar
+        if not is_new:
+            try:
+                original = Contenido.objects.get(pk=self.pk)
+            except Contenido.DoesNotExist:
+                original = None
+        else:
+            original = None
+
+        # Guardamos el contenido primero (si es un nuevo contenido)
+        super(Contenido, self).save(*args, **kwargs)
+
+        if is_new:
+            # Si es un nuevo contenido, crear la versión 1
+            print("Creando la versión 1 del contenido")
+            version = VersionContenido.objects.create(
+                contenido_original=self,
+                version_num=1,
+                titulo_conte=self.titulo_conte,
+                tipo_conte=self.tipo_conte,
+                texto_conte=self.texto_conte,
+                fecha_version=timezone.now(),
+            )
+
+            # Establecer la versión 1 como la versión actual
+            self.version_actual = version
+            self.save()  # Guardar nuevamente para asignar la versión actual
+            print(f"Versión 1 creada y asignada como la versión actual: {self.version_actual}")
+
+        elif original and crear_version:
+            # Solo creamos una nueva versión si `crear_version` es True
+            print(f"Comparando texto_conte (sin HTML):")
+            print(f"Original (limpio): {strip_tags(original.texto_conte)}")
+            print(f"Nuevo (limpio): {strip_tags(self.texto_conte)}")
+
+            print(f"Comparando titulo_conte:")
+            print(f"Original: {original.titulo_conte}")
+            print(f"Nuevo: {self.titulo_conte}")
+
+            # Comparar si hubo cambios significativos en el título o texto sin HTML
+            if strip_tags(original.texto_conte) != strip_tags(self.texto_conte) or original.titulo_conte != self.titulo_conte:
+                print("Detectados cambios en el contenido, creando una nueva versión")
                 # Incrementar el número de versión basado en las versiones existentes
                 version_num = self.versiones.count() + 1
-                # Crear una nueva versión del contenido
-                VersionContenido.objects.create(
+                version = VersionContenido.objects.create(
                     contenido_original=self,
                     version_num=version_num,
-                    titulo_conte=original.titulo_conte,
-                    tipo_conte=original.tipo_conte,
-                    texto_conte=original.texto_conte,
-                    fecha_version=timezone.now(),
+                    titulo_conte=self.titulo_conte,  # Guardar el título editado
+                    tipo_conte=self.tipo_conte,      # Guardar el tipo editado
+                    texto_conte=self.texto_conte,    # Guardar el texto editado
+                    fecha_version=timezone.now(),    # Guardar la fecha de edición
                 )
-        
-        super(Contenido, self).save(*args, **kwargs)  # Guardar el contenido normalmente
+
+                # Establecer la nueva versión creada como la versión actual
+                self.version_actual = version
+                self.save()  # Guardar nuevamente para asignar la versión actual
+                print(f"Versión {version_num} creada y asignada como la versión actual: {self.version_actual}")
+            else:
+                print("No se detectaron cambios significativos, no se crea una nueva versión")
+
+
+
     
 class VersionContenido(models.Model):
     contenido_original = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='versiones')
@@ -162,3 +252,27 @@ class ReporteContenido(models.Model):
     def __str__(self):
         return f'Reporte de {self.usuario.username} sobre {self.contenido.titulo_conte}'
 
+
+#historial de compra de categorías 
+class HistorialCompra(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    numero_compra = models.CharField(max_length=100)  # Número o ID de la compra de Stripe
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
+    fecha_transaccion = models.DateTimeField(auto_now_add=True)  # Fecha de la compra
+
+    def __str__(self):
+        return f"Compra {self.numero_compra} - {self.categoria.nombre}"
+
+
+class CambioEstado(models.Model):
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='cambios_estado')
+    estado_anterior = models.CharField(max_length=50)
+    estado_nuevo = models.CharField(max_length=50)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    fecha_cambio = models.DateTimeField(auto_now_add=True)
+    razon_cambio = models.TextField(blank=True, null=True)  # Solo para cambios a "Borrador"
+    razon_revision = models.TextField(blank=True, null=True)  # Solo para cambios a "En revision"
+    
+
+    def _str_(self):
+        return f"Cambio en {self.contenido.titulo_conte} de {self.estado_anterior} a {self.estado_nuevo}"

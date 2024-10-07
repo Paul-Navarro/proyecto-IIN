@@ -40,6 +40,8 @@ from django.views.generic import ListView
 from .models import Notificacion
 from django.http import JsonResponse
 
+
+
 def home(request):
     # DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
@@ -50,7 +52,7 @@ def home(request):
     autores = User.objects.all()
 
    # Filtrar los contenidos publicados y con autopublicar_conte en True
-    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True)
+    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True , vigencia_conte=False)
 
     # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')
@@ -126,11 +128,13 @@ def home(request):
         'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
         'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
         'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
+        'has_financiero_role':user.has_role('Financiero') if user.is_authenticated else False,
         'has_multiple_roles': roles_count > 1,
         'has_single_role': roles_count == 1,
         'query': query,  # Pasar el término de búsqueda al contexto
         'notificaciones': notificaciones,  # Añadir las notificaciones al contexto
         'notificaciones_no_leidas': notificaciones_no_leidas,  # Añadir el conteo de no leídas
+    
     }
 
     return render(request, 'home/index.html', context)
@@ -369,4 +373,6 @@ def user_list(request):
     """
     users = User.objects.all()
     return render(request, 'admin/users/user_list.html', {'users': users})
+
+
 
