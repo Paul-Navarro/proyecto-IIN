@@ -96,7 +96,7 @@
                     <h3><i class="fas fa-check-circle"></i> Publicado</h3>
                     <div class="kanban-items">
                         {% for contenido in contenidos %}
-                            {% if contenido.estado_conte == 'PUBLICADO' %}
+                            {% if contenido.estado_conte == 'PUBLICADO' and not contenido.vigencia_conte%}
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>

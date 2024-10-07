@@ -43,6 +43,13 @@ from django.http import JsonResponse
 
 
 def home(request):
+    '''
+    @function home
+    @description Muestra la página principal del sitio, permitiendo la búsqueda y filtrado de contenidos según varias opciones como categoría, autor, moderación, suscripción, y fechas. Además, ejecuta una tarea programada para autopublicar contenido y muestra notificaciones no leídas del usuario autenticado.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /
+    @returns {HttpResponse} Renderiza la plantilla 'home/index.html' con los contenidos filtrados, categorías, autores, roles y notificaciones.
+    '''
     # DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
     cronjob.do()
@@ -142,6 +149,14 @@ def home(request):
 
 #para marcar notificaciones como leidas
 def marcar_como_leida(request, id):
+    '''
+    @function marcar_como_leida
+    @description Marca una notificación específica como leída para el usuario autenticado. Solo responde a solicitudes POST.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} id - El ID de la notificación que se va a marcar como leída.
+    @route {POST} /notificaciones/marcar_como_leida/<int:id>/
+    @returns {JsonResponse} Retorna una respuesta JSON con el estado 'ok' si la notificación se marca correctamente o un error si falla.
+    '''
     # Verificar que el método sea POST y que el usuario esté autenticado
     if request.method == 'POST' and request.user.is_authenticated:
         # Obtener la notificación del usuario autenticado
@@ -166,10 +181,13 @@ def marcar_como_leida(request, id):
 
 @login_required
 def role_based_redirect(request):
-    """
-    Si el usuario tiene un solo rol, redirige directamente al panel correspondiente.
-    Si tiene múltiples roles, ofrece una página para seleccionar el rol.
-    """
+    '''
+    @function role_based_redirect
+    @description Redirige al usuario a un panel específico según su rol. Si el usuario tiene un solo rol, redirige automáticamente. Si tiene múltiples roles, ofrece una página para que seleccione el rol deseado. Si no tiene roles, asigna un rol predeterminado o maneja la situación de otra forma.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /role_based_redirect/
+    @returns {HttpResponse|HttpRedirect} Redirige al panel correspondiente basado en el rol del usuario o muestra una página para seleccionar un rol si tiene múltiples.
+    '''
     user = request.user
     roles = user.roles.all()  # Obtiene todos los roles del usuario
     
@@ -191,9 +209,12 @@ def role_based_redirect(request):
 
 
 def redirect_based_on_role(role_name):
-    """
-    Redirige a la página correspondiente según el rol.
-    """
+    '''
+    @function redirect_based_on_role
+    @description Redirige al usuario a la página correspondiente según su rol. Dependiendo del rol que se le pase, el usuario será redirigido a su panel específico.
+    @param {str} role_name - El nombre del rol del usuario.
+    @returns {HttpResponseRedirect} Redirige al panel de control correspondiente o a la página principal si no se reconoce el rol.
+    '''
     if role_name == 'Admin':
         return redirect('admin_dashboard')
     elif role_name == 'Editor':
@@ -209,39 +230,53 @@ def redirect_based_on_role(role_name):
 
 @login_required
 def role_based_redirect_choice(request, role_name):
-    """
-    Redirige al panel correspondiente basado en el rol seleccionado.
-    """
+    '''
+    @function role_based_redirect_choice
+    @description Redirige al usuario al panel correspondiente según el rol que haya seleccionado. Usa la función `redirect_based_on_role` para gestionar la redirección.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {str} role_name - El nombre del rol seleccionado por el usuario.
+    @returns {HttpResponseRedirect} Redirige al panel correspondiente según el rol seleccionado.
+    '''
     return redirect_based_on_role(role_name)
 
 @login_required
 def admin_dashboard(request):
-    """
+    '''
     @function admin_dashboard
-    @description Renderiza el panel de administración para usuarios con el rol de Admin.
-    """
+    @description Renderiza el panel de administración para usuarios con el rol de Admin.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /admin/dashboard/
+    @returns {HttpResponse} Renderiza la plantilla 'admin/users/dashboard.html'.
+    '''
     return render(request, '../templates/admin/users/dashboard.html')
 
 @login_required
 def editor_dashboard(request):
-    """
+    '''
     @function editor_dashboard
-    @description Renderiza el panel de administración para usuarios con el rol de Editor.
-    """
+    @description Renderiza el panel de administración para usuarios con el rol de Editor, mostrando una lista de todos los contenidos disponibles.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /editor/dashboard/
+    @returns {HttpResponse} Renderiza la plantilla 'editor/dashboard.html' con la lista de contenidos.
+    '''
     
     contenidos = Contenido.objects.all() 
     return render(request, '../templates/editor/dashboard.html',{'contenidos': contenidos})
 
 @login_required
 def publicador_dashboard(request):
+    '''
+    @function publicador_dashboard
+    @description Ejecuta el cron job para autopublicar contenido y renderiza el panel de administración para usuarios con el rol de Publicador. Muestra una lista de contenidos disponibles y asigna el rol de usuario como 'Publicador'.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /publicador/dashboard/
+    @returns {HttpResponse} Renderiza la plantilla 'publicador/dashboard.html' con la lista de contenidos y el rol de usuario.
+    '''
     
     #DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
     cronjob.do()
-    """
-    @function publicador_dashboard
-    @description Renderiza el panel de administración para usuarios con el rol de Publicador.
-    """
+    
     contenidos = Contenido.objects.all()  
     user_role = 'Publicador'
     
@@ -249,18 +284,24 @@ def publicador_dashboard(request):
 
 @login_required
 def suscriptor_dashboard(request):
-    """
+    '''
     @function suscriptor_dashboard
     @description Renderiza el panel de administración para usuarios con el rol de Suscriptor.
-    """
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /suscriptor/dashboard/
+    @returns {HttpResponse} Renderiza la plantilla 'suscriptor/dashboard.html'.
+    '''
     return render(request, '../templates/suscriptor/dashboard.html')
 
 @login_required
 def autor_dashboard(request):
-    """
+    '''
     @function autor_dashboard
-    @description Renderiza el panel de administración para usuarios con el rol de Autor.
-    """
+    @description Renderiza el panel de administración para usuarios con el rol de Autor, mostrando los contenidos creados por el autor actual.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /autor/dashboard/
+    @returns {HttpResponse} Renderiza la plantilla 'autor/dashboard.html' con los contenidos del autor.
+    '''
     
     contenidos = Contenido.objects.filter(autor=request.user)
     return render(request, '../templates/autor/dashboard.html',{'contenidos': contenidos})
@@ -270,13 +311,16 @@ User = get_user_model()
 
 @login_required
 def create_user(request):
-    """
+    '''
     @function create_user
     @description Maneja la creación de un nuevo usuario.
     
     Muestra un formulario para crear un nuevo usuario y lo guarda en la base de datos si el formulario es válido. 
     Muestra un mensaje de éxito y redirige a la lista de usuarios tras la creación.
-    """
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET|POST} /admin/users/create/
+    @returns {HttpResponse} Renderiza la plantilla 'admin/users/create_user.html' con el formulario para crear un usuario.
+    '''
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -289,13 +333,17 @@ def create_user(request):
 
 @login_required
 def edit_user(request, user_id):
-    """
+    '''
     @function edit_user
     @description Maneja la edición de un usuario existente.
     
     Muestra un formulario para editar un usuario y guarda los cambios en la base de datos si el formulario es válido. 
     Muestra un mensaje de éxito y redirige a la lista de usuarios tras la actualización.
-    """
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} user_id - El ID del usuario a editar.
+    @route {GET|POST} /admin/users/edit/<user_id>/
+    @returns {HttpResponse} Renderiza la plantilla 'admin/users/edit_user.html' con el formulario para editar un usuario.
+    '''
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, instance=user)
@@ -309,6 +357,16 @@ def edit_user(request, user_id):
 
 @login_required
 def editar_perfil(request):
+    '''
+    @function editar_perfil
+    @description Maneja la edición del perfil del usuario actual.
+    
+    Permite al usuario actualizar su información personal, como nombre y foto de perfil, así como cambiar su contraseña. 
+    Muestra mensajes de éxito o error según el resultado de las operaciones.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET|POST} /account/editar-perfil/
+    @returns {HttpResponse} Renderiza la plantilla 'account/configurar_perfil.html' con los formularios de edición.
+    '''
     user = request.user
 
     # Initialize both forms with user instance data
@@ -349,13 +407,17 @@ def editar_perfil(request):
 
 @login_required
 def delete_user(request, user_id):
-    """
+    '''
     @function delete_user
     @description Maneja la eliminación de un usuario existente.
     
     Muestra un formulario de confirmación para eliminar un usuario y lo elimina de la base de datos si la solicitud es POST. 
     Muestra un mensaje de éxito y redirige a la lista de usuarios tras la eliminación.
-    """
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} user_id - El ID del usuario a eliminar.
+    @route {POST} /admin/users/delete/<user_id>/
+    @returns {HttpResponse} Renderiza la plantilla 'admin/users/delete_user.html' para la confirmación de eliminación.
+    '''
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         user.delete()
@@ -365,12 +427,15 @@ def delete_user(request, user_id):
 
 @login_required
 def user_list(request):
-    """
+    '''
     @function user_list
     @description Renderiza una lista de todos los usuarios en el sistema.
     
     Obtiene todos los usuarios y los pasa al contexto para su renderización en la plantilla 'admin/users/user_list.html'.
-    """
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /admin/users/
+    @returns {HttpResponse} Renderiza la plantilla 'admin/users/user_list.html' con la lista de usuarios.
+    '''
     users = User.objects.all()
     return render(request, 'admin/users/user_list.html', {'users': users})
 

@@ -7,7 +7,7 @@ User = get_user_model()
 
 @receiver(post_save, sender=User)
 def assign_default_role(sender, instance, created, **kwargs):
-    """
+    '''
     @function assign_default_role
     @description Asigna el rol predeterminado de 'Suscriptor' a un usuario recién creado si no tiene ningún rol asignado.
     Este método se ejecuta automáticamente después de que un nuevo usuario sea guardado en la base de datos. Si el usuario
@@ -17,7 +17,7 @@ def assign_default_role(sender, instance, created, **kwargs):
     @param instance {User} La instancia del usuario que ha sido creada o guardada.
     @param created {bool} Indica si la instancia del usuario fue recién creada.
     @param **kwargs {dict} Argumentos adicionales.
-    """
+    '''
     if created:  # Solo se ejecuta cuando el usuario es creado
         if instance.roles.count() == 0:
             # Verificar si el usuario no tiene roles
