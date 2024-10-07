@@ -1114,4 +1114,4 @@ def asignar_fecha_publicacion(request, pk):
             messages.success(request, f'La fecha de publicación ha sido actualizada para el contenido "{contenido.titulo_conte}".')
             return redirect('autor_dashboard')  # Redirigir al tablero de autor
 
-    return render(request, 'tu_template.html', {'contenido': contenido})
+    return render(request, 'home/index.html', {'contenido': contenido})
