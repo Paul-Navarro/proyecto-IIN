@@ -191,7 +191,7 @@ def contenido_update(request, pk):
             # Guardar los tags (relaciones many-to-many)
             form.save_m2m()
 
-            return redirect('contenido_list')
+            return redirect('autor_dashboard')
     else:
         form = ContenidoForm(instance=contenido)
 
