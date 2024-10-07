@@ -5,11 +5,11 @@ from allauth.account.forms import SignupForm
 from django.contrib.auth import get_user_model
 
 class CustomUserCreationForm(UserCreationForm):
-    """
+    '''
     @class CustomUserCreationForm
     @extends UserCreationForm
     @description Formulario personalizado para la creación de usuarios. Este formulario extiende el formulario de creación de usuarios estándar de Django para incluir campos adicionales específicos del modelo `CustomUser`. Además, permite asignar múltiples roles a un usuario utilizando un widget de selección múltiple.
-    """
+    '''
 
     # Permite seleccionar múltiples roles utilizando checkboxes
     roles = forms.ModelMultipleChoiceField(
@@ -19,9 +19,9 @@ class CustomUserCreationForm(UserCreationForm):
     )
 
     class Meta:
-        """
+        '''
         @description Clase Meta para especificar el modelo y los campos que se incluirán en el formulario de creación de usuarios.
-        """
+        '''
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 'roles')  # Incluye los campos que deseas utilizar
 
@@ -36,11 +36,11 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CustomUserChangeForm(UserChangeForm):
-    """
+    '''
     @class CustomUserChangeForm
     @extends UserChangeForm
     @description Formulario personalizado para la edición de usuarios. Este formulario extiende el formulario de cambio de usuario estándar de Django para incluir campos adicionales específicos del modelo `CustomUser`, como la asignación de múltiples roles utilizando un widget de selección múltiple.
-    """
+    '''
 
     # Permite seleccionar múltiples roles utilizando checkboxes
     roles = forms.ModelMultipleChoiceField(
@@ -50,9 +50,9 @@ class CustomUserChangeForm(UserChangeForm):
     )
 
     class Meta:
-        """
+        '''
         @description Clase Meta para especificar el modelo y los campos que se incluirán en el formulario de edición de usuarios.
-        """
+        '''
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 'roles', 'is_active', 'is_staff')  # Incluye los campos que deseas modificar
 
@@ -66,11 +66,11 @@ class CustomUserChangeForm(UserChangeForm):
         return roles
 
 class CustomSignupForm(SignupForm):
-    """
+    '''
     @class CustomSignupForm
     @extends SignupForm
     @description Formulario de registro personalizado que extiende el formulario de registro de `allauth`. Incluye los campos de nombre y apellido, además de los campos estándar de registro.
-    """
+    '''
     first_name = forms.CharField(
         max_length=30, 
         label='Nombre',

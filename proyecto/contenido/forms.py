@@ -65,6 +65,11 @@ class ContenidoForm(forms.ModelForm):
 
 #formulario de contacto     
 class ContactForm(forms.Form):
+    '''
+    @class ContactForm
+    @extends forms.Form
+    @description Formulario para que los usuarios puedan enviar un mensaje de contacto, incluyendo campos como nombre, correo electrónico, asunto y el mensaje en sí.
+    '''
     nombre = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Nombre y apellido'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Correo electrónico'}))
     asunto = forms.CharField(max_length=200, required=False, widget=forms.TextInput(attrs={'placeholder': 'Asunto'}))
@@ -74,6 +79,11 @@ class ContactForm(forms.Form):
 
 #formulario para reporte de contenidos
 class ReporteContenidoForm(forms.ModelForm):
+    '''
+    @class ReporteContenidoForm
+    @extends forms.ModelForm
+    @description Formulario utilizado para reportar un contenido específico. Permite a los usuarios enviar una razón o motivo por el cual están reportando el contenido.
+    '''
     class Meta:
         model = ReporteContenido
         fields = ['razon']

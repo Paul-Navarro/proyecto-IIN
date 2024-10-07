@@ -63,14 +63,39 @@ urlpatterns = [
     path('ventas/', VentaListView.as_view(), name='venta_list'),
     
     path('contenido/registro/<int:pk>/', views.contenido_registro, name='contenido_registro'),   
+    
+    path('contenido/asignar_fecha_publicacion/<int:pk>/', views.asignar_fecha_publicacion, name='asignar_fecha_publicacion'),
 ]
 
 '''
-@description Rutas de la aplicación 'contenido'. Define las rutas para listar, mostrar el detalle, crear, editar y eliminar contenido.
-@routes
-    @route {GET} / - Lista todos los contenidos. Utiliza la vista views.contenido_list.
-    @route {GET} /contenido/<int:pk>/ - Muestra el detalle de un contenido específico. Utiliza la vista views.contenido_detail.
-    @route {GET, POST} /contenido/new/ - Crea un nuevo contenido. Utiliza la vista views.contenido_create.
-    @route {GET, POST} /contenido/<int:pk>/edit/ - Edita un contenido existente. Utiliza la vista views.contenido_update.
-    @route {POST} /contenido/<int:pk>/delete/ - Elimina un contenido específico. Utiliza la vista views.contenido_delete.
-'''
+    @description Rutas de la aplicación 'contenido'. Define las rutas para listar, mostrar el detalle, crear, editar y eliminar contenido.
+    @routes
+        @route {GET} / - Lista todos los contenidos. Utiliza la vista views.contenido_list.
+        @route {GET} /contenido/<int:pk>/ - Muestra el detalle de un contenido específico. Utiliza la vista views.contenido_detail.
+        @route {GET} /contenido_admin/ - Interfaz KANBAN para que los administradores gestionen contenidos. Utiliza la vista views.administrador_KANBAN.
+        @route {GET} /contenido/seleccionar_version/<int:pk>/<int:version_id>/ - Selecciona una versión específica de un contenido. Utiliza la vista views.seleccionar_version.
+        @route {GET} /contenido_autor/<int:pk>/ - Muestra el detalle de un contenido para el autor. Utiliza la vista views.contenido_detail_autor.
+        @route {GET} /contenido/new/ - Crea un nuevo contenido. Utiliza la vista views.contenido_create.
+        @route {GET} /contenido/<int:pk>/version/<int:version_num>/ - Muestra los detalles de una versión específica del contenido. Utiliza la vista views.contenido_version_detail.
+        @route {GET, POST} /contenido/<int:pk>/edit/ - Edita un contenido existente. Utiliza la vista views.contenido_update.
+        @route {GET, POST} /contenido/<int:pk>/edit_editor/ - Edita un contenido específico para los editores. Utiliza la vista views.contenido_update_editor.
+        @route {POST} /contenido/<int:pk>/delete/ - Elimina un contenido específico. Utiliza la vista views.contenido_delete.
+        @route {POST} /contenido_admin/<int:pk>/delete/ - Elimina un contenido específico desde la administración. Utiliza la vista views.contenido_delete_admin.
+        @route {POST} /contenido/cambiar-estado/<int:id_conte>/ - Cambia el estado de un contenido. Utiliza la vista views.contenido_cambiar_estado.
+        @route {POST} /contenido/cambiar_estado_KANBAN/<int:id_conte>/ - Cambia el estado de un contenido desde la interfaz KANBAN. Utiliza la vista views.contenido_cambiar_estado_KANBAN.
+        @route {GET} /publicador/gestionar/ - Interfaz de gestión de contenidos para el publicador. Utiliza la vista views.gestionar_contenido.
+        @route {POST} /contenido/<int:id_conte>/like/ - Añade un like a un contenido. Utiliza la vista views.like_contenido.
+        @route {POST} /contenido/<int:id_conte>/unlike/ - Añade un unlike a un contenido. Utiliza la vista views.unlike_contenido.
+        @route {GET} /suscripciones/ - Muestra las suscripciones del usuario. Utiliza la vista views.suscripciones_view.
+        @route {POST} /comprar_suscripcion/ - Compra una suscripción. Utiliza la vista views.comprar_suscripcion.
+        @route {GET} /success/ - Indica una suscripción exitosa. Utiliza la vista views.suscripcion_exitosa.
+        @route {GET} /cancel/ - Indica una suscripción cancelada. Utiliza la vista views.suscripcion_cancelada.
+        @route {GET, POST} /contact_us/ - Muestra un formulario de contacto. Utiliza la vista views.contact_us.
+        @route {POST} /desuscribir/<int:categoria_id>/ - Permite al usuario desuscribirse de una categoría. Utiliza la vista views.desuscribir_categoria.
+        @route {GET} /suscripciones/no-pagadas/ - Muestra suscripciones que no han sido pagadas. Utiliza la vista views.suscribirse_no_pagadas.
+        @route {POST} /contenido/<int:contenido_id_conte>/reportar/ - Permite a los usuarios reportar un contenido. Utiliza la vista views.reportar_contenido.
+        @route {GET} /admin/reportes/ - Muestra los reportes de contenido en la administración. Utiliza la vista views.ver_reportes.
+        @route {GET} /historial-compras/ - Muestra el historial de compras del usuario. Utiliza la vista views.historial_compras_view.
+        @route {GET} /ventas/ - Lista las ventas realizadas. Utiliza la vista views.VentaListView.
+        @route {GET} /contenido/registro/<int:pk>/ - Muestra el registro de un contenido. Utiliza la vista views.contenido_registro.
+    '''

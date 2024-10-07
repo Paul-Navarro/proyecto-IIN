@@ -48,8 +48,21 @@
                 {% for cambio in cambios_estado %}
                 <tr>
                     <td>{{ cambio.fecha_cambio }}</td>
-                    <td>{{ cambio.estado_anterior }}</td>
-                    <td>{{ cambio.estado_nuevo }}</td>
+                    <td>
+                        {% if cambio.estado_anterior == 'EDITADO' %}
+                            EN EDICIÓN
+                        {% else %}
+                            {{ cambio.estado_anterior }}
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        {% if cambio.estado_nuevo == 'EDITADO' %}
+                            EN EDICIÓN
+                        {% else %}
+                            {{ cambio.estado_nuevo }}
+                        {% endif %}
+                    </td>
                     <td>{{ cambio.usuario.username }}</td>
                     <td>{{ cambio.razon_cambio|default_if_none:"" }}</td>
                     <td>{{ cambio.razon_revision|default_if_none:"" }}</td>

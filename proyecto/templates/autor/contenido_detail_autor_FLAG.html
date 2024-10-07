@@ -61,10 +61,7 @@
                 {% endfor %}
             </ul>
         
-            <!-- Botón para volver a la versión original (Versión 1) -->
-            <a href="{% url 'seleccionar_version' pk=contenido.pk version_id=versiones.first.id %}" class="btn-select-version">
-                <i class="fas fa-undo"></i> Ir a Versión Original
-            </a>
+
         
         {% else %}
             <p>No hay versiones anteriores disponibles.</p>

@@ -8,6 +8,11 @@ from django.utils.html import strip_tags
 
 
 class Tag(models.Model):
+    '''
+    @class Tag
+    @extends models.Model
+    @description Modelo que representa una etiqueta (tag) asociada al contenido. Cada etiqueta tiene un nombre único con un límite de 50 caracteres.
+    '''
     nombre = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
@@ -175,6 +180,11 @@ class Contenido(models.Model):
 
     
 class VersionContenido(models.Model):
+    '''
+    @class VersionContenido
+    @extends models.Model
+    @description Modelo que almacena versiones de un contenido original. Cada versión está vinculada a un contenido original y contiene información como el número de versión, título, tipo, texto y la fecha en la que fue creada.
+    '''
     contenido_original = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='versiones')
     version_num = models.PositiveIntegerField()  # Número de versión
     titulo_conte = models.CharField(max_length=255)
@@ -216,6 +226,11 @@ class CambioBorrador(models.Model):
 
     
 class VotoContenido(models.Model):
+    '''
+    @class VotoContenido
+    @extends models.Model
+    @description Modelo que representa un voto de un usuario sobre un contenido. Un voto puede ser un 'Like' o 'Unlike' y cada usuario solo puede votar una vez por contenido.
+    '''
     VOTOS = [
         ('LIKE', 'Like'),
         ('UNLIKE', 'Unlike')
@@ -232,6 +247,11 @@ class VotoContenido(models.Model):
 
 ############# suscripciones #################
 class Suscripcion(models.Model):
+    '''
+    @class Suscripcion
+    @extends models.Model
+    @description Modelo que representa la suscripción de un usuario a una categoría específica. Un usuario puede suscribirse a varias categorías, pero solo una vez por cada categoría.
+    '''
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     
@@ -244,6 +264,11 @@ class Suscripcion(models.Model):
 
 #reporte de contenido
 class ReporteContenido(models.Model):
+    '''
+    @class ReporteContenido
+    @extends models.Model
+    @description Modelo que representa un reporte realizado por un usuario sobre un contenido. Cada reporte contiene el usuario que lo realizó, el contenido reportado, el motivo del reporte y la fecha en la que fue creado.
+    '''
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Usuario que reporta
     contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)  # Contenido reportado
     razon = models.TextField()  # Motivo del reporte
@@ -255,6 +280,11 @@ class ReporteContenido(models.Model):
 
 #historial de compra de categorías 
 class HistorialCompra(models.Model):
+    '''
+    @class HistorialCompra
+    @extends models.Model
+    @description Modelo que almacena el historial de compras realizadas por los usuarios. Incluye detalles como el usuario que realizó la compra, el número de la compra, la categoría relacionada y la fecha de la transacción.
+    '''
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     numero_compra = models.CharField(max_length=100)  # Número o ID de la compra de Stripe
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
@@ -265,6 +295,11 @@ class HistorialCompra(models.Model):
 
 
 class CambioEstado(models.Model):
+    '''
+    @class CambioEstado
+    @extends models.Model
+    @description Modelo que registra los cambios de estado de un contenido. Almacena información sobre el contenido afectado, el estado anterior, el nuevo estado, el usuario que realizó el cambio, la fecha y las razones asociadas.
+    '''
     contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name='cambios_estado')
     estado_anterior = models.CharField(max_length=50)
     estado_nuevo = models.CharField(max_length=50)

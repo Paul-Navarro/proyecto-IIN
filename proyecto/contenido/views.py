@@ -191,7 +191,7 @@ def contenido_update(request, pk):
             # Guardar los tags (relaciones many-to-many)
             form.save_m2m()
 
-            return redirect('contenido_list')
+            return redirect('autor_dashboard')
     else:
         form = ContenidoForm(instance=contenido)
 
@@ -285,6 +285,14 @@ def contenido_delete_admin(request, pk):
     return render(request, 'admin/contenido/contenido_delete.html', {'contenido': contenido})
 
 def contenido_cambiar_estado(request, id_conte):
+    '''
+    @function contenido_cambiar_estado
+    @description Cambia el estado de un contenido específico. El nuevo estado es proporcionado por el formulario en una solicitud POST.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} id_conte - El ID del contenido cuyo estado se va a cambiar.
+    @route {POST} /contenido/cambiar-estado/<int:id_conte>/
+    @returns Redirige a la vista 'gestionar_contenido'.
+    '''
     # Obtener el contenido por su ID
     contenido = get_object_or_404(Contenido, id_conte=id_conte)
 
@@ -338,6 +346,14 @@ def administrador_KANBAN(request):
 
 @csrf_exempt
 def contenido_cambiar_estado_KANBAN(request, id_conte):
+    '''
+    @function contenido_cambiar_estado_KANBAN
+    @description Cambia el estado de un contenido específico desde la interfaz KANBAN mediante una solicitud AJAX. El nuevo estado y las razones del cambio (si es necesario) se envían en el cuerpo de la solicitud como JSON.
+    @param {HttpRequest} request - La solicitud HTTP recibida (debe ser POST).
+    @param {int} id_conte - El ID del contenido cuyo estado se va a cambiar.
+    @route {POST} /contenido/cambiar_estado_KANBAN/<int:id_conte>/
+    @returns {JsonResponse} Respuesta en formato JSON con el éxito de la operación y el estado anterior y nuevo del contenido.
+    '''
     # Obtener el contenido por su ID
     contenido = get_object_or_404(Contenido, pk=id_conte)
 
@@ -382,6 +398,21 @@ def contenido_cambiar_estado_KANBAN(request, id_conte):
             
 
             if nuevo_estado in ['PUBLICADO', 'RECHAZADO', 'EDITADO', 'BORRADOR', 'A_PUBLICAR']:
+                
+                if nuevo_estado == 'EDITADO':
+                    razon_rechazo = data.get('razon_rechazo', '')
+                    
+                    if razon_rechazo != '':
+                        Rechazo.objects.create(contenido=contenido, razon=razon_rechazo)
+                        
+                # Lógica para mover a BORRADOR con la razón del cambio
+                if nuevo_estado == 'BORRADOR':
+                    
+                    razon_cambio = data.get('razon_cambio', '')  # Obtener la razón del cambio a Borrador
+                    
+                    if razon_cambio != '':
+                        CambioBorrador.objects.create(contenido=contenido, razon=razon_cambio)  # Guardar la razón del cambio
+                    
                 estado_anterior = contenido.estado_conte
                 contenido.estado_conte = nuevo_estado
 
@@ -427,6 +458,14 @@ def editor_dashboard(request):
 @csrf_exempt
 @login_required
 def like_contenido(request, id_conte):
+    '''
+    @function like_contenido
+    @description Permite a los usuarios dar like a un contenido. Si ya ha dado like, lo quita. Si el usuario había dado un unlike, este se elimina y se añade un like en su lugar.
+    @param {HttpRequest} request - La solicitud HTTP recibida (debe ser POST).
+    @param {int} id_conte - El ID del contenido al que el usuario está dando like.
+    @route {POST} /contenido/<int:id_conte>/like/
+    @returns {JsonResponse} Respuesta en formato JSON con el número actualizado de likes y unlikes del contenido.
+    '''
     contenido = get_object_or_404(Contenido, id_conte=id_conte)
     usuario = request.user
 
@@ -456,6 +495,14 @@ def like_contenido(request, id_conte):
 @csrf_exempt
 @login_required
 def unlike_contenido(request, id_conte):
+    '''
+    @function unlike_contenido
+    @description Permite a los usuarios dar un unlike a un contenido. Si ya ha dado un unlike, lo quita. Si el usuario había dado un like, este se elimina y se añade un unlike en su lugar.
+    @param {HttpRequest} request - La solicitud HTTP recibida (debe ser POST).
+    @param {int} id_conte - El ID del contenido al que el usuario está dando un unlike.
+    @route {POST} /contenido/<int:id_conte>/unlike/
+    @returns {JsonResponse} Respuesta en formato JSON con el número actualizado de likes y unlikes del contenido.
+    '''
     contenido = get_object_or_404(Contenido, id_conte=id_conte)
     usuario = request.user
 
@@ -483,11 +530,15 @@ def unlike_contenido(request, id_conte):
 
 
 def seleccionar_version(request, pk, version_id):
-    """
-    Vista para seleccionar una versión específica de un contenido.
-    Cuando seleccionas una versión, el contenido principal se actualiza con los datos de la versión seleccionada
-    sin crear una nueva versión.
-    """
+    '''
+    @function seleccionar_version
+    @description Permite seleccionar una versión específica de un contenido y actualizar el contenido principal con los datos de dicha versión. No crea una nueva versión, simplemente establece la versión seleccionada como la actual.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} pk - El ID del contenido principal que se va a actualizar.
+    @param {int} version_id - El ID de la versión que se va a seleccionar y aplicar al contenido.
+    @route {POST} /contenido/seleccionar_version/<int:pk>/<int:version_id>/
+    @returns Redirige a la vista 'contenido_detail_autor' del contenido seleccionado.
+    '''
     contenido = get_object_or_404(Contenido, pk=pk)
     version = get_object_or_404(VersionContenido, id=version_id, contenido_original=contenido)
 
@@ -532,6 +583,13 @@ def suscripciones_view(request):
 '''
 
 def suscripciones_view(request):
+    '''
+    @function suscripciones_view
+    @description Muestra las suscripciones actuales del usuario autenticado y las categorías disponibles para suscripción, tanto pagadas como no pagadas.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /suscripciones/
+    @returns {HttpResponse} Renderiza la plantilla 'suscripciones/inicio_suscripcion.html' con las categorías a las que el usuario está suscrito y las disponibles para suscripción.
+    '''
     if request.user.is_authenticated:
         usuario = request.user
 
@@ -561,12 +619,26 @@ def suscripciones_view(request):
 
 #vista para contacto
 def contact_us(request):
+    '''
+    @function contact_us
+    @description Renderiza la página de contacto donde los usuarios pueden enviar mensajes o consultas.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /contact_us/
+    @returns {HttpResponse} Renderiza la plantilla 'anhadidos/contact_us.html'.
+    '''
     return render(request, 'anhadidos/contact_us.html')
     
 #vista para la pasarela de pago
 
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 def comprar_suscripcion(request):
+    '''
+    @function comprar_suscripcion
+    @description Procesa la compra de suscripciones para categorías seleccionadas por el usuario autenticado. Crea una sesión de Stripe Checkout y genera line items basados en las categorías seleccionadas.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {POST} /comprar_suscripcion/
+    @returns {JsonResponse} Retorna el ID de la sesión de Stripe si el pago es iniciado correctamente, o un mensaje de error si hay algún problema con el proceso.
+    '''
     if request.method == 'POST' and request.user.is_authenticated:
         usuario = request.user
         # Debugging: Ver el usuario y sesión actual
@@ -653,6 +725,13 @@ def suscripcion_exitosa(request):
     return redirect('suscripciones_view')
 '''
 def suscripcion_exitosa(request):
+    '''
+    @function suscripcion_exitosa
+    @description Maneja la lógica cuando una suscripción ha sido exitosa. Verifica que el pago ha sido completado en Stripe y, si es así, crea las suscripciones y registra la compra en el historial del usuario.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /success/
+    @returns {HttpResponse} Renderiza la página de éxito si el pago es completado, o redirige a la página de login si el usuario es anónimo o a la vista de suscripciones si ocurre un error.
+    '''
     # Depurar el estado de request.user
     print(f"request.user: {request.user}")
     print(f"request.user.is_authenticated: {request.user.is_authenticated}")
@@ -700,10 +779,25 @@ def suscripcion_exitosa(request):
 
 
 def suscripcion_cancelada(request):
+    '''
+    @function suscripcion_cancelada
+    @description Renderiza la página que notifica al usuario que su suscripción ha sido cancelada o no se ha completado el pago.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /cancel/
+    @returns {HttpResponse} Renderiza la plantilla 'suscripciones/cancel.html'.
+    '''
     return render(request, 'suscripciones/cancel.html')
 
 #desuscribirse
 def desuscribir_categoria(request, categoria_id):
+    '''
+    @function desuscribir_categoria
+    @description Permite a un usuario autenticado cancelar su suscripción a una categoría específica.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} categoria_id - El ID de la categoría de la cual el usuario quiere desuscribirse.
+    @route {POST} /desuscribir/<int:categoria_id>/
+    @returns {HttpResponse} Redirige a la vista de suscripciones después de cancelar la suscripción.
+    '''
     if request.method == 'POST':
         categoria = get_object_or_404(Categoria, id=categoria_id)
         suscripcion = Suscripcion.objects.filter(usuario=request.user, categoria=categoria)
@@ -716,6 +810,13 @@ def desuscribir_categoria(request, categoria_id):
 # views.py
 
 def contacto(request):
+    '''
+    @function contacto
+    @description Muestra el formulario de contacto y maneja el envío de mensajes de contacto a través de correo electrónico. Si el formulario es válido, envía el mensaje y muestra un mensaje de éxito.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET, POST} /contacto/
+    @returns {HttpResponse} Renderiza la plantilla 'anhadidos/contact_us.html' con el formulario de contacto y un mensaje de éxito si el mensaje fue enviado correctamente.
+    '''
     mensaje_exito = None  # Bandera para mostrar mensaje de éxito
     
     if request.method == 'POST':
@@ -749,6 +850,13 @@ def contacto(request):
 
 #para suscripciones que no son pagadas
 def suscribirse_no_pagadas(request):
+    '''
+    @function suscribirse_no_pagadas
+    @description Permite a los usuarios autenticados suscribirse a categorías que no requieren pago, siempre que estén habilitadas para suscriptores.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {POST} /suscripciones/no-pagadas/
+    @returns {HttpResponse} Redirige a la vista de suscripciones después de completar el proceso de suscripción.
+    '''
     if request.method == 'POST' and request.user.is_authenticated:
         usuario = request.user
         categorias_seleccionadas = request.POST.getlist('categorias_no_pagadas')
@@ -765,6 +873,14 @@ def suscribirse_no_pagadas(request):
 
 #para reportar contenidos
 def reportar_contenido(request, contenido_id_conte):  # Usamos contenido_id_conte en lugar de contenido_id
+    '''
+    @function reportar_contenido
+    @description Permite a los usuarios reportar un contenido específico utilizando un formulario. El reporte se guarda en la base de datos y asocia el reporte con el contenido y el usuario que lo realiza.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} contenido_id_conte - El ID del contenido que está siendo reportado.
+    @route {GET, POST} /contenido/<int:contenido_id_conte>/reportar/
+    @returns {HttpResponse} Renderiza la plantilla 'home/reportar_contenido.html' con el formulario de reporte, o redirige a la página de detalle del contenido tras un reporte exitoso.
+    '''
     contenido = get_object_or_404(Contenido, id_conte=contenido_id_conte)  # Cambiar id a id_conte
 
     if request.method == 'POST':
@@ -789,6 +905,13 @@ def reportar_contenido(request, contenido_id_conte):  # Usamos contenido_id_cont
 #para visualizar los reportes (admin)
 @login_required
 def ver_reportes(request):
+    '''
+    @function ver_reportes
+    @description Muestra una lista de todos los reportes de contenido realizados por los usuarios, ordenados por fecha (del más reciente al más antiguo).
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /admin/reportes/
+    @returns {HttpResponse} Renderiza la plantilla 'admin/contenido/ver_reportes.html' con la lista de reportes de contenido.
+    '''
    
     # Obtener todos los reportes y ordenarlos por la fecha más reciente
     reportes = ReporteContenido.objects.all().order_by('-fecha_reporte')
@@ -798,6 +921,13 @@ def ver_reportes(request):
 
 #vista par mostrar el historial de compra
 def historial_compras_view(request):
+    '''
+    @function historial_compras_view
+    @description Muestra el historial de compras de suscripciones realizadas por el usuario autenticado. Las compras se ordenan por fecha de transacción en orden descendente.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @route {GET} /historial-compras/
+    @returns {HttpResponse} Renderiza la plantilla 'home/historial_compras.html' con el historial de compras del usuario. Si el usuario no está autenticado, se muestra una lista vacía.
+    '''
     if request.user.is_authenticated:
         usuario = request.user
         # Ordenar las compras por fecha de transacción en orden descendente
@@ -814,6 +944,14 @@ def historial_compras_view(request):
 #para rol financiero
 
 class VentaListView(ListView):
+    '''
+    @class VentaListView
+    @extends ListView
+    @description Muestra una lista de todas las ventas registradas en el sistema (basado en el modelo `HistorialCompra`). Permite filtrar las ventas por rango de fechas y nombre de cliente.
+    @permission_required users.view_sales - Asegura que solo los usuarios con el permiso adecuado puedan acceder a esta vista.
+    @template ventas/venta_list.html - La plantilla utilizada para mostrar la lista de ventas.
+    @context ventas - El contexto que contiene la lista de ventas.
+    '''
     model = HistorialCompra  # Modelo correcto para las compras
     template_name = 'ventas/venta_list.html'  # Ruta de la plantilla correcta
     context_object_name = 'ventas'
@@ -840,6 +978,14 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 def enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado):
+    '''
+    @function enviar_notificaciones_cambio_estado
+    @description Envía notificaciones por correo electrónico y crea notificaciones en el sistema para el autor, editores y publicadores cuando cambia el estado de un contenido. Notifica al autor sobre cualquier cambio de estado y a los editores o publicadores cuando el contenido requiere revisión o está listo para publicar.
+    @param {Contenido} contenido - El contenido cuyo estado ha cambiado.
+    @param {str} old_state - El estado anterior del contenido.
+    @param {str} nuevo_estado - El nuevo estado del contenido.
+    @returns {None}
+    '''
     # Obtener la URL del contenido para que el autor y editor puedan revisarlo
     contenido_url = reverse('contenido_detail', args=[contenido.pk])
 
@@ -937,9 +1083,15 @@ def enviar_notificaciones_cambio_estado(contenido, old_state, nuevo_estado):
 
 #Para visulizar registros de los estados de cada contenido
 def contenido_registro(request, pk):
-    """
-    Vista para mostrar el registro de cambios de un contenido específico.
-    """
+    '''
+    @function contenido_registro
+    @description Muestra el registro de cambios de estado de un contenido específico, incluyendo el historial de cambios y los detalles del contenido.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} pk - El ID del contenido cuyo registro de cambios se va a mostrar.
+    @route {GET} /contenido/registro/<int:pk>/
+    @returns {HttpResponse} Renderiza la plantilla 'autor/contenido_registro.html' con el contenido y su historial de cambios de estado.
+    '''
+    
     contenido = get_object_or_404(Contenido, pk=pk)
     cambios_estado = contenido.cambios_estado.all()  # Obtener todos los cambios de estado
     
@@ -947,3 +1099,19 @@ def contenido_registro(request, pk):
         'contenido': contenido,
         'cambios_estado': cambios_estado
     })
+    
+    
+def asignar_fecha_publicacion(request, pk):
+    contenido = get_object_or_404(Contenido, pk=pk)
+
+    if request.method == 'POST':
+        nueva_fecha_publicacion = request.POST.get('fecha_publicacion')
+        if nueva_fecha_publicacion:
+            contenido.fecha_vigencia = nueva_fecha_publicacion
+            contenido.vigencia_conte = False  # Cambiar vigencia_conte a False
+            contenido.estado_conte = 'BORRADOR'
+            contenido.save()
+            messages.success(request, f'La fecha de publicación ha sido actualizada para el contenido "{contenido.titulo_conte}".')
+            return redirect('autor_dashboard')  # Redirigir al tablero de autor
+
+    return render(request, 'home/index.html', {'contenido': contenido})
