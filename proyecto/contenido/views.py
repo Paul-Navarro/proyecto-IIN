@@ -21,7 +21,8 @@ from .forms import ContactForm
 from .models import HistorialCompra
 from users.models import Notificacion
 from django.utils import timezone
-
+from django.template.loader import render_to_string
+from django.db.models import Avg
 #para rol financiero
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView
@@ -1211,3 +1212,72 @@ def calificar_contenido(request, contenido_id):
             return JsonResponse({'success': True, 'mensaje': mensaje, 'estrellas': rating.estrellas})
 
     return JsonResponse({'success': False, 'mensaje': 'Algo salió mal.'})
+
+def enviar_reporte_estadistico(autor):
+    """
+    Función para enviar un informe estadístico de los contenidos del autor, con likes, unlikes y calificaciones promedio.
+    """
+    # Obtener todos los contenidos del autor
+    contenidos = Contenido.objects.filter(autor=autor)
+
+    # Preparar datos estadísticos para el informe
+    reporte_datos = []
+    for contenido in contenidos:
+        # Calcular estadísticas del contenido
+        promedio_estrellas = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg'] or 0
+        likes = contenido.likes
+        unlikes = contenido.unlikes
+
+        reporte_datos.append({
+            'titulo': contenido.titulo_conte,
+            'likes': likes,
+            'unlikes': unlikes,
+            'promedio_estrellas': round(promedio_estrellas, 1),
+            'fecha_publicacion': contenido.fecha_publicacion,
+        })
+
+    # Renderizar el contenido del email usando una plantilla HTML
+    subject = "Informe Estadístico de tus Contenidos"
+    message = render_to_string('account/email/reporte_estadistico.html', {
+        'autor': autor,
+        'reporte_datos': reporte_datos
+    })
+
+    # Enviar el correo al autor
+    send_mail(
+        subject,
+        '',
+        settings.DEFAULT_FROM_EMAIL,
+        [autor.email],
+        html_message=message,  # Aquí es donde añadimos el contenido HTML
+        fail_silently=False,
+    )
+
+def ver_estadisticas(request):
+    # Obtener el usuario actual (autor)
+    autor = request.user
+    # Obtener solo los contenidos del autor actual
+    contenidos = Contenido.objects.filter(autor=autor)
+    # Obtener las estadísticas de los contenidos
+    titulos = [c.titulo_conte for c in contenidos]
+    likes = [c.likes for c in contenidos]
+    unlikes = [c.unlikes for c in contenidos]
+    visualizaciones = [c.cant_visualiz_conte for c in contenidos]
+    
+    context = {
+        'titulos_contenidos': titulos,
+        'likes_contenidos': likes,
+        'unlikes_contenidos': unlikes,
+        'visualizaciones_contenidos': visualizaciones,
+        
+    }
+
+    return render(request, 'autor/estadisticas.html', context)
+
+def enviar_informe(request):
+    # Obtener el usuario actual (autor)
+    autor = request.user
+    # Enviar el informe estadístico al autor actual
+    enviar_reporte_estadistico(autor)
+    messages.success(request, '¡El informe ha sido enviado a tu correo con éxito!')
+    return redirect('autor_dashboard')
