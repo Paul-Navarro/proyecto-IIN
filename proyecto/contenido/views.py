@@ -203,6 +203,56 @@ def contenido_update(request, pk):
         'categorias_suscriptores': categorias_suscriptores,
     })
 
+
+def contenido_update_version(request, version_id):
+    '''
+    @function contenido_update_version
+    @description Actualiza una versión específica de un contenido.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} version_id - El ID de la versión que se va a actualizar.
+    @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
+    '''
+    # Obtener la versión seleccionada
+    version = get_object_or_404(VersionContenido, id=version_id)
+    contenido = version.contenido_original  # Obtenemos el contenido original
+
+    # Obtener las categorías agrupadas
+    categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
+    categorias_moderadas = Categoria.objects.filter(es_moderada=True)
+    categorias_pagadas = Categoria.objects.filter(es_pagada=True)
+    categorias_suscriptores = Categoria.objects.filter(para_suscriptores=True)
+
+    if request.method == 'POST':
+        form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Usamos el contenido original
+        if form.is_valid():
+            contenido_editado = form.save(commit=False)
+
+            # Mantener las fechas de publicación intactas
+            contenido_editado.fecha_publicacion = Contenido.objects.get(pk=contenido.pk).fecha_publicacion
+            contenido_editado.fecha_vigencia = Contenido.objects.get(pk=contenido.pk).fecha_vigencia
+
+            # Guardar el contenido sin crear manualmente una nueva versión
+            contenido_editado.save()
+
+            messages.success(request, 'La versión ha sido actualizada y guardada como la nueva versión actual.')
+            return redirect('autor_dashboard')
+    else:
+        # Pre-cargar el formulario con los datos de la versión seleccionada
+        form = ContenidoForm(initial={
+            'titulo_conte': version.titulo_conte,
+            'tipo_conte': version.tipo_conte,
+            'texto_conte': version.texto_conte,
+        })
+
+    return render(request, 'autor/contenido_update.html', {
+        'form': form,
+        'categorias_no_moderadas': categorias_no_moderadas,
+        'categorias_moderadas': categorias_moderadas,
+        'categorias_pagadas': categorias_pagadas,
+        'categorias_suscriptores': categorias_suscriptores,
+    })
+
+
 def contenido_update_editor(request, pk):
     '''
     @function contenido_update

@@ -36,6 +36,10 @@ urlpatterns = [
 
     path('contenido/cambiar_estado/<int:id_conte>/', views.contenido_cambiar_estado_KANBAN, name='contenido_cambiar_estado_KANBAN'),
     
+    path('contenido/version/<int:version_id>/edit/', views.contenido_update_version, name='contenido_update_version'),
+    
+    
+    
     #Urls del PUBLICADOR para administrar contenidos
      path('publicador/gestionar/', views.gestionar_contenido, name='gestionar_contenido'),
      

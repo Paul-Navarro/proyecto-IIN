@@ -137,10 +137,12 @@ ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm'}
 AUTH_USER_MODEL = 'users.CustomUser'
 
 # Configuración del backend de correo para desarrollo(ESTE NO ENVIA AL CORREO MUESTRA EN CONSOLA)
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Configuración del backend de correo para PRODUCCION(ESTE ENVIA AL CORREO)
+
 # Configuración del backend de correo para desarrollo
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 # Configuración de correo para envío de campos en contacto

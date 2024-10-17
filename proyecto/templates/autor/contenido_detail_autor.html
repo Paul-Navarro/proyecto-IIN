@@ -49,8 +49,8 @@
                         <strong>Versión {{ version.version_num }}:</strong> {{ version.fecha_version }} - {{ version.titulo_conte }}
                         
                         <!-- Botón para seleccionar esta versión -->
-                        <a href="{% url 'seleccionar_version' pk=contenido.pk version_id=version.id %}" class="btn-select-version">
-                            <i class="fas fa-check-circle"></i> Seleccionar esta versión
+                        <a href="{% url 'contenido_update_version' version_id=version.id %}" class="btn-select-version">
+                            <i class="fas fa-check-circle"></i> Editar esta versión
                         </a>
                         
                         <!-- Mostrar si esta versión es la actual -->
