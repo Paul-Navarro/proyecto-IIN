@@ -9,7 +9,7 @@ urlpatterns = [
     #Urls de los contenidos
     path('', views.contenido_list, name='contenido_list'),
     path('contenido/<int:pk>/', views.contenido_detail, name='contenido_detail'),
-    
+    path('<int:pk>/rate/', views.contenido_detail, name='rate_contenido'),#para la calificación de las estrellas
     path('contenido_admin', views.administrador_KANBAN, name='administrador_KANBAN'),
     
     path('contenido/seleccionar_version/<int:pk>/<int:version_id>/', views.seleccionar_version, name='seleccionar_version'),

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado
+from .models import Contenido, Rating,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado
 from .forms import ContenidoForm,ReporteContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -33,10 +33,9 @@ def contenido_list(request):
     @param {HttpRequest} request - El objeto de solicitud HTTP.
     @returns {HttpResponse} Respuesta renderizada con la lista de contenidos filtrados.
     '''
-    
     user = request.user
     contenidos = Contenido.objects.filter(autor=user)  # Mostrar solo los contenidos del autor
-
+    
 
     return render(request, 'autor/contenido_list.html', {'contenidos': contenidos})
 
@@ -55,7 +54,25 @@ def contenido_detail(request, pk):
     contenido.cant_visualiz_conte += 1
     contenido.save()  # Guardar el cambio en la base de datos
     
-    return render(request, 'home/contenido_detail.html', {'contenido': contenido})
+    # Obtener la calificación previa del usuario si existe
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = Rating.objects.filter(usuario=request.user, contenido=contenido).first()
+
+    if request.method == 'POST':
+        estrellas = request.POST.get('estrellas')
+        if estrellas and request.user.is_authenticated:
+            rating, created = Rating.objects.update_or_create(
+                usuario=request.user,
+                contenido=contenido,
+                defaults={'estrellas': estrellas}
+            )
+            return JsonResponse({'success': True, 'estrellas': rating.estrellas})
+
+    return render(request, 'home/contenido_detail.html', {
+        'contenido': contenido,
+        'user_rating': user_rating,
+    })
 
 def contenido_detail_editor(request, pk):
     '''
@@ -1167,3 +1184,30 @@ def asignar_fecha_publicacion(request, pk):
             return redirect('autor_dashboard')  # Redirigir al tablero de autor
 
     return render(request, 'home/index.html', {'contenido': contenido})
+
+def calificar_contenido(request, contenido_id):
+    """
+    Función para manejar la calificación de un contenido. Evita duplicados actualizando
+    la calificación si el usuario ya ha calificado el contenido.
+    """
+    contenido = get_object_or_404(Contenido, id_conte=contenido_id)
+    
+    if request.method == 'POST' and request.user.is_authenticated:
+        estrellas = request.POST.get('estrellas')
+        if estrellas:
+            # Intentamos obtener una calificación existente
+            rating, created = Rating.objects.update_or_create(
+                usuario=request.user,
+                contenido=contenido,
+                defaults={'estrellas': estrellas, 'fecha_calificacion': timezone.now()}
+            )
+            # Si la calificación ya existía, la hemos actualizado; de lo contrario, hemos creado una nueva
+            if created:
+                mensaje = 'Tu calificación ha sido registrada.'
+            else:
+                mensaje = 'Tu calificación ha sido actualizada.'
+            
+            # Puedes retornar el resultado en formato JSON o redirigir a otra página
+            return JsonResponse({'success': True, 'mensaje': mensaje, 'estrellas': rating.estrellas})
+
+    return JsonResponse({'success': False, 'mensaje': 'Algo salió mal.'})

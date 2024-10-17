@@ -310,3 +310,18 @@ class CambioEstado(models.Model):
 
     def _str_(self):
         return f"Cambio en {self.contenido.titulo_conte} de {self.estado_anterior} a {self.estado_nuevo}"
+    
+
+# Calificación de estrellas
+
+class Rating(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
+    estrellas = models.IntegerField(default=0)  # Rating de 1 a 5 estrellas
+    fecha_calificacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'contenido')  # Un usuario solo puede calificar un contenido una vez
+
+    def __str__(self):
+        return f'{self.usuario} - {self.contenido}: {self.estrellas} estrellas'

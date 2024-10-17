@@ -337,6 +337,18 @@
                                         No publicada
                                     {% endif %}
                                 </p>
+
+                                 <!-- Mostrar el promedio de calificaciones -->
+                                <p>
+                                    <i class="fas fa-star"></i> 
+                                    <strong>Popularidad:</strong> 
+                                    {% if contenido.promedio_calificacion > 0 %}
+                                        {{ contenido.promedio_calificacion|floatformat:1 }} de 5 estrellas
+                                    {% else %}
+                                        Aún no ha sido calificado.
+                                    {% endif %}
+                                </p>
+
                             </div>
 
                                  <div class="contenedor_info">
