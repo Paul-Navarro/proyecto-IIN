@@ -40,6 +40,10 @@
             <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
             {% endif %}
 
+            {% if contenido.fecha_vigencia %}
+            <p><strong>Fecha de vigencia (expiracion):</strong> {{ contenido.fecha_vigencia }}</p>
+            {% endif %}
+
             <h3><i class="fas fa-history"></i> Versiones Anteriores</h3>
 
             {% if versiones %}
