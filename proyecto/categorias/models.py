@@ -17,6 +17,7 @@ class Categoria(models.Model):
     descripcion = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+    precio = models.IntegerField(null=True, blank=True)  # Campo de precio opcional
 
     def save(self, *args, **kwargs):
         if self.codigo is None:

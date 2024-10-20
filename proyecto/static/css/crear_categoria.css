@@ -158,3 +158,25 @@ body {
         font-size: 1.5rem;
     }
 }
+
+input[type="text"], input[type="number"] {
+    width: 100%;  /* Asegúrate de que ocupe todo el ancho disponible */
+    padding: 10px;  /* Añade algo de padding interno para hacerlo más grande */
+    border: 1px solid #ccc;  /* Cambia el color del borde */
+    border-radius: 5px;  /* Redondea los bordes */
+    box-sizing: border-box;  /* Asegúrate de que el padding no afecte al ancho */
+    font-size: 16px;  /* Tamaño de la fuente */
+    margin-bottom: 20px;
+}
+
+input[type="text"]:focus, input[type="number"]:focus {
+    outline: none;  /* Elimina el borde exterior al hacer clic */
+    border-color: #000;  /* Cambia el color del borde cuando el campo tiene el foco */
+}
+
+/* Para Chrome, Safari, Edge y Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
