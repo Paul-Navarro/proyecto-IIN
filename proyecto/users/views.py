@@ -225,6 +225,9 @@ def redirect_based_on_role(role_name):
         return redirect('autor_dashboard')
     elif role_name == 'Suscriptor':
         return redirect('home') # Al ser un suscriptor se lo redirige a la pagina home
+    elif role_name == 'Financiero':
+        return redirect('venta_list')  # Redirigir a la página de ventas
+
 
     return redirect('home')
 

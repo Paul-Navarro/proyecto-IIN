@@ -164,10 +164,7 @@
                     <ul><strong>Acceso a:</strong>
                         <li>
                             <a href="{% url 'historial_compras' %}">Historial de Compras</a>
-                        </li>     
-                        {% if has_financiero_role %}
-                            <li><a href="{% url 'venta_list' %}">Historial de Ventas</a></li>
-                        {% endif %}          
+                        </li>              
                     </ul>
                 {% endif %}
                 {% if has_multiple_roles or has_single_role %}
@@ -193,6 +190,10 @@
                     {% if has_publicador_role %}
                     <li><a href="{% url 'publicador_dashboard' %}">Panel de Publicador</a></li>
                     {% endif %}
+                    
+                    {% if has_financiero_role %}
+                    <li><a href="{% url 'venta_list' %}">Panel de Financiero</a></li>
+                    {% endif %} 
                 </ul>
                             
                 <li><strong>Configuración</strong></li>
