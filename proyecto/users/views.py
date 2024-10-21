@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, CustomUserChangeForm,UserChangeForm, UserProfileChangeForm
 from django.contrib import messages
-from contenido.models import Contenido, Categoria
+from contenido.models import Contenido, Categoria, Rating
 from django.db.models import Q  # Para realizar búsquedas complejas con OR
 from contenido.cron import AutopublicarContenido
 from django.contrib.auth import update_session_auth_hash  # Para mantener la sesión después de cambiar la contraseña
@@ -39,7 +39,7 @@ from django.utils.dateparse import parse_date  # Import to handle date parsing
 from django.views.generic import ListView
 from .models import Notificacion
 from django.http import JsonResponse
-
+from django.db.models import Avg
 
 
 def home(request):
@@ -60,6 +60,12 @@ def home(request):
 
    # Filtrar los contenidos publicados y con autopublicar_conte en True
     contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True , vigencia_conte=False).order_by('-fecha_publicacion')
+
+    # Calcular el promedio de calificaciones para cada contenido
+    for contenido in contenidos:
+        promedio_calificacion = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg']
+        contenido.promedio_calificacion = promedio_calificacion if promedio_calificacion else 0  # Asignar 0 si no tiene calificaciones
+
 
     # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')

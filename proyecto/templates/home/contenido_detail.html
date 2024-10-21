@@ -48,6 +48,89 @@
                 <a href="{% url 'reportar_contenido' contenido.id_conte %}" class="btn-reportar"><i class="fas fa-exclamation-triangle"></i> Reportar Contenido</a>
             </div>
         {% endif %}
+        <!-- Sección de calificación por estrellas -->
+        <div class="rating" data-content-id="{{ contenido.id_conte }}">
+            <h4>Calificación: </h4>
+            <div id="rating-stars" data-rating="{{ user_rating.estrellas|default:0 }}">
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+            </div>
+            <p id="rating-feedback"></p>
+        </div>
+         <!-- Para las estrellas -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const stars = document.querySelectorAll('#rating-stars .fa-star');
+                const feedback = document.getElementById('rating-feedback');
+                const contentId = document.querySelector('.rating').getAttribute('data-content-id');
+                let currentRating = parseInt(document.getElementById('rating-stars').getAttribute('data-rating'));
+
+                // Marcar las estrellas según la calificación actual
+                function markStars(rating) {
+                    stars.forEach(star => {
+                        if (parseInt(star.getAttribute('data-value')) <= rating) {
+                            star.classList.add('checked');
+                        } else {
+                            star.classList.remove('checked');
+                        }
+                    });
+                }
+
+                // Mostrar la calificación actual
+                markStars(currentRating);
+
+                // Permitir que el usuario mueva las estrellas con el mouse
+                stars.forEach(star => {
+                    star.addEventListener('mouseover', function () {
+                        const rating = parseInt(this.getAttribute('data-value'));
+                        markStars(rating);
+                    });
+
+                    // Restablecer las estrellas si el usuario no selecciona ninguna
+                    star.addEventListener('mouseout', function () {
+                        markStars(currentRating);
+                    });
+
+                    // Guardar la calificación al hacer clic
+                    star.addEventListener('click', function () {
+                        const rating = parseInt(this.getAttribute('data-value'));
+                        fetch(`/contenido/${contentId}/rate/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: new URLSearchParams({
+                                'estrellas': rating
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                currentRating = data.estrellas;
+                                feedback.textContent = `Has calificado con ${currentRating} estrellas.`;
+                            }
+                        });
+                    });
+                });
+            });
+        </script>
+
+        <style>
+            .fa-star {
+                font-size: 2rem;
+                cursor: pointer;
+                color: lightgray;
+            }
+
+            .fa-star.checked {
+                color: gold;
+            }
+        </style>
+        <!-- Para las estrellas -->
 
         <!-- Insertar sección de Disqus -->
         <div id="disqus_thread"></div>

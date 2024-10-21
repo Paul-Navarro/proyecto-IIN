@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import suscripciones_view, comprar_suscripcion, contacto, historial_compras_view
+from .views import enviar_informe, suscripciones_view, comprar_suscripcion, contacto, historial_compras_view, ver_estadisticas
 
 from contenido.views import VentaListView
 
@@ -9,7 +9,7 @@ urlpatterns = [
     #Urls de los contenidos
     path('', views.contenido_list, name='contenido_list'),
     path('contenido/<int:pk>/', views.contenido_detail, name='contenido_detail'),
-    
+    path('<int:pk>/rate/', views.contenido_detail, name='rate_contenido'),#para la calificación de las estrellas
     path('contenido_admin', views.administrador_KANBAN, name='administrador_KANBAN'),
     
     path('contenido/seleccionar_version/<int:pk>/<int:version_id>/', views.seleccionar_version, name='seleccionar_version'),
@@ -69,6 +69,9 @@ urlpatterns = [
     path('contenido/registro/<int:pk>/', views.contenido_registro, name='contenido_registro'),   
     
     path('contenido/asignar_fecha_publicacion/<int:pk>/', views.asignar_fecha_publicacion, name='asignar_fecha_publicacion'),
+
+    path('estadisticas/', ver_estadisticas, name='ver_estadisticas'),
+    path('enviar-informe/', enviar_informe, name='enviar_informe'),  # Ruta para enviar el informe por correo
 ]
 
 '''

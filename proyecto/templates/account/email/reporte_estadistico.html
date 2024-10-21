@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Informe Estadístico de tus Contenidos</title>
+</head>
+<body>
+    <h1>Hola, {{ autor.username }}</h1>
+    <p>Aquí tienes un resumen estadístico de tus contenidos:</p>
+
+    <table border="1" cellpadding="10" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Likes</th>
+                <th>Unlikes</th>
+                <th>Calificación Promedio</th>
+                <th>Fecha de Publicación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contenido in reporte_datos %}
+            <tr>
+                <td>{{ contenido.titulo }}</td>
+                <td>{{ contenido.likes }}</td>
+                <td>{{ contenido.unlikes }}</td>
+                <td>{{ contenido.promedio_estrellas }}</td>
+                <td>{{ contenido.fecha_publicacion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p>¡Gracias por usar nuestra plataforma!</p>
+</body>
+</html>
