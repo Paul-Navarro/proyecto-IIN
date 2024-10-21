@@ -50,7 +50,7 @@ def home(request):
     @route {GET} /
     @returns {HttpResponse} Renderiza la plantilla 'home/index.html' con los contenidos filtrados, categorías, autores, roles y notificaciones.
     '''
-    # DISPARADOR DE CRON
+    '''# DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
     cronjob.do()
 
@@ -144,7 +144,115 @@ def home(request):
     
     }
 
+    return render(request, 'home/index.html', context)'''
+    # DISPARADOR DE CRON
+    cronjob = AutopublicarContenido()
+    cronjob.do()
+
+    # Obtener todas las categorías y autores
+    categorias = Categoria.objects.all()
+    autores = User.objects.all()
+
+    # Inicializamos el queryset de contenidos como vacío
+    contenidos = Contenido.objects.none()
+
+    # Si el usuario está autenticado, obtenemos las categorías a las que está suscrito
+    if request.user.is_authenticated:
+        suscripciones_usuario = request.user.suscripcion_set.all().values_list('categoria_id', flat=True)
+
+        # Filtramos las categorías a las que el usuario está suscrito, y además añadimos las categorías públicas
+        categorias_accesibles = Categoria.objects.filter(
+            Q(es_pagada=False, para_suscriptores=False) |  # Categorías públicas
+            Q(id__in=suscripciones_usuario)  # Categorías a las que está suscrito
+        )
+    else:
+        # Si el usuario no está autenticado, solo mostramos las categorías públicas
+        categorias_accesibles = Categoria.objects.filter(es_pagada=False, para_suscriptores=False)
+
+    # Filtrar los contenidos de las categorías accesibles
+    contenidos = Contenido.objects.filter(categoria__in=categorias_accesibles, estado_conte='PUBLICADO', autopublicar_conte=True, vigencia_conte=False).order_by('-fecha_publicacion')
+
+    # Filtrar por categoría si está presente en la solicitud
+    categoria_id = request.GET.get('categoria')
+    if categoria_id:
+        contenidos = contenidos.filter(categoria_id=categoria_id)
+
+    # Verificar si se ha enviado un término de búsqueda
+    query = request.GET.get('q')
+    if query:
+        contenidos = contenidos.filter(
+            Q(titulo_conte__icontains=query) |  # Buscar por título
+            Q(tags__nombre__icontains=query)    # Buscar por tags
+        ).distinct()
+
+    # Aplicar los filtros adicionales
+    moderadas = 'moderadas' in request.GET
+    no_moderadas = 'no_moderadas' in request.GET
+    pagadas = 'pagadas' in request.GET
+    suscriptores = 'suscriptores' in request.GET
+
+    # Filtrar contenidos por moderación
+    if moderadas and no_moderadas:
+        contenidos = contenidos.filter(
+            Q(categoria__es_moderada=True) | Q(categoria__es_moderada=False)
+        )
+    elif moderadas:
+        contenidos = contenidos.filter(categoria__es_moderada=True)
+    elif no_moderadas:
+        contenidos = contenidos.filter(categoria__es_moderada=False)
+
+    # Filtrar contenidos por pagadas
+    if pagadas:
+        contenidos = contenidos.filter(categoria__es_pagada=True)
+
+    # Filtrar contenidos para suscriptores
+    if suscriptores:
+        contenidos = contenidos.filter(categoria__para_suscriptores=True)
+
+    # Filtrar por rango de fechas
+    fecha_desde = request.GET.get('fecha_desde')
+    fecha_hasta = request.GET.get('fecha_hasta')
+    
+    if fecha_desde:
+        contenidos = contenidos.filter(fecha_publicacion__gte=parse_date(fecha_desde))
+    if fecha_hasta:
+        contenidos = contenidos.filter(fecha_publicacion__lte=parse_date(fecha_hasta))
+
+    # Filtrar por autor
+    autor_id = request.GET.get('autor')
+    if autor_id:
+        contenidos = contenidos.filter(autor_id=autor_id)
+
+    # Obtener el usuario y sus roles
+    user = request.user
+    roles_count = user.roles.count() if user.is_authenticated else 0
+
+    # Obtener las notificaciones no leídas del usuario autenticado
+    notificaciones_no_leidas = 0
+    notificaciones = []
+    if user.is_authenticated:
+        notificaciones = Notificacion.objects.filter(usuario=user, leida=False)
+        notificaciones_no_leidas = notificaciones.count()
+
+    # Contexto para pasar a la plantilla
+    context = {
+        'contenidos': contenidos,
+        'categorias': categorias,
+        'autores': autores,  # Pasamos los autores al contexto
+        'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
+        'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
+        'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
+        'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
+        'has_financiero_role': user.has_role('Financiero') if user.is_authenticated else False,
+        'has_multiple_roles': roles_count > 1,
+        'has_single_role': roles_count == 1,
+        'query': query,  # Pasar el término de búsqueda al contexto
+        'notificaciones': notificaciones,  # Añadir las notificaciones al contexto
+        'notificaciones_no_leidas': notificaciones_no_leidas,  # Añadir el conteo de no leídas
+    }
+
     return render(request, 'home/index.html', context)
+
 
 
 #para marcar notificaciones como leidas
