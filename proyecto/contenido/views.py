@@ -703,22 +703,24 @@ def comprar_suscripcion(request):
             return JsonResponse({'error': 'No seleccionaste ninguna categoría.'}, status=400)
 
         line_items = []
-        precio_por_categoria = 250 * 100  #25000 GS por categoría
+        ###precio_por_categoria = 250 * 100  #25000 GS por categoría
 
         # Crear los line_items para Stripe basado en las categorías seleccionadas
         for categoria_id in categorias_seleccionadas:
             categoria = Categoria.objects.get(id=categoria_id)
-            if categoria.es_pagada:
+            if categoria.es_pagada and categoria.precio:
                 line_items.append({
                     'price_data': {
                         'currency': 'pyg',
                         'product_data': {
                             'name': f'Suscripción a {categoria.nombre}',  # Nombre de la suscripción
                         },
-                        'unit_amount': precio_por_categoria,  # Monto por suscripción
+                        'unit_amount': int(categoria.precio),  # Monto por suscripción
                     },
                     'quantity': 1,
                 })
+        if not line_items:
+            return JsonResponse({'error': 'No se seleccionaron categorías válidas.'}, status=400)
 
         # Crear una sesión de Stripe Checkout y pasar los IDs de categorías en los metadatos
         dominio = "http://localhost:8000"
@@ -1023,6 +1025,16 @@ class VentaListView(ListView):
             queryset = queryset.filter(usuario__username__icontains=cliente)  # Filtrar por usuario (cliente)
 
         return queryset
+    #Para sumar el total de lo vendido
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ventas = context['ventas']
+        
+        # Calcular la suma total de los precios de las categorías compradas
+        total_vendido = sum(venta.categoria.precio for venta in ventas if venta.categoria and venta.categoria.precio)
+        context['total_vendido'] = total_vendido
+        
+        return context
 #Notificación al correo
 from django.core.mail import send_mail
 from django.conf import settings

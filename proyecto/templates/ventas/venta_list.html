@@ -11,7 +11,11 @@
     <header class="header">
         <div><a class="boton_atras" href="{% url 'home' %}">Atrás</a></div>
         <h1>Historial de Ventas</h1>
-        <div></div>
+        <!-- Mostrar el total vendido -->
+        <div class="total-vendido">
+            <h3>Total Vendido</h3>
+            <p>{{ total_vendido }} GS</p>
+        </div>
     </header>
     <div class="contenedor">
         <main>
@@ -49,6 +53,10 @@
                                     <p>{{ venta.categoria.nombre }}</p> <!-- Nombre de la categoría -->
                                 </div>
                                 <div class="compra-detalle">
+                                    <h3>Precio</h3>
+                                    <p>{{ venta.categoria.precio }} PYG</p> <!-- Precio de la categoría -->
+                                </div>
+                                <div class="compra-detalle">
                                     <h3>Fecha</h3>
                                     <p>{{ venta.fecha_transaccion|date:"d M Y H:i" }}</p> <!-- Fecha de la transacción -->
                                 </div>
@@ -56,6 +64,7 @@
                             </div>
                         </div>
                     {% endfor %}
+                    
                 {% else %}
                     <p>No hay ventas que mostrar.</p>
                 {% endif %}
