@@ -178,6 +178,12 @@ def home(request):
     # Filtrar los contenidos de las categorías accesibles
     contenidos = Contenido.objects.filter(categoria__in=categorias_accesibles, estado_conte='PUBLICADO', autopublicar_conte=True, vigencia_conte=False).order_by('-fecha_publicacion')
 
+     # Calcular el promedio de calificaciones para cada contenido
+    for contenido in contenidos:
+        promedio_calificacion = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg']
+        contenido.promedio_calificacion = promedio_calificacion if promedio_calificacion else 0  # Asignar 0 si no tiene calificaciones
+    
+
     # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')
     if categoria_id:
