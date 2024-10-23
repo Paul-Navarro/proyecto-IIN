@@ -22,10 +22,13 @@ from .models import HistorialCompra
 from users.models import Notificacion
 from django.utils import timezone
 from django.template.loader import render_to_string
-from django.db.models import Avg
+from django.db.models import Avg,Count, Sum
 #para rol financiero
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView
+from datetime import datetime
+from django.db.models.functions import TruncMonth, TruncYear
+from datetime import datetime
 
 def contenido_list(request):
     '''
@@ -1225,6 +1228,92 @@ def calificar_contenido(request, contenido_id):
 
     return JsonResponse({'success': False, 'mensaje': 'Algo salió mal.'})
 
+def ver_estadisticas(request):
+    autor = request.user  # Usuario actual (autor)
+
+    # Lista de meses y años para los filtros
+    months = list(range(1, 13))  # Del 1 al 12
+    current_year = datetime.now().year
+    years = list(range(current_year, current_year - 10, -1))  # Los últimos 10 años
+
+    # Categorías disponibles
+    categorias = Categoria.objects.all()
+
+    # Filtrar contenido por autor
+    contenidos = Contenido.objects.filter(autor=autor)
+
+    # Variables para filtros desde el formulario
+    selected_month = request.GET.get('month', 'all')
+    selected_year = request.GET.get('year', 'all')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    selected_category = request.GET.get('category', 'all')
+
+    # Filtrado de los contenidos
+    if selected_month != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__month=int(selected_month))
+    
+    if selected_year != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__year=int(selected_year))
+    
+    if start_date and end_date:
+        contenidos = contenidos.filter(fecha_publicacion__range=[start_date, end_date])
+
+    if selected_category != 'all':
+        contenidos = contenidos.filter(categoria__id=int(selected_category))
+
+    # Obtener los datos de estadísticas
+    titulos = [c.titulo_conte for c in contenidos]
+    likes = [c.likes for c in contenidos]
+    unlikes = [c.unlikes for c in contenidos]
+    visualizaciones = [c.cant_visualiz_conte for c in contenidos]
+
+    # Calcular popularidad (promedio de estrellas)
+    popularidad = [
+        Rating.objects.filter(contenido=c).aggregate(Avg('estrellas'))['estrellas__avg'] or 0
+        for c in contenidos
+    ]
+
+    # Total de visualizaciones para el autor
+    total_visualizaciones = contenidos.aggregate(total=Sum('cant_visualiz_conte'))['total'] or 0
+
+    # Categorías más relevantes (ordenadas por cantidad de likes)
+    categorias_relevantes = (
+        contenidos.values('categoria__nombre')
+        .annotate(total_likes=Sum('likes'))
+        .order_by('-total_likes')[:5]
+    )
+
+    # Mejor mes basado en likes
+    mejor_mes = (
+        contenidos.annotate(month=TruncMonth('fecha_publicacion'))
+        .values('month')
+        .annotate(total_likes=Sum('likes'))
+        .order_by('-total_likes')
+        .first()
+    )
+
+    # Preparar datos para los gráficos
+    context = {
+        'titulos_contenidos': titulos,
+        'likes_contenidos': likes,
+        'unlikes_contenidos': unlikes,
+        'visualizaciones_contenidos': visualizaciones,
+        'popularidad_contenidos': popularidad,
+        'total_visualizaciones': total_visualizaciones,
+        'categorias_relevantes': categorias_relevantes,
+        'mejor_mes': mejor_mes['month'] if mejor_mes else None,
+        'months': months,  # Enviamos los meses
+        'years': years,  # Enviamos los años
+        'categorias': categorias,  # Enviamos las categorías
+        'selected_month': selected_month,  # Para que mantenga la selección
+        'selected_year': selected_year,
+        'selected_category': selected_category,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+
+    return render(request, 'autor/estadisticas.html', context)
 def enviar_reporte_estadistico(autor):
     """
     Función para enviar un informe estadístico de los contenidos del autor, con likes, unlikes y calificaciones promedio.
@@ -1261,32 +1350,17 @@ def enviar_reporte_estadistico(autor):
         '',
         settings.DEFAULT_FROM_EMAIL,
         [autor.email],
-        html_message=message,  # Aquí es donde añadimos el contenido HTML
+        html_message=message,  
         fail_silently=False,
     )
 
-def ver_estadisticas(request):
-    # Obtener el usuario actual (autor)
-    autor = request.user
-    # Obtener solo los contenidos del autor actual
-    contenidos = Contenido.objects.filter(autor=autor)
-    # Obtener las estadísticas de los contenidos
-    titulos = [c.titulo_conte for c in contenidos]
-    likes = [c.likes for c in contenidos]
-    unlikes = [c.unlikes for c in contenidos]
-    visualizaciones = [c.cant_visualiz_conte for c in contenidos]
-    
-    context = {
-        'titulos_contenidos': titulos,
-        'likes_contenidos': likes,
-        'unlikes_contenidos': unlikes,
-        'visualizaciones_contenidos': visualizaciones,
-        
-    }
-
-    return render(request, 'autor/estadisticas.html', context)
-
 def enviar_informe(request):
+    '''
+    @function enviar_informe
+    @description Enviar un informe estadístico al autor actual con la información de sus contenidos.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @returns {HttpResponse} Redirige al panel del autor con un mensaje de éxito.
+    '''
     # Obtener el usuario actual (autor)
     autor = request.user
     # Enviar el informe estadístico al autor actual
