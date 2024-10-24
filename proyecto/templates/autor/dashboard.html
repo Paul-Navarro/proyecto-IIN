@@ -203,9 +203,27 @@
         var data = ev.dataTransfer.getData("text");
         var draggedItem = document.getElementById(data);
 
-        if (ev.target.classList.contains('kanban-items')) {
+
+
+        /*nuevo*/
+        var dropear = false;
+        var columnaParaAgregar;
+        
+        
+        columnaParaAgregar = ev.target.closest(".kanban-items");
+        if(columnaParaAgregar !== null){
+            dropear = true;
+        }
+        //ev.target.classList.contains('kanban-items')
+        if (dropear) {
             var targetColumn = ev.target.closest('.kanban-column').id;
             var originalColumn = draggedItem.closest('.kanban-column').id;
+
+
+            //Evitar realizar cualquier accion si se arrastra a la misma columna
+            if(targetColumn === originalColumn){
+                return;
+            }
 
             // Si el contenido está siendo movido fuera de la columna "Borrador", eliminar el mensaje de rechazo
             var mensajeRechazo = draggedItem.querySelector('.razon-borrador');
@@ -235,8 +253,9 @@
 
             // Lógica existente para mover a "Borrador" o "Editado"
             if (targetColumn === 'borrador' || targetColumn === 'editado') {
+                
                 ev.target.appendChild(draggedItem);
-
+                
                 // Limpiar todos los botones previos de la tarjeta
                 let buttons = draggedItem.querySelectorAll('a.btn');
                 buttons.forEach(button => button.remove());
@@ -304,8 +323,10 @@
         document.getElementById('confirmRevisionBtn').addEventListener('click', function() {
             if (draggedItemData) {
                 // Mover el contenido a la columna de "En revisión"
-                draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
-
+                var columna = draggedItemData.ev.target.closest('.kanban-items');
+                
+                //draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
+                columna.appendChild(draggedItemData.draggedItem);
                 // Limpiar todos los botones previos de la tarjeta
                 let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
                 buttons.forEach(button => button.remove());
@@ -349,8 +370,10 @@
         document.getElementById('confirmBorradorBtn').addEventListener('click', function() {
             if (draggedItemData) {
                 // Mover el contenido a la columna de "Borrador"
-                draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
 
+                var columna =draggedItemData.ev.target.closest(".kanban-items");
+                //draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
+                columna.appendChild(draggedItemData.draggedItem);
                 // Limpiar todos los botones previos de la tarjeta
                 let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
                 buttons.forEach(button => button.remove());
