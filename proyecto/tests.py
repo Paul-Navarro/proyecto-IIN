@@ -1,9 +1,11 @@
+from django.forms import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from contenido.models import Contenido
 from categorias.models import Categoria
 from users.models import CustomUser as User, Role  # Usamos CustomUser ya que has sustituido el User
 from django.db import IntegrityError
+from django.core.validators import validate_email
 # Tests for Contenido module
 class ContenidoModelTest(TestCase):
     def setUp(self):
@@ -24,7 +26,41 @@ class ContenidoModelTest(TestCase):
     def test_contenido_fields(self):
         self.assertEqual(self.contenido.titulo_conte, "Test Contenido")
         self.assertEqual(self.contenido.estado_conte, "Publicado")
+    
+    def test_contenido_creation_with_empty_title(self):
+        contenido = Contenido.objects.create(
+            titulo_conte="",
+            tipo_conte="Tipo 1",
+            texto_conte="Texto de prueba",
+            estado_conte="Publicado",
+            fecha_conte="2023-09-01",
+            autor=self.user
+        )
+        self.assertEqual(contenido.titulo_conte, "")
 
+    def test_contenido_creation_with_empty_text(self):
+        contenido = Contenido.objects.create(
+            titulo_conte="Test Contenido",
+            tipo_conte="Tipo 1",
+            texto_conte="",
+            estado_conte="Publicado",
+            fecha_conte="2023-09-01",
+            autor=self.user
+        )
+        self.assertEqual(contenido.texto_conte, "")
+    def test_contenido_creation_with_invalid_title(self):
+        with self.assertRaises(IntegrityError):
+            Contenido.objects.create(
+                titulo_conte="",
+                tipo_conte="Tipo 1",
+                texto_conte="Texto de prueba",
+                estado_conte="Publicado",
+                fecha_conte="2023-09-01",
+                autor=self.user
+            )
+    def test_contenido_creation_with_invalid_title(self):
+        contenido = Contenido.objects.create(titulo_conte="Test Contenido", tipo_conte="Tipo 1", texto_conte="Texto de prueba", estado_conte="Publicado", fecha_conte="2023-09-01", autor=self.user)
+        self.assertIsNotNone(contenido.titulo_conte)
 
 class ContenidoViewsTest(TestCase):
     def setUp(self):
@@ -92,6 +128,24 @@ class CategoriaModelTest(TestCase):
         self.assertEqual(self.categoria.nombre, "Categoria Test")
         self.assertEqual(self.categoria.descripcion, "Descripcion de prueba")
 
+    def test_categoria_creation_with_empty_name(self):
+        categoria = Categoria.objects.create(
+            nombre="",
+            descripcion="Descripcion de prueba"
+        )
+        self.assertEqual(categoria.nombre, "")
+
+    def test_categoria_creation_with_empty_description(self):
+        categoria = Categoria.objects.create(
+            nombre="Categoria Test",
+            descripcion=""
+        )
+        self.assertEqual(categoria.descripcion, "")
+    
+    def test_categoria_creation_with_duplicate_nombre(self):
+        categoria = Categoria.objects.create(nombre="Categoria 1", descripcion="Desc 1")
+        categoria2 = Categoria.objects.create(nombre="Categoria 2", descripcion="Desc 2")
+        self.assertNotEqual(categoria.nombre, categoria2.nombre)
 
 class CategoriaViewsTest(TestCase):
     def setUp(self):
@@ -137,7 +191,15 @@ class UserModelTest(TestCase):
     def test_user_fields(self):
         self.assertEqual(self.user.username, "testuser")
         self.assertEqual(self.user.email, "testuser@example.com")
-
+    
+    
+    
+    def test_user_creation_with_invalid_email(self):
+        try:
+            validate_email("invalid_email")
+            self.fail("Invalid email should not be valid")
+        except ValidationError:
+            pass
 
 class UserViewsTest(TestCase):
     def setUp(self):
@@ -187,6 +249,12 @@ def test_create_user_view(self):
     self.assertEqual(response.status_code, 302)  # Verifica la redirección
     self.assertTrue(User.objects.filter(username='newuser').exists())
 
+    def test_user_profile_view(self):
+        response = self.client.get(reverse('user_profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.user.username)
+
+
 # More Tests for Contenido, Categoria, and Users
 
 class MoreContenidoModelTests(TestCase):
@@ -210,6 +278,45 @@ class MoreContenidoModelTests(TestCase):
     def test_contenido_author(self):
         self.assertEqual(self.contenido.autor.username, "testuser2")
 
+    def test_contenido_update(self):
+        contenido = Contenido.objects.create(
+            titulo_conte="Another Test Contenido",
+            tipo_conte="Tipo 1",
+            texto_conte="Texto de prueba adicional",
+            estado_conte="Publicado",
+            fecha_conte="2023-09-03",
+            autor=self.user
+        )
+        contenido.titulo_conte = "Updated Title"
+        contenido.save()
+        self.assertEqual(contenido.titulo_conte, "Updated Title")
+    def test_contenido_update_with_new_autor(self):
+        contenido = Contenido.objects.create(
+            titulo_conte="Test Contenido",
+            tipo_conte="Tipo 1",
+            texto_conte="Texto de prueba",
+            estado_conte="Publicado",
+            fecha_conte="2023-09-01",
+            autor=self.user
+        )
+        new_user = User.objects.create_user(username="newuser", email="newuser@example.com", password="password123")
+        contenido.autor = new_user
+        contenido.save()
+        self.assertEqual(contenido.autor, new_user)
+    
+    def test_contenido_creation_with_categoria(self):
+        categoria = Categoria.objects.create(nombre="Categoria 1", descripcion="Desc 1")
+        contenido = Contenido.objects.create(
+            titulo_conte="Test Contenido",
+            tipo_conte="Tipo 1",
+            texto_conte="Texto de prueba",
+            estado_conte="Publicado",
+            fecha_conte="2023-09-01",
+            autor=self.user,
+            categoria=categoria
+        )
+        self.assertEqual(contenido.categoria, categoria)
+
 class MoreCategoriaTests(TestCase):
     def setUp(self):
         self.categoria = Categoria.objects.create(nombre="Test Categoria 2", descripcion="Otra descripcion de prueba", codigo=1)
@@ -221,6 +328,22 @@ class MoreCategoriaTests(TestCase):
 
     def test_categoria_description_length(self):
         self.assertTrue(len(self.categoria.descripcion) > 5)
+
+    def test_categoria_update(self):
+        categoria = Categoria.objects.create(
+            nombre="Test Categoria 2",
+            descripcion="Otra descripcion de prueba",
+            codigo=2
+        )
+        categoria.nombre = "Updated Nombre"
+        categoria.save()
+        self.assertEqual(categoria.nombre, "Updated Nombre")
+    
+    def test_categoria_update_with_new_descripcion(self):
+        categoria = Categoria.objects.create(nombre="Categoria 1", descripcion="Desc 1")
+        categoria.descripcion = "New Desc"
+        categoria.save()
+        self.assertEqual(categoria.descripcion, "New Desc")
 
 class MoreUserTests(TestCase):
     def setUp(self):
