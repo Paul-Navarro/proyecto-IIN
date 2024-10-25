@@ -72,6 +72,8 @@ urlpatterns = [
 
     path('estadisticas/', ver_estadisticas, name='ver_estadisticas'),
     path('enviar-informe/', enviar_informe, name='enviar_informe'),  # Ruta para enviar el informe por correo
+    
+    path('inhabilitar/<int:pk>/', views.inhabilitar_contenido, name='inhabilitar_contenido'),
 ]
 
 '''

@@ -144,15 +144,32 @@
         // Soltar el elemento en la nueva columna y cambiar su estado
         function drop(ev) {
             ev.preventDefault();
+            
             var data = ev.dataTransfer.getData("text");
             draggedItem = document.getElementById(data);
 
+            /*nuevo*/
+            var dropear = false;
+            var columnaParaAgregar;
+            
+            columnaParaAgregar = ev.target.closest(".kanban-items");
+            if(columnaParaAgregar !== null){
+                dropear = true;
+            }
+
+            
             // Asegurarse de que se suelte en el área correcta (columna)
-            if (ev.target.classList.contains('kanban-items')) {
+            //ev.target.classList.contains('kanban-items')
+            if (dropear) {//dropear
                 var targetColumn = ev.target.closest('.kanban-column').id;
 
                 // Guardamos el item original y la columna original antes de cualquier acción
                 originalColumnId = draggedItem.closest('.kanban-column').id;
+
+                //Evitar realizar cualquier accion si se arrastra a la misma columna
+                if(targetColumn === originalColumnId){
+                    return;
+                }
 
                 // Popup de advertencia para intentar mover a "Borrador"
                 if (targetColumn === 'borrador') {
@@ -187,7 +204,8 @@
                 }
 
                 // Para otras columnas, simplemente mover el contenido
-                ev.target.appendChild(draggedItem);
+                //ev.target.appendChild(draggedItem);
+                columnaParaAgregar.appendChild(draggedItem);
                 // Llamada AJAX para actualizar el estado en el servidor
                 cambiarEstado(draggedItem, targetColumn);
             }
