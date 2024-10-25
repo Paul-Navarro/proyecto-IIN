@@ -101,6 +101,12 @@
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                
+                                    <!-- Botón de inhabilitar -->
+                                <form method="post" action="{% url 'inhabilitar_contenido' contenido.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Inactivar</button>
+                                </form>
                                 </div>
                             {% endif %}
                         {% endfor %}
