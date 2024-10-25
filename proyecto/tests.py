@@ -137,7 +137,7 @@ class CategoriaModelTest(TestCase):
 
     def test_categoria_creation_with_empty_description(self):
         categoria = Categoria.objects.create(
-            nombre="Categoria Test",
+            nombre="Categoria Test 2",
             descripcion=""
         )
         self.assertEqual(categoria.descripcion, "")
@@ -242,7 +242,7 @@ def test_create_user_view(self):
     data = {
         'username': 'newuser',
         'email': 'newuser@example.com',
-        'password1': 'password123',  # Asegúrate de usar 'password1' y 'password2'
+        'password1': 'password123',  
         'password2': 'password123'
     }
     response = self.client.post(reverse('create_user'), data)
@@ -331,13 +331,12 @@ class MoreCategoriaTests(TestCase):
 
     def test_categoria_update(self):
         categoria = Categoria.objects.create(
-            nombre="Test Categoria 2",
-            descripcion="Otra descripcion de prueba",
-            codigo=2
+            nombre="Test Categoria 3",
+            descripcion="Desc 1"
         )
-        categoria.nombre = "Updated Nombre"
+        categoria.descripcion = "New Desc"
         categoria.save()
-        self.assertEqual(categoria.nombre, "Updated Nombre")
+        self.assertEqual(categoria.descripcion, "New Desc")
     
     def test_categoria_update_with_new_descripcion(self):
         categoria = Categoria.objects.create(nombre="Categoria 1", descripcion="Desc 1")
