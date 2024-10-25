@@ -1216,6 +1216,17 @@ def contenido_registro(request, pk):
     
     
 def asignar_fecha_publicacion(request, pk):
+    '''
+    @function asignar_fecha_publicacion
+    @description Asigna una nueva fecha de publicación a un contenido existente.
+    Cambia el estado del contenido a 'BORRADOR' y actualiza su vigencia.
+    
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} pk - El ID del contenido al que se le asignará la nueva fecha de publicación.
+    
+    @route {POST} /asignar_fecha_publicacion/<int:pk>/
+    @returns {HttpResponse} Redirige al tablero del autor después de actualizar la fecha, o renderiza la plantilla de inicio si no se recibe una fecha válida.
+    '''
     contenido = get_object_or_404(Contenido, pk=pk)
 
     if request.method == 'POST':
@@ -1234,6 +1245,12 @@ def calificar_contenido(request, contenido_id):
     """
     Función para manejar la calificación de un contenido. Evita duplicados actualizando
     la calificación si el usuario ya ha calificado el contenido.
+    
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} contenido_id - El ID del contenido que se va a calificar.
+    
+    @route {POST} /calificar_contenido/<int:contenido_id>/
+    @returns {JsonResponse} Retorna un JSON con el resultado de la operación.
     """
     contenido = get_object_or_404(Contenido, id_conte=contenido_id)
     
@@ -1258,6 +1275,15 @@ def calificar_contenido(request, contenido_id):
     return JsonResponse({'success': False, 'mensaje': 'Algo salió mal.'})
 
 def ver_estadisticas(request):
+    '''
+    @function ver_estadisticas
+    @description Muestra estadísticas de contenido para el autor actual. Permite filtrar por mes, año, fechas y categorías.
+    
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    
+    @route {GET} /ver_estadisticas/
+    @returns {HttpResponse} Renderiza la plantilla de estadísticas con los datos filtrados.
+    '''
     autor = request.user  # Usuario actual (autor)
 
     # Lista de meses y años para los filtros
@@ -1345,7 +1371,10 @@ def ver_estadisticas(request):
     return render(request, 'autor/estadisticas.html', context)
 def enviar_reporte_estadistico(autor):
     """
-    Función para enviar un informe estadístico de los contenidos del autor, con likes, unlikes y calificaciones promedio.
+    @function enviar_reporte_estadistico
+    @description Envía un informe estadístico de los contenidos del autor, incluyendo likes, unlikes y calificaciones promedio.
+
+    @param {User} autor - El autor cuyo contenido se está reportando.
     """
     # Obtener todos los contenidos del autor
     contenidos = Contenido.objects.filter(autor=autor)

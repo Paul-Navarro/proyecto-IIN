@@ -92,6 +92,11 @@ class CustomSignupForm(SignupForm):
 
 User = get_user_model()
 class UserProfileChangeForm(UserChangeForm):
+    """
+    @class UserProfileChangeForm
+    @extends UserChangeForm
+    @description Formulario para permitir a los usuarios cambiar su perfil, incluyendo nombre, apellido, nombre de usuario e imagen de perfil.
+    """
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'profile_image']  # Incluye el campo de imagen
