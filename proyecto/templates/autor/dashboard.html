@@ -102,11 +102,12 @@
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
                                 
-                                    <!-- Botón de inhabilitar -->
-                                <form method="post" action="{% url 'inhabilitar_contenido' contenido.pk %}">
+                                <!-- Botón de inhabilitar -->
+                                <form method="post" action="{% url 'inhabilitar_contenido' contenido.pk %}" onsubmit="event.preventDefault(); openInactivarModal(this);">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger">Inactivar</button>
                                 </form>
+                                    
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -189,7 +190,32 @@
     </div>
 </div>
 
+
+<!-- Modal de Confirmación para Inactivar -->
+<div class="modal fade" id="confirmInactivarModal" tabindex="-1" role="dialog" aria-labelledby="confirmInactivarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmInactivarModalLabel">Confirmar Inactivación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas inactivar este contenido?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmInactivarBtn" class="btn btn-danger">Inactivar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
+
+
     let contenidoBorradorId = null;
     let draggedItemData = null; // Almacenar temporalmente el contenido arrastrado
 
@@ -466,6 +492,21 @@
                 return state;
         }
     }
+
+    var formToSubmit = null;  // Variable para almacenar temporalmente el formulario
+
+    // Función para abrir el modal de confirmación
+    function openInactivarModal(form) {
+        formToSubmit = form;  // Guardar el formulario temporalmente
+        $('#confirmInactivarModal').modal('show');  // Mostrar el modal
+    }
+
+    // Manejador de evento para el botón de confirmación en el modal
+    document.getElementById('confirmInactivarBtn').addEventListener('click', function() {
+        if (formToSubmit) {
+            formToSubmit.submit();  // Enviar el formulario
+        }
+    });
 </script>
 <!-- Modal de Confirmación para cambio a "Borrador" -->
 <div class="modal fade" id="confirmBorradorModal" tabindex="-1" role="dialog" aria-labelledby="confirmBorradorModalLabel" aria-hidden="true">
