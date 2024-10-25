@@ -101,6 +101,13 @@
                                 <div class="kanban-item" id="item{{ contenido.pk }}" draggable="false" ondragstart="drag(event)">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_detail_autor_FLAG' contenido.pk %}" class="btn btn-ver">Ver</a>
+                                
+                                <!-- Botón de inhabilitar -->
+                                <form method="post" action="{% url 'inhabilitar_contenido' contenido.pk %}" onsubmit="event.preventDefault(); openInactivarModal(this);">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Inactivar</button>
+                                </form>
+                                    
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -183,7 +190,32 @@
     </div>
 </div>
 
+
+<!-- Modal de Confirmación para Inactivar -->
+<div class="modal fade" id="confirmInactivarModal" tabindex="-1" role="dialog" aria-labelledby="confirmInactivarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmInactivarModalLabel">Confirmar Inactivación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas inactivar este contenido?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmInactivarBtn" class="btn btn-danger">Inactivar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
+
+
     let contenidoBorradorId = null;
     let draggedItemData = null; // Almacenar temporalmente el contenido arrastrado
 
@@ -203,9 +235,27 @@
         var data = ev.dataTransfer.getData("text");
         var draggedItem = document.getElementById(data);
 
-        if (ev.target.classList.contains('kanban-items')) {
+
+
+        /*nuevo*/
+        var dropear = false;
+        var columnaParaAgregar;
+        
+        
+        columnaParaAgregar = ev.target.closest(".kanban-items");
+        if(columnaParaAgregar !== null){
+            dropear = true;
+        }
+        //ev.target.classList.contains('kanban-items')
+        if (dropear) {
             var targetColumn = ev.target.closest('.kanban-column').id;
             var originalColumn = draggedItem.closest('.kanban-column').id;
+
+
+            //Evitar realizar cualquier accion si se arrastra a la misma columna
+            if(targetColumn === originalColumn){
+                return;
+            }
 
             // Si el contenido está siendo movido fuera de la columna "Borrador", eliminar el mensaje de rechazo
             var mensajeRechazo = draggedItem.querySelector('.razon-borrador');
@@ -235,8 +285,9 @@
 
             // Lógica existente para mover a "Borrador" o "Editado"
             if (targetColumn === 'borrador' || targetColumn === 'editado') {
+                
                 ev.target.appendChild(draggedItem);
-
+                
                 // Limpiar todos los botones previos de la tarjeta
                 let buttons = draggedItem.querySelectorAll('a.btn');
                 buttons.forEach(button => button.remove());
@@ -304,8 +355,10 @@
         document.getElementById('confirmRevisionBtn').addEventListener('click', function() {
             if (draggedItemData) {
                 // Mover el contenido a la columna de "En revisión"
-                draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
-
+                var columna = draggedItemData.ev.target.closest('.kanban-items');
+                
+                //draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
+                columna.appendChild(draggedItemData.draggedItem);
                 // Limpiar todos los botones previos de la tarjeta
                 let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
                 buttons.forEach(button => button.remove());
@@ -349,8 +402,10 @@
         document.getElementById('confirmBorradorBtn').addEventListener('click', function() {
             if (draggedItemData) {
                 // Mover el contenido a la columna de "Borrador"
-                draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
 
+                var columna =draggedItemData.ev.target.closest(".kanban-items");
+                //draggedItemData.ev.target.appendChild(draggedItemData.draggedItem);
+                columna.appendChild(draggedItemData.draggedItem);
                 // Limpiar todos los botones previos de la tarjeta
                 let buttons = draggedItemData.draggedItem.querySelectorAll('a.btn');
                 buttons.forEach(button => button.remove());
@@ -437,6 +492,21 @@
                 return state;
         }
     }
+
+    var formToSubmit = null;  // Variable para almacenar temporalmente el formulario
+
+    // Función para abrir el modal de confirmación
+    function openInactivarModal(form) {
+        formToSubmit = form;  // Guardar el formulario temporalmente
+        $('#confirmInactivarModal').modal('show');  // Mostrar el modal
+    }
+
+    // Manejador de evento para el botón de confirmación en el modal
+    document.getElementById('confirmInactivarBtn').addEventListener('click', function() {
+        if (formToSubmit) {
+            formToSubmit.submit();  // Enviar el formulario
+        }
+    });
 </script>
 <!-- Modal de Confirmación para cambio a "Borrador" -->
 <div class="modal fade" id="confirmBorradorModal" tabindex="-1" role="dialog" aria-labelledby="confirmBorradorModalLabel" aria-hidden="true">

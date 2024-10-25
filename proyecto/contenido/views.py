@@ -1425,3 +1425,19 @@ def enviar_informe(request):
     enviar_reporte_estadistico(autor)
     messages.success(request, '¡El informe ha sido enviado a tu correo con éxito!')
     return redirect('autor_dashboard')
+
+def inhabilitar_contenido(request, pk):
+    # Verifica que el método de la solicitud sea POST
+    if request.method == 'POST':
+        # Busca el contenido por su clave primaria (pk)
+        contenido = get_object_or_404(Contenido, pk=pk)
+        # Actualiza el campo vigencia_conte a True
+        contenido.vigencia_conte = True
+        contenido.save()  # Guarda los cambios en la base de datos
+        # Muestra un mensaje de éxito
+        messages.success(request, f'El contenido "{contenido.titulo_conte}" ha sido inhabilitado.')
+        # Redirige a una página (puede ser la misma o una diferente)
+        return redirect('autor_dashboard')  # Cambia esto por la vista a la que quieras redirigir
+    else:
+        # Si el método no es POST, redirige a otra página
+        return redirect('autor_dashboard')  # Cambia esto por la vista adecuada
