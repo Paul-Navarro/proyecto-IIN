@@ -23,6 +23,10 @@ from users.models import Notificacion
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.db.models import Avg,Count, Sum
+from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.sessions.models import Session
+
+
 #para rol financiero
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView
@@ -714,6 +718,10 @@ def comprar_suscripcion(request):
     '''
     if request.method == 'POST' and request.user.is_authenticated:
         usuario = request.user
+
+        # Verificar si la sesión existe, si no, crear una nueva
+        if not request.session.session_key:
+            request.session.create()
         # Debugging: Ver el usuario y sesión actual
         print(f"Usuario autenticado antes del pago: {usuario.username}")
         print(f"Session Key antes del pago: {request.session.session_key}")
@@ -742,6 +750,10 @@ def comprar_suscripcion(request):
                 })
         if not line_items:
             return JsonResponse({'error': 'No se seleccionaron categorías válidas.'}, status=400)
+        
+        # Guardar la sesión del usuario antes de redirigir a Stripe
+        print(f"Guardando la sesión del usuario antes de crear la sesión de Stripe")
+        request.session.save()
 
         # Crear una sesión de Stripe Checkout y pasar los IDs de categorías en los metadatos
         dominio = "http://localhost:8000"
@@ -750,7 +762,8 @@ def comprar_suscripcion(request):
                 payment_method_types=['card'],
                 line_items=line_items,
                 mode='payment',
-                success_url=dominio + '/contenido/success/?session_id={CHECKOUT_SESSION_ID}',
+                #success_url=dominio + '/contenido/success/?session_id={CHECKOUT_SESSION_ID}',
+                success_url = dominio + f'/contenido/success/?session_id={{CHECKOUT_SESSION_ID}}&session_key={request.session.session_key}',
                 cancel_url=dominio + '/contenido/cancel/',
                 metadata={
                     'categorias_ids': ','.join(categorias_seleccionadas)  # Pasar los IDs de las categorías seleccionadas
@@ -807,9 +820,25 @@ def suscripcion_exitosa(request):
     @route {GET} /success/
     @returns {HttpResponse} Renderiza la página de éxito si el pago es completado, o redirige a la página de login si el usuario es anónimo o a la vista de suscripciones si ocurre un error.
     '''
-    # Depurar el estado de request.user
-    print(f"request.user: {request.user}")
+     # Restaurar la sesión usando la session_key de la URL
+    session_key = request.GET.get('session_key')
+    if session_key:
+        try:
+            session = Session.objects.get(session_key=session_key)
+            request.session = session.get_decoded()  # Restaurar la sesión del usuario
+
+            # Verificar si la sesión contiene un usuario autenticado
+            if not request.user.is_authenticated:
+                print("Error: Usuario no autenticado después de intentar restaurar la sesión")
+                return redirect('account_login')  # Redirigir al login si no está autenticado
+        except Session.DoesNotExist:
+            print(f"Error: No se pudo encontrar la sesión con session_key={session_key}")
+            return redirect('account_login')
+
+    # Depurar el estado de request.user después de restaurar la sesión
+    print(f"request.user después de restaurar la sesión: {request.user}")
     print(f"request.user.is_authenticated: {request.user.is_authenticated}")
+
     
     session_id = request.GET.get('session_id')
     if session_id:
