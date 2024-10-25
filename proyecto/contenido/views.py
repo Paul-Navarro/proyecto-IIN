@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado
+from .models import Contenido, Rating,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado
 from .forms import ContenidoForm,ReporteContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -21,10 +21,18 @@ from .forms import ContactForm
 from .models import HistorialCompra
 from users.models import Notificacion
 from django.utils import timezone
+from django.template.loader import render_to_string
+from django.db.models import Avg,Count, Sum
+from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.sessions.models import Session
+
 
 #para rol financiero
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView
+from datetime import datetime
+from django.db.models.functions import TruncMonth, TruncYear
+from datetime import datetime
 
 def contenido_list(request):
     '''
@@ -33,10 +41,9 @@ def contenido_list(request):
     @param {HttpRequest} request - El objeto de solicitud HTTP.
     @returns {HttpResponse} Respuesta renderizada con la lista de contenidos filtrados.
     '''
-    
     user = request.user
     contenidos = Contenido.objects.filter(autor=user)  # Mostrar solo los contenidos del autor
-
+    
 
     return render(request, 'autor/contenido_list.html', {'contenidos': contenidos})
 
@@ -55,7 +62,25 @@ def contenido_detail(request, pk):
     contenido.cant_visualiz_conte += 1
     contenido.save()  # Guardar el cambio en la base de datos
     
-    return render(request, 'home/contenido_detail.html', {'contenido': contenido})
+    # Obtener la calificación previa del usuario si existe
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = Rating.objects.filter(usuario=request.user, contenido=contenido).first()
+
+    if request.method == 'POST':
+        estrellas = request.POST.get('estrellas')
+        if estrellas and request.user.is_authenticated:
+            rating, created = Rating.objects.update_or_create(
+                usuario=request.user,
+                contenido=contenido,
+                defaults={'estrellas': estrellas}
+            )
+            return JsonResponse({'success': True, 'estrellas': rating.estrellas})
+
+    return render(request, 'home/contenido_detail.html', {
+        'contenido': contenido,
+        'user_rating': user_rating,
+    })
 
 def contenido_detail_editor(request, pk):
     '''
@@ -202,6 +227,56 @@ def contenido_update(request, pk):
         'categorias_pagadas': categorias_pagadas,
         'categorias_suscriptores': categorias_suscriptores,
     })
+
+
+def contenido_update_version(request, version_id):
+    '''
+    @function contenido_update_version
+    @description Actualiza una versión específica de un contenido.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} version_id - El ID de la versión que se va a actualizar.
+    @returns {HttpResponse} Redirige a la lista de contenidos después de la actualización o muestra el formulario con errores.
+    '''
+    # Obtener la versión seleccionada
+    version = get_object_or_404(VersionContenido, id=version_id)
+    contenido = version.contenido_original  # Obtenemos el contenido original
+
+    # Obtener las categorías agrupadas
+    categorias_no_moderadas = Categoria.objects.filter(es_moderada=False)
+    categorias_moderadas = Categoria.objects.filter(es_moderada=True)
+    categorias_pagadas = Categoria.objects.filter(es_pagada=True)
+    categorias_suscriptores = Categoria.objects.filter(para_suscriptores=True)
+
+    if request.method == 'POST':
+        form = ContenidoForm(request.POST, request.FILES, instance=contenido)  # Usamos el contenido original
+        if form.is_valid():
+            contenido_editado = form.save(commit=False)
+
+            # Mantener las fechas de publicación intactas
+            contenido_editado.fecha_publicacion = Contenido.objects.get(pk=contenido.pk).fecha_publicacion
+            contenido_editado.fecha_vigencia = Contenido.objects.get(pk=contenido.pk).fecha_vigencia
+
+            # Guardar el contenido sin crear manualmente una nueva versión
+            contenido_editado.save()
+
+            messages.success(request, 'La versión ha sido actualizada y guardada como la nueva versión actual.')
+            return redirect('autor_dashboard')
+    else:
+        # Pre-cargar el formulario con los datos de la versión seleccionada
+        form = ContenidoForm(initial={
+            'titulo_conte': version.titulo_conte,
+            'tipo_conte': version.tipo_conte,
+            'texto_conte': version.texto_conte,
+        })
+
+    return render(request, 'autor/contenido_update.html', {
+        'form': form,
+        'categorias_no_moderadas': categorias_no_moderadas,
+        'categorias_moderadas': categorias_moderadas,
+        'categorias_pagadas': categorias_pagadas,
+        'categorias_suscriptores': categorias_suscriptores,
+    })
+
 
 def contenido_update_editor(request, pk):
     '''
@@ -643,6 +718,10 @@ def comprar_suscripcion(request):
     '''
     if request.method == 'POST' and request.user.is_authenticated:
         usuario = request.user
+
+        # Verificar si la sesión existe, si no, crear una nueva
+        if not request.session.session_key:
+            request.session.create()
         # Debugging: Ver el usuario y sesión actual
         print(f"Usuario autenticado antes del pago: {usuario.username}")
         print(f"Session Key antes del pago: {request.session.session_key}")
@@ -653,22 +732,28 @@ def comprar_suscripcion(request):
             return JsonResponse({'error': 'No seleccionaste ninguna categoría.'}, status=400)
 
         line_items = []
-        precio_por_categoria = 250 * 100  #25000 GS por categoría
+        ###precio_por_categoria = 250 * 100  #25000 GS por categoría
 
         # Crear los line_items para Stripe basado en las categorías seleccionadas
         for categoria_id in categorias_seleccionadas:
             categoria = Categoria.objects.get(id=categoria_id)
-            if categoria.es_pagada:
+            if categoria.es_pagada and categoria.precio:
                 line_items.append({
                     'price_data': {
                         'currency': 'pyg',
                         'product_data': {
                             'name': f'Suscripción a {categoria.nombre}',  # Nombre de la suscripción
                         },
-                        'unit_amount': precio_por_categoria,  # Monto por suscripción
+                        'unit_amount': int(categoria.precio),  # Monto por suscripción
                     },
                     'quantity': 1,
                 })
+        if not line_items:
+            return JsonResponse({'error': 'No se seleccionaron categorías válidas.'}, status=400)
+        
+        # Guardar la sesión del usuario antes de redirigir a Stripe
+        print(f"Guardando la sesión del usuario antes de crear la sesión de Stripe")
+        request.session.save()
 
         # Crear una sesión de Stripe Checkout y pasar los IDs de categorías en los metadatos
         dominio = "http://localhost:8000"
@@ -677,7 +762,8 @@ def comprar_suscripcion(request):
                 payment_method_types=['card'],
                 line_items=line_items,
                 mode='payment',
-                success_url=dominio + '/contenido/success/?session_id={CHECKOUT_SESSION_ID}',
+                #success_url=dominio + '/contenido/success/?session_id={CHECKOUT_SESSION_ID}',
+                success_url = dominio + f'/contenido/success/?session_id={{CHECKOUT_SESSION_ID}}&session_key={request.session.session_key}',
                 cancel_url=dominio + '/contenido/cancel/',
                 metadata={
                     'categorias_ids': ','.join(categorias_seleccionadas)  # Pasar los IDs de las categorías seleccionadas
@@ -734,9 +820,25 @@ def suscripcion_exitosa(request):
     @route {GET} /success/
     @returns {HttpResponse} Renderiza la página de éxito si el pago es completado, o redirige a la página de login si el usuario es anónimo o a la vista de suscripciones si ocurre un error.
     '''
-    # Depurar el estado de request.user
-    print(f"request.user: {request.user}")
+     # Restaurar la sesión usando la session_key de la URL
+    session_key = request.GET.get('session_key')
+    if session_key:
+        try:
+            session = Session.objects.get(session_key=session_key)
+            request.session = session.get_decoded()  # Restaurar la sesión del usuario
+
+            # Verificar si la sesión contiene un usuario autenticado
+            if not request.user.is_authenticated:
+                print("Error: Usuario no autenticado después de intentar restaurar la sesión")
+                return redirect('account_login')  # Redirigir al login si no está autenticado
+        except Session.DoesNotExist:
+            print(f"Error: No se pudo encontrar la sesión con session_key={session_key}")
+            return redirect('account_login')
+
+    # Depurar el estado de request.user después de restaurar la sesión
+    print(f"request.user después de restaurar la sesión: {request.user}")
     print(f"request.user.is_authenticated: {request.user.is_authenticated}")
+
     
     session_id = request.GET.get('session_id')
     if session_id:
@@ -973,6 +1075,16 @@ class VentaListView(ListView):
             queryset = queryset.filter(usuario__username__icontains=cliente)  # Filtrar por usuario (cliente)
 
         return queryset
+    #Para sumar el total de lo vendido
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ventas = context['ventas']
+        
+        # Calcular la suma total de los precios de las categorías compradas
+        total_vendido = sum(venta.categoria.precio for venta in ventas if venta.categoria and venta.categoria.precio)
+        context['total_vendido'] = total_vendido
+        
+        return context
 #Notificación al correo
 from django.core.mail import send_mail
 from django.conf import settings
@@ -1104,6 +1216,17 @@ def contenido_registro(request, pk):
     
     
 def asignar_fecha_publicacion(request, pk):
+    '''
+    @function asignar_fecha_publicacion
+    @description Asigna una nueva fecha de publicación a un contenido existente.
+    Cambia el estado del contenido a 'BORRADOR' y actualiza su vigencia.
+    
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} pk - El ID del contenido al que se le asignará la nueva fecha de publicación.
+    
+    @route {POST} /asignar_fecha_publicacion/<int:pk>/
+    @returns {HttpResponse} Redirige al tablero del autor después de actualizar la fecha, o renderiza la plantilla de inicio si no se recibe una fecha válida.
+    '''
     contenido = get_object_or_404(Contenido, pk=pk)
 
     if request.method == 'POST':
@@ -1117,3 +1240,204 @@ def asignar_fecha_publicacion(request, pk):
             return redirect('autor_dashboard')  # Redirigir al tablero de autor
 
     return render(request, 'home/index.html', {'contenido': contenido})
+
+def calificar_contenido(request, contenido_id):
+    """
+    Función para manejar la calificación de un contenido. Evita duplicados actualizando
+    la calificación si el usuario ya ha calificado el contenido.
+    
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} contenido_id - El ID del contenido que se va a calificar.
+    
+    @route {POST} /calificar_contenido/<int:contenido_id>/
+    @returns {JsonResponse} Retorna un JSON con el resultado de la operación.
+    """
+    contenido = get_object_or_404(Contenido, id_conte=contenido_id)
+    
+    if request.method == 'POST' and request.user.is_authenticated:
+        estrellas = request.POST.get('estrellas')
+        if estrellas:
+            # Intentamos obtener una calificación existente
+            rating, created = Rating.objects.update_or_create(
+                usuario=request.user,
+                contenido=contenido,
+                defaults={'estrellas': estrellas, 'fecha_calificacion': timezone.now()}
+            )
+            # Si la calificación ya existía, la hemos actualizado; de lo contrario, hemos creado una nueva
+            if created:
+                mensaje = 'Tu calificación ha sido registrada.'
+            else:
+                mensaje = 'Tu calificación ha sido actualizada.'
+            
+            # Puedes retornar el resultado en formato JSON o redirigir a otra página
+            return JsonResponse({'success': True, 'mensaje': mensaje, 'estrellas': rating.estrellas})
+
+    return JsonResponse({'success': False, 'mensaje': 'Algo salió mal.'})
+
+def ver_estadisticas(request):
+    '''
+    @function ver_estadisticas
+    @description Muestra estadísticas de contenido para el autor actual. Permite filtrar por mes, año, fechas y categorías.
+    
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    
+    @route {GET} /ver_estadisticas/
+    @returns {HttpResponse} Renderiza la plantilla de estadísticas con los datos filtrados.
+    '''
+    autor = request.user  # Usuario actual (autor)
+
+    # Lista de meses y años para los filtros
+    months = list(range(1, 13))  # Del 1 al 12
+    current_year = datetime.now().year
+    years = list(range(current_year, current_year - 10, -1))  # Los últimos 10 años
+
+    # Categorías disponibles
+    categorias = Categoria.objects.all()
+
+    # Filtrar contenido por autor
+    contenidos = Contenido.objects.filter(autor=autor)
+
+    # Variables para filtros desde el formulario
+    selected_month = request.GET.get('month', 'all')
+    selected_year = request.GET.get('year', 'all')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    selected_category = request.GET.get('category', 'all')
+
+    # Filtrado de los contenidos
+    if selected_month != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__month=int(selected_month))
+    
+    if selected_year != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__year=int(selected_year))
+    
+    if start_date and end_date:
+        contenidos = contenidos.filter(fecha_publicacion__range=[start_date, end_date])
+
+    if selected_category != 'all':
+        contenidos = contenidos.filter(categoria__id=int(selected_category))
+
+    # Obtener los datos de estadísticas
+    titulos = [c.titulo_conte for c in contenidos]
+    likes = [c.likes for c in contenidos]
+    unlikes = [c.unlikes for c in contenidos]
+    visualizaciones = [c.cant_visualiz_conte for c in contenidos]
+
+    # Calcular popularidad (promedio de estrellas)
+    popularidad = [
+        Rating.objects.filter(contenido=c).aggregate(Avg('estrellas'))['estrellas__avg'] or 0
+        for c in contenidos
+    ]
+
+    # Total de visualizaciones para el autor
+    total_visualizaciones = contenidos.aggregate(total=Sum('cant_visualiz_conte'))['total'] or 0
+
+    # Categorías más relevantes (ordenadas por cantidad de likes)
+    categorias_relevantes = (
+        contenidos.values('categoria__nombre')
+        .annotate(total_likes=Sum('likes'))
+        .order_by('-total_likes')[:5]
+    )
+
+    # Mejor mes basado en likes
+    mejor_mes = (
+        contenidos.annotate(month=TruncMonth('fecha_publicacion'))
+        .values('month')
+        .annotate(total_likes=Sum('likes'))
+        .order_by('-total_likes')
+        .first()
+    )
+
+    # Preparar datos para los gráficos
+    context = {
+        'titulos_contenidos': titulos,
+        'likes_contenidos': likes,
+        'unlikes_contenidos': unlikes,
+        'visualizaciones_contenidos': visualizaciones,
+        'popularidad_contenidos': popularidad,
+        'total_visualizaciones': total_visualizaciones,
+        'categorias_relevantes': categorias_relevantes,
+        'mejor_mes': mejor_mes['month'] if mejor_mes else None,
+        'months': months,  # Enviamos los meses
+        'years': years,  # Enviamos los años
+        'categorias': categorias,  # Enviamos las categorías
+        'selected_month': selected_month,  # Para que mantenga la selección
+        'selected_year': selected_year,
+        'selected_category': selected_category,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+
+    return render(request, 'autor/estadisticas.html', context)
+def enviar_reporte_estadistico(autor):
+    """
+    @function enviar_reporte_estadistico
+    @description Envía un informe estadístico de los contenidos del autor, incluyendo likes, unlikes y calificaciones promedio.
+
+    @param {User} autor - El autor cuyo contenido se está reportando.
+    """
+    # Obtener todos los contenidos del autor
+    contenidos = Contenido.objects.filter(autor=autor)
+
+    # Preparar datos estadísticos para el informe
+    reporte_datos = []
+    for contenido in contenidos:
+        # Calcular estadísticas del contenido
+        promedio_estrellas = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg'] or 0
+        likes = contenido.likes
+        unlikes = contenido.unlikes
+
+        reporte_datos.append({
+            'titulo': contenido.titulo_conte,
+            'likes': likes,
+            'unlikes': unlikes,
+            'promedio_estrellas': round(promedio_estrellas, 1),
+            'fecha_publicacion': contenido.fecha_publicacion,
+        })
+
+    # Renderizar el contenido del email usando una plantilla HTML
+    subject = "Informe Estadístico de tus Contenidos"
+    message = render_to_string('account/email/reporte_estadistico.html', {
+        'autor': autor,
+        'reporte_datos': reporte_datos
+    })
+
+    # Enviar el correo al autor
+    send_mail(
+        subject,
+        '',
+        settings.DEFAULT_FROM_EMAIL,
+        [autor.email],
+        html_message=message,  
+        fail_silently=False,
+    )
+
+def enviar_informe(request):
+    '''
+    @function enviar_informe
+    @description Enviar un informe estadístico al autor actual con la información de sus contenidos.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @returns {HttpResponse} Redirige al panel del autor con un mensaje de éxito.
+    '''
+    # Obtener el usuario actual (autor)
+    autor = request.user
+    # Enviar el informe estadístico al autor actual
+    enviar_reporte_estadistico(autor)
+    messages.success(request, '¡El informe ha sido enviado a tu correo con éxito!')
+    return redirect('autor_dashboard')
+
+def inhabilitar_contenido(request, pk):
+    # Verifica que el método de la solicitud sea POST
+    if request.method == 'POST':
+        # Busca el contenido por su clave primaria (pk)
+        contenido = get_object_or_404(Contenido, pk=pk)
+        # Actualiza el campo vigencia_conte a True
+        contenido.vigencia_conte = True
+        contenido.save()  # Guarda los cambios en la base de datos
+        # Muestra un mensaje de éxito
+        messages.success(request, f'El contenido "{contenido.titulo_conte}" ha sido inhabilitado.')
+        # Redirige a una página (puede ser la misma o una diferente)
+        return redirect('autor_dashboard')  # Cambia esto por la vista a la que quieras redirigir
+    else:
+        # Si el método no es POST, redirige a otra página
+        return redirect('autor_dashboard')  # Cambia esto por la vista adecuada

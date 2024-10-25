@@ -40,6 +40,10 @@
             <p><strong>Fecha de Publicación Programada:</strong> {{ contenido.fecha_publicacion }}</p>
             {% endif %}
 
+            {% if contenido.fecha_vigencia %}
+            <p><strong>Fecha de vigencia (expiracion):</strong> {{ contenido.fecha_vigencia }}</p>
+            {% endif %}
+
             <h3><i class="fas fa-history"></i> Versiones Anteriores</h3>
 
             {% if versiones %}
@@ -49,8 +53,8 @@
                         <strong>Versión {{ version.version_num }}:</strong> {{ version.fecha_version }} - {{ version.titulo_conte }}
                         
                         <!-- Botón para seleccionar esta versión -->
-                        <a href="{% url 'seleccionar_version' pk=contenido.pk version_id=version.id %}" class="btn-select-version">
-                            <i class="fas fa-check-circle"></i> Seleccionar esta versión
+                        <a href="{% url 'contenido_update_version' version_id=version.id %}" class="btn-select-version">
+                            <i class="fas fa-check-circle"></i> Editar esta versión
                         </a>
                         
                         <!-- Mostrar si esta versión es la actual -->
@@ -61,10 +65,7 @@
                 {% endfor %}
             </ul>
         
-            <!-- Botón para volver a la versión original (Versión 1) -->
-            <a href="{% url 'seleccionar_version' pk=contenido.pk version_id=versiones.first.id %}" class="btn-select-version">
-                <i class="fas fa-undo"></i> Ir a Versión Original
-            </a>
+
         
         {% else %}
             <p>No hay versiones anteriores disponibles.</p>

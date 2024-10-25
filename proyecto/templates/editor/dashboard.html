@@ -194,13 +194,29 @@
         ev.preventDefault();
         var data = ev.dataTransfer.getData("text");
         draggedItemGlobal = document.getElementById(data); // Guardar el ítem arrastrado globalmente
+        
+        /*nuevo*/
+        var dropear = false;
+        var columnaParaAgregar;
+        
+        
+        columnaParaAgregar = ev.target.closest(".kanban-items");
+        if(columnaParaAgregar !== null){
+            dropear = true;
+        }
 
         // Asegurarse de que se suelte en el área correcta (columna)
-        if (ev.target.classList.contains('kanban-items')) {
+        //ev.target.classList.contains('kanban-items')
+        if (dropear) {
             targetColumnGlobal = ev.target.closest('.kanban-column').id;
 
             // Guardamos el ítem original y la columna original antes de cualquier acción
             originalColumnId = draggedItemGlobal.closest('.kanban-column').id;
+
+            //Evitar realizar cualquier accion si se arrastra a la misma columna
+            if(targetColumnGlobal === originalColumnId){
+                return;
+            }
 
             if (targetColumnGlobal === 'publicado') {
                 // Mostrar el modal de advertencia
@@ -236,6 +252,7 @@
             }
 
             // Mover el contenido directamente si no es a las columnas especiales
+           
             moveContent(draggedItemGlobal, targetColumnGlobal, ev);
         }
     }
@@ -283,8 +300,10 @@
         }
 
         // Mover el contenido al DOM de la nueva columna
-        ev.target.appendChild(draggedItem);
-
+        //.target
+        var columna = ev.target.closest('.kanban-items'); //nuevo
+        //ev.target.appendChild(draggedItem);
+        columna.appendChild(draggedItem);
         // Llamada AJAX para actualizar el estado en el servidor
         fetch(`/contenido/contenido/cambiar_estado/${draggedItem.id.replace('item', '')}/`, {
             method: 'POST',

@@ -8,7 +8,7 @@ class Categoria(models.Model):
     Este modelo define una categoría con atributos como nombre, estado de moderación, estado de pago, accesibilidad para suscriptores, y un código único.
     También maneja la autogeneración del código si no se proporciona uno.
     """
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     es_moderada = models.BooleanField(default=False)
     es_pagada = models.BooleanField(default=False)
     para_suscriptores = models.BooleanField(default=False)
@@ -17,6 +17,7 @@ class Categoria(models.Model):
     descripcion = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+    precio = models.IntegerField(null=True, blank=True)  # Campo de precio opcional
 
     def save(self, *args, **kwargs):
         if self.codigo is None:

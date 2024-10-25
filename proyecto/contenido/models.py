@@ -76,14 +76,20 @@ class Contenido(models.Model):
         return self.titulo_conte
     
     def establecer_version_actual(self, version):
-        """Establece una versión específica como la versión actual del contenido."""
+        """
+        Establece una versión específica como la versión actual del contenido.
+
+        @param {VersionContenido} version - La versión que se establecerá como actual.
+        """
         self.version_actual = version
         self.save()
         
     def establecer_version_anterior(self, version):
         """
-        Este método permite establecer cualquier versión anterior como la versión actual.
-        Primero, guarda la versión actual antes de cambiarla para evitar perderla.
+        Establece una versión anterior como la versión actual, 
+        guardando la versión actual previamente.
+
+        @param {VersionContenido} version - La versión que se establecerá como actual.
         """
         # Si hay una versión actual, guárdala como una nueva versión
         if self.version_actual:
@@ -106,13 +112,21 @@ class Contenido(models.Model):
     
         # Método para verificar si el contenido debe ser publicado
     def autopublicar(self):
+        """
+        Verifica si el contenido debe ser publicado automáticamente.
+
+        Publica el contenido si la fecha de publicación es anterior o igual a la fecha actual 
+        y si su estado es 'PUBLICADO'.
+        """
         if self.fecha_publicacion and self.fecha_publicacion <= timezone.now() and self.estado_conte == 'PUBLICADO':
             self.autopublicar_conte = True
             self.save()
             
     def save(self, *args, crear_version=True, **kwargs):
         """
-        Sobrescribe el método save para crear una nueva versión solo cuando `crear_version` es True.
+        Sobrescribe el método save para crear una nueva versión solo si `crear_version` es True.
+
+        @param {bool} crear_version - Determina si se debe crear una nueva versión al guardar.
         """
         is_new = self.pk is None  # Verificar si es un nuevo contenido
 
@@ -311,3 +325,24 @@ class CambioEstado(models.Model):
 
     def _str_(self):
         return f"Cambio en {self.contenido.titulo_conte} de {self.estado_anterior} a {self.estado_nuevo}"
+    
+
+# Calificación de estrellas
+
+class Rating(models.Model):
+    '''
+    @class Rating
+    @extends models.Model
+    @description Modelo que representa la calificación de un contenido por parte de un usuario.
+    Cada calificación consiste en un número de estrellas y se asocia a un usuario y a un contenido específico.
+    '''
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
+    estrellas = models.IntegerField(default=0)  # Rating de 1 a 5 estrellas
+    fecha_calificacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'contenido')  # Un usuario solo puede calificar un contenido una vez
+
+    def __str__(self):
+        return f'{self.usuario} - {self.contenido}: {self.estrellas} estrellas'

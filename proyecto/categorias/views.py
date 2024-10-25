@@ -24,7 +24,11 @@ def crear_categoria(request):
     if request.method == "POST":
         form = CategoriaForm(request.POST)
         if form.is_valid():
-            form.save()
+            categoria = form.save(commit=False)  # No guardamos aún la categoría
+            if not categoria.es_pagada:
+                # Si la categoría no es pagada, el campo precio debe ser None
+                categoria.precio = None
+            categoria.save()  # Ahora guardamos la categoría
             return redirect('listar_categorias')
     else:
         form = CategoriaForm()

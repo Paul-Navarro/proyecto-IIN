@@ -28,6 +28,11 @@
                                     <h3>Suscripción a</h3>
                                     <p>{{ compra.categoria.nombre }}</p>
                                 </div>
+                                <!-- Mostrar precio -->
+                                <div class="compra-detalle">
+                                    <h3>Precio</h3>
+                                    <p>{{ compra.categoria.precio }} GS</p>  
+                                </div>
                                 <div class="compra-detalle">
                                     <h3>Fecha de transacción</h3>
                                     <p>{{ compra.fecha_transaccion|date:"d M Y H:i" }}</p>

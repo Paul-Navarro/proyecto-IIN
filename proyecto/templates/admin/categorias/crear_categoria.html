@@ -25,6 +25,7 @@
                 <form method="post" class="category-form">
                     {% csrf_token %}
                     {{ form.as_p }}
+
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Crear Categoría
                     </button>
@@ -33,28 +34,36 @@
         </div>
     </main>
 
-    <!-- Bloque de JavaScript -->
     <script>
         // Obtener los checkboxes por sus IDs
         const esPagadaCheckbox = document.getElementById('id_es_pagada');
         const paraSuscriptoresCheckbox = document.getElementById('id_para_suscriptores');
+        const precioField = document.getElementById('id_precio');  // El campo de precio
+
+        // Función para mostrar/ocultar el campo de precio
+        function togglePrecioField() {
+            if (esPagadaCheckbox.checked) {
+                precioField.parentElement.style.display = 'block';  // Mostrar campo de precio
+                paraSuscriptoresCheckbox.disabled = true;  // Deshabilitar el checkbox de suscriptores
+            } else {
+                precioField.parentElement.style.display = 'none';  // Ocultar campo de precio
+                paraSuscriptoresCheckbox.disabled = false;  // Habilitar el checkbox de suscriptores
+            }
+        }
 
         // Añadir eventos de cambio a los checkboxes
-        esPagadaCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                paraSuscriptoresCheckbox.disabled = true;
-            } else {
-                paraSuscriptoresCheckbox.disabled = false;
-            }
-        });
-
+        esPagadaCheckbox.addEventListener('change', togglePrecioField);
         paraSuscriptoresCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 esPagadaCheckbox.disabled = true;
+                precioField.parentElement.style.display = 'none';  // Ocultar campo de precio si se selecciona "para_suscriptores"
             } else {
                 esPagadaCheckbox.disabled = false;
             }
         });
+
+        // Llamar a la función al cargar la página por si ya está marcado
+        togglePrecioField();
     </script>
 </body>
 </html>
