@@ -417,9 +417,11 @@
             </button>
 
             <!-- Botón para mostrar los favoritos del usuario -->
-            <button onclick="window.location.href='?favoritos=true';" style="display: block; margin: 10px auto; padding: 10px 20px; font-size: 16px; font-weight: bold; color: white; background-color: #e63946; border: none; border-radius: 5px; cursor: pointer; text-align: center; transition: background-color 0.3s ease;">
-                Ver Favoritos ❤️
-            </button>
+            {% if user.is_authenticated %}
+                <button onclick="window.location.href='?favoritos=true';" style="display: block; margin: 10px auto; padding: 10px 20px; font-size: 16px; font-weight: bold; color: white; background-color: #e63946; border: none; border-radius: 5px; cursor: pointer; text-align: center; transition: background-color 0.3s ease;">
+                    Ver Favoritos ❤️
+                </button>
+            {% endif %}
             
             
         </aside>
