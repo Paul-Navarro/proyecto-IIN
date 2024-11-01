@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, CustomUserChangeForm,UserChangeForm, UserProfileChangeForm
 from django.contrib import messages
-from contenido.models import Contenido, Categoria, Rating
+from contenido.models import Contenido, Categoria, Rating, Favorito
 from django.db.models import Q  # Para realizar búsquedas complejas con OR
 from contenido.cron import AutopublicarContenido
 from django.contrib.auth import update_session_auth_hash  # Para mantener la sesión después de cambiar la contraseña
@@ -50,107 +50,6 @@ def home(request):
     @route {GET} /
     @returns {HttpResponse} Renderiza la plantilla 'home/index.html' con los contenidos filtrados, categorías, autores, roles y notificaciones.
     '''
-    '''# DISPARADOR DE CRON
-    cronjob = AutopublicarContenido()
-    cronjob.do()
-
-    # Obtener todas las categorías y autores
-    categorias = Categoria.objects.all()
-    autores = User.objects.all()
-
-   # Filtrar los contenidos publicados y con autopublicar_conte en True
-    contenidos = Contenido.objects.filter(estado_conte='PUBLICADO', autopublicar_conte=True , vigencia_conte=False).order_by('-fecha_publicacion')
-
-    # Calcular el promedio de calificaciones para cada contenido
-    for contenido in contenidos:
-        promedio_calificacion = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg']
-        contenido.promedio_calificacion = promedio_calificacion if promedio_calificacion else 0  # Asignar 0 si no tiene calificaciones
-
-
-    # Filtrar por categoría si está presente en la solicitud
-    categoria_id = request.GET.get('categoria')
-    if categoria_id:
-        contenidos = contenidos.filter(categoria_id=categoria_id)
-
-    # Verificar si se ha enviado un término de búsqueda
-    query = request.GET.get('q')
-    if query:
-        contenidos = contenidos.filter(
-            Q(titulo_conte__icontains=query) |  # Buscar por título
-            Q(tags__nombre__icontains=query)    # Buscar por tags
-        ).distinct()
-
-    # Aplicar los filtros adicionales
-    moderadas = 'moderadas' in request.GET
-    no_moderadas = 'no_moderadas' in request.GET
-    pagadas = 'pagadas' in request.GET
-    suscriptores = 'suscriptores' in request.GET
-
-    # Filtrar contenidos por moderación
-    if moderadas and no_moderadas:
-        # Mostrar tanto moderadas como no moderadas
-        contenidos = contenidos.filter(
-            Q(categoria__es_moderada=True) | Q(categoria__es_moderada=False)
-        )
-    elif moderadas:
-        # Mostrar solo moderadas
-        contenidos = contenidos.filter(categoria__es_moderada=True)
-    elif no_moderadas:
-        # Mostrar solo no moderadas
-        contenidos = contenidos.filter(categoria__es_moderada=False)
-
-    # Filtrar contenidos por pagadas
-    if pagadas:
-        contenidos = contenidos.filter(categoria__es_pagada=True)
-
-    # Filtrar contenidos para suscriptores
-    if suscriptores:
-        contenidos = contenidos.filter(categoria__para_suscriptores=True)
-
-    # Filtrar por rango de fechas
-    fecha_desde = request.GET.get('fecha_desde')
-    fecha_hasta = request.GET.get('fecha_hasta')
-    
-    if fecha_desde:
-        contenidos = contenidos.filter(fecha_publicacion__gte=parse_date(fecha_desde))
-    if fecha_hasta:
-        contenidos = contenidos.filter(fecha_publicacion__lte=parse_date(fecha_hasta))
-
-    # Filtrar por autor
-    autor_id = request.GET.get('autor')
-    if autor_id:
-        contenidos = contenidos.filter(autor_id=autor_id)
-
-    # Obtener el usuario y sus roles
-    user = request.user
-    roles_count = user.roles.count() if user.is_authenticated else 0
-
-    # Obtener las notificaciones no leídas del usuario autenticado
-    notificaciones_no_leidas = 0
-    notificaciones = []
-    if user.is_authenticated:
-        notificaciones = Notificacion.objects.filter(usuario=user, leida=False)
-        notificaciones_no_leidas = notificaciones.count()
-
-    # Contexto para pasar a la plantilla
-    context = {
-        'contenidos': contenidos,
-        'categorias': categorias,
-        'autores': autores,  # Pasamos los autores al contexto
-        'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
-        'has_autor_role': user.has_role('Autor') if user.is_authenticated else False,
-        'has_editor_role': user.has_role('Editor') if user.is_authenticated else False,
-        'has_publicador_role': user.has_role('Publicador') if user.is_authenticated else False,
-        'has_financiero_role':user.has_role('Financiero') if user.is_authenticated else False,
-        'has_multiple_roles': roles_count > 1,
-        'has_single_role': roles_count == 1,
-        'query': query,  # Pasar el término de búsqueda al contexto
-        'notificaciones': notificaciones,  # Añadir las notificaciones al contexto
-        'notificaciones_no_leidas': notificaciones_no_leidas,  # Añadir el conteo de no leídas
-    
-    }
-
-    return render(request, 'home/index.html', context)'''
     # DISPARADOR DE CRON
     cronjob = AutopublicarContenido()
     cronjob.do()
@@ -178,10 +77,19 @@ def home(request):
     # Filtrar los contenidos de las categorías accesibles
     contenidos = Contenido.objects.filter(categoria__in=categorias_accesibles, estado_conte='PUBLICADO', autopublicar_conte=True, vigencia_conte=False).order_by('-fecha_publicacion')
 
+# Verificar si se solicitó ver solo favoritos
+    if request.GET.get('favoritos') == 'true' and request.user.is_authenticated:
+        favoritos = Favorito.objects.filter(usuario=request.user).values_list('contenido', flat=True)
+        contenidos = contenidos.filter(id_conte__in=favoritos)
+
      # Calcular el promedio de calificaciones para cada contenido
     for contenido in contenidos:
         promedio_calificacion = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg']
         contenido.promedio_calificacion = promedio_calificacion if promedio_calificacion else 0  # Asignar 0 si no tiene calificaciones
+
+        # Verificar si el usuario está autenticado y si el contenido está en favoritos
+        contenido.es_favorito = contenido.favoritos.filter(usuario=request.user).exists() if request.user.is_authenticated else False
+
     
 
     # Filtrar por categoría si está presente en la solicitud

@@ -74,6 +74,11 @@ urlpatterns = [
     path('enviar-informe/', enviar_informe, name='enviar_informe'),  # Ruta para enviar el informe por correo
     
     path('inhabilitar/<int:pk>/', views.inhabilitar_contenido, name='inhabilitar_contenido'),
+    
+    path('contenido/<int:contenido_id>/agregar_favorito/', views.agregar_favorito, name='agregar_favorito'),
+    path('contenido/<int:contenido_id>/eliminar_favorito/', views.eliminar_favorito, name='eliminar_favorito'),
+    path('favoritos/', views.lista_favoritos, name='lista_favoritos'),
+
 ]
 
 '''

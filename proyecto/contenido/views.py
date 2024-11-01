@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido, Rating,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado
+from .models import Contenido, Rating,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado,Favorito
 from .forms import ContenidoForm,ReporteContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -1441,3 +1441,22 @@ def inhabilitar_contenido(request, pk):
     else:
         # Si el método no es POST, redirige a otra página
         return redirect('autor_dashboard')  # Cambia esto por la vista adecuada
+    
+    
+    
+@login_required
+def agregar_favorito(request, contenido_id):
+    contenido = get_object_or_404(Contenido, id_conte=contenido_id)
+    Favorito.objects.get_or_create(usuario=request.user, contenido=contenido)
+    return JsonResponse({"status": "ok", "message": "Añadido a favoritos"})
+
+@login_required
+def eliminar_favorito(request, contenido_id):
+    contenido = get_object_or_404(Contenido, id_conte=contenido_id)
+    Favorito.objects.filter(usuario=request.user, contenido=contenido).delete()
+    return JsonResponse({"status": "ok", "message": "Eliminado de favoritos"})
+
+@login_required
+def lista_favoritos(request):
+    favoritos = Favorito.objects.filter(usuario=request.user).select_related('contenido')
+    return render(request, 'home/favoritos.html', {'favoritos': favoritos})
