@@ -6,13 +6,19 @@
     <title>Historial de Compras</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/historial_compras.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header class="header">
-        <div><a class="boton_atras" href="{% url 'home' %}">Atras</a></div>
-        <h1>Historial de compras</h1>
+        <div>
+            <a class="boton_atras" href="{% url 'home' %}">
+                <i class="fas fa-arrow-left"></i> Atrás
+            </a>
+        </div>
+        <h1><i class="fas fa-shopping-cart"></i> Historial de Compras</h1>
         <div></div>
     </header>
+
     <div class="contenedor">
         <main>
             <div class="historial-container">
@@ -20,21 +26,27 @@
                     {% for compra in historial_compras %}
                         <div class="compra-card">
                             <div class="compra-info">
+                                <!-- Número de compra -->
                                 <div class="compra-detalle">
-                                    <h3>Compra N°</h3>
+                                    <h3><i class="fas fa-receipt"></i> Compra N°</h3>
                                     <p>{{ forloop.counter }}</p>
                                 </div>
+                                
+                                <!-- Suscripción a -->
                                 <div class="compra-detalle">
-                                    <h3>Suscripción a</h3>
+                                    <h3><i class="fas fa-tags"></i> Suscripción a</h3>
                                     <p>{{ compra.categoria.nombre }}</p>
                                 </div>
-                                <!-- Mostrar precio -->
+                                
+                                <!-- Precio -->
                                 <div class="compra-detalle">
-                                    <h3>Precio</h3>
+                                    <h3><i class="fas fa-dollar-sign"></i> Precio</h3>
                                     <p>{{ compra.categoria.precio }} GS</p>  
                                 </div>
+                                
+                                <!-- Fecha de transacción -->
                                 <div class="compra-detalle">
-                                    <h3>Fecha de transacción</h3>
+                                    <h3><i class="fas fa-calendar-alt"></i> Fecha de Transacción</h3>
                                     <p>{{ compra.fecha_transaccion|date:"d M Y H:i" }}</p>
                                 </div>
                             </div>

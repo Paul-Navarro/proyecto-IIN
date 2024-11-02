@@ -1461,14 +1461,13 @@ def lista_favoritos(request):
     favoritos = Favorito.objects.filter(usuario=request.user).select_related('contenido')
     return render(request, 'home/favoritos.html', {'favoritos': favoritos})
 
-<<<<<<< HEAD
 
 def toggle_destacado(request, pk):
     contenido = get_object_or_404(Contenido, pk=pk)
     contenido.es_destacado = not contenido.es_destacado
     contenido.save()
     return redirect(reverse('administrador_KANBAN'))
-=======
+
 def ver_estadisticas_todos_autores(request):
     """
     Muestra las estadísticas de todos los autores para el administrador.
@@ -1548,4 +1547,4 @@ def ver_estadisticas_todos_autores(request):
     }
 
     return render(request, 'admin/estadisticas.html', context)
->>>>>>> f3eb1869abbbfacf4470e69a75f11f3b6c279bd9
+

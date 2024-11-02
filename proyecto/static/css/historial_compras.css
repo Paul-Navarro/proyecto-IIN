@@ -8,7 +8,6 @@ body {
     line-height: 1.6;
 }
 
-
 .contenedor {
     max-width: 1200px;
     margin: 0 auto;
@@ -25,26 +24,39 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    border-bottom: 3px solid #12746b;
 }
 
-.boton_atras{
-    font-size: 19px;
+.boton_atras {
+    font-size: 18px;
     text-decoration: none;
-    padding: 5px 10px;
+    padding: 8px 12px;
     border-radius: 5px;
-    color: #12746b;
+    color: #16a085;
     background-color: #d6eae3;
     transition: background-color 0.3s ease;
-    display: inline-block;
-    text-align: center;
-    width: auto;
+    display: inline-flex;
+    align-items: center;
+}
+
+.boton_atras i {
+    margin-right: 5px;
+}
+
+.boton_atras:hover {
+    background-color: #b4d9d0;
 }
 
 .header h1 {
     color: #fff;
-    font-size: 2.6em;
+    font-size: 2.4em;
     margin: 0;
+    display: inline-flex;
+    align-items: center;
+}
+
+.header h1 i {
+    margin-right: 10px;
 }
 
 /* Contenedor del historial */
@@ -70,18 +82,21 @@ header {
     transform: scale(1.02);
 }
 
-/* Detalles de la compra, uno debajo del otro */
+/* Detalles de la compra */
 .compra-info {
-    text-align: center;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
 }
 
 .compra-detalle h3 {
     font-size: 20px;
     color: #333;
-    margin-bottom: 8px;
-    margin-top: 0;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .compra-detalle p {
