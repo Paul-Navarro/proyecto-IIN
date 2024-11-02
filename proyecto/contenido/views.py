@@ -1460,3 +1460,83 @@ def eliminar_favorito(request, contenido_id):
 def lista_favoritos(request):
     favoritos = Favorito.objects.filter(usuario=request.user).select_related('contenido')
     return render(request, 'home/favoritos.html', {'favoritos': favoritos})
+
+def ver_estadisticas_todos_autores(request):
+    """
+    Muestra las estadísticas de todos los autores para el administrador.
+    Permite filtrar por mes, año, categorías y autor.
+    """
+    # Lista de meses y años para los filtros
+    months = list(range(1, 13))  # Del 1 al 12
+    current_year = datetime.now().year
+    years = list(range(current_year, current_year - 10, -1))  # Los últimos 10 años
+
+    # Categorías disponibles
+    categorias = Categoria.objects.all()
+    
+    # Filtrar contenidos por parámetros de la solicitud
+    contenidos = Contenido.objects.all()
+    selected_month = request.GET.get('month', 'all')
+    selected_year = request.GET.get('year', 'all')
+    selected_category = request.GET.get('category', 'all')
+    selected_author = request.GET.get('author', 'all')
+
+    if selected_month != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__month=int(selected_month))
+    if selected_year != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__year=int(selected_year))
+    if selected_category != 'all':
+        contenidos = contenidos.filter(categoria__id=int(selected_category))
+    if selected_author != 'all':
+        contenidos = contenidos.filter(autor__id=int(selected_author))
+
+    # Obtener los datos de estadísticas
+    autores_estadisticas = contenidos.values('autor__id', 'autor__username')\
+        .annotate(total_visualizaciones=Sum('cant_visualiz_conte'),
+                  total_likes=Sum('likes'),
+                  total_unlikes=Sum('unlikes'))
+
+    # Autor con más visualizaciones, más likes y más unlikes
+    autor_mas_visualizaciones = autores_estadisticas.order_by('-total_visualizaciones').first()
+    autor_mas_likes = autores_estadisticas.order_by('-total_likes').first()
+    autor_mas_unlikes = autores_estadisticas.order_by('-total_unlikes').first()
+
+    # Extraer los contenidos de cada autor para los gráficos
+    autores_contenidos = []
+    for autor in autores_estadisticas:
+        contenidos_autor = contenidos.filter(autor__id=autor['autor__id'])
+        titulos = [c.titulo_conte for c in contenidos_autor]
+        likes = [c.likes for c in contenidos_autor]
+        unlikes = [c.unlikes for c in contenidos_autor]
+        visualizaciones = [c.cant_visualiz_conte for c in contenidos_autor]
+        mejor_contenido = contenidos_autor.order_by('-likes').first()
+
+        autores_contenidos.append({
+            'autor': autor['autor__username'],
+            'total_visualizaciones': autor['total_visualizaciones'],
+            'total_likes': autor['total_likes'],
+            'total_unlikes': autor['total_unlikes'],
+            'titulos': titulos,
+            'likes': likes,
+            'unlikes': unlikes,
+            'visualizaciones': visualizaciones,
+            'mejor_contenido': mejor_contenido
+        })
+
+    # Preparar datos para la plantilla
+    context = {
+        'autores_estadisticas': autores_estadisticas,
+        'autor_mas_visualizaciones': autor_mas_visualizaciones,
+        'autor_mas_likes': autor_mas_likes,
+        'autor_mas_unlikes': autor_mas_unlikes,
+        'autores_contenidos': autores_contenidos,
+        'months': months,
+        'years': years,
+        'categorias': categorias,
+        'selected_month': selected_month,
+        'selected_year': selected_year,
+        'selected_category': selected_category,
+        'selected_author': selected_author,
+    }
+
+    return render(request, 'admin/estadisticas.html', context)
