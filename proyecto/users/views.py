@@ -10,6 +10,7 @@ from django.db.models import Q  # Para realizar búsquedas complejas con OR
 from contenido.cron import AutopublicarContenido
 from django.contrib.auth import update_session_auth_hash  # Para mantener la sesión después de cambiar la contraseña
 from django.contrib.auth.forms import PasswordChangeForm  # Para el formulario de cambio de contraseña
+from django.urls import reverse
 
 
 # En tu vista, al procesar los datos

@@ -83,6 +83,11 @@
                                 <div class="kanban-item" id="item{{ contenido.pk }}">
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_delete_admin' contenido.pk %}" class="btn btn-delete">Eliminar</a>
+                                    {% if contenido.es_destacado %}
+                                    <a href="{% url 'contenido_toggle_destacado' contenido.pk %}" class="btn btn-ndestacar">No destacar</a>
+                                {% else %}
+                                    <a href="{% url 'contenido_toggle_destacado' contenido.pk %}" class="btn btn-destacar">Destacar</a>
+                                {% endif %}
                                 </div>
                             {% endif %}
                         {% endfor %}

@@ -1460,3 +1460,10 @@ def eliminar_favorito(request, contenido_id):
 def lista_favoritos(request):
     favoritos = Favorito.objects.filter(usuario=request.user).select_related('contenido')
     return render(request, 'home/favoritos.html', {'favoritos': favoritos})
+
+
+def toggle_destacado(request, pk):
+    contenido = get_object_or_404(Contenido, pk=pk)
+    contenido.es_destacado = not contenido.es_destacado
+    contenido.save()
+    return redirect(reverse('administrador_KANBAN'))

@@ -78,6 +78,7 @@ urlpatterns = [
     path('contenido/<int:contenido_id>/agregar_favorito/', views.agregar_favorito, name='agregar_favorito'),
     path('contenido/<int:contenido_id>/eliminar_favorito/', views.eliminar_favorito, name='eliminar_favorito'),
     path('favoritos/', views.lista_favoritos, name='lista_favoritos'),
+    path('contenido/<int:pk>/toggle_destacado/', views.toggle_destacado, name='contenido_toggle_destacado'),
 
 ]
 
