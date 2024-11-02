@@ -284,6 +284,24 @@ body {
     }
 }
 
+.swiper-container {
+    overflow: hidden;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenidoDestacado {
+    width: 100%;
+    max-width: 600px;
+    /* Puedes ajustar este ancho máximo */
+    margin: 0 auto;
+}
 
 
 /* Listado lateral derecho */
