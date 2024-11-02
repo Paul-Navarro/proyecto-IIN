@@ -49,6 +49,7 @@ class Contenido(models.Model):
     unlikes = models.IntegerField(default=0)
     autopublicar_conte = models.BooleanField(default=False)
     vigencia_conte = models.BooleanField(default=False)
+    es_destacado = models.BooleanField(default=False)
     
 
     # Relación con el autor del contenido

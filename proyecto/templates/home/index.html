@@ -281,10 +281,105 @@
             
             
             
-            
-            
             <!-- Cada contenido a mostrarse acá, tiene que tener su propio div -->
             <div class="cajaContenidos" id="cajaContenidos">
+
+                
+
+                {% if contenidos_destacados %}
+
+                {% for contenido in contenidos_destacados %}
+                    <div class="contenidoDestacado">
+                         <!-- Código del contenido destacado -->
+                         <div class="codigoConte">
+                            <span>Código: {{ contenido.id_conte }}</span>
+                        </div>
+
+                        <div class="destacado-header">
+                            <h4>Destacado</h4>
+                        </div>
+                        
+                        <!-- Título del contenido -->
+                        <h3 class="contenido-titulo">{{ contenido.titulo_conte }}</h3>
+        
+                        <!-- Imagen del contenido (opcional) -->
+                        {% if contenido.imagen_conte %}
+                        <div class="divImagenContenido">
+                            <img class="imagenContenido" src="{{ contenido.imagen_conte.url }}" alt="{{ contenido.titulo_conte }}">
+                        </div>
+                        {% endif %}
+        
+                        <!-- Descripción del contenido -->
+                        <div class="descripcion">
+                        <p class="contenido-descripcion">{{ contenido.texto_conte|truncatechars:550|safe }}</p>
+                        </div>
+        
+                        <!-- Información adicional del contenido -->
+                        <div class="info-contenido">
+                            <p>
+                                <i class="fas fa-user"></i> 
+                                <strong>Autor:</strong> 
+                                {% if contenido.autor %}
+                                    {{ contenido.autor.get_full_name }}
+                                {% else %}
+                                    (Autor desconocido)
+                                {% endif %}
+                            </p>
+                        
+                            <p>
+                                <i class="fas fa-folder"></i> 
+                                <strong>Categoría:</strong>
+                                {% if contenido.categoria %}
+                                    {{ contenido.categoria.nombre }}
+                                {% else %}
+                                    Sin categoría
+                                {% endif %}
+                            </p>
+                        
+                            <p>
+                                <i class="fas fa-calendar-alt"></i> 
+                                <strong>Fecha de publicación:</strong> 
+                                {% if contenido.fecha_publicacion %}
+                                    {{ contenido.fecha_publicacion|date:"d M, Y H:i" }}
+                                {% else %}
+                                    No publicada
+                                {% endif %}
+                            </p>
+
+                             <!-- Mostrar el promedio de calificaciones -->
+                            <p>
+                                <i class="fas fa-star"></i> 
+                                <strong>Popularidad:</strong> 
+                                {% if contenido.promedio_calificacion > 0 %}
+                                    {{ contenido.promedio_calificacion|floatformat:1 }} de 5 estrellas
+                                {% else %}
+                                    Aún no ha sido calificado.
+                                {% endif %}
+                            </p>
+
+                        </div>
+
+                             <div class="contenedor_info">
+
+                                <!-- Sección de likes y unlikes -->
+                                <div class="likes-container">
+                                    <button class="like-button" data-id="{{ contenido.id_conte }}" onclick="likeContenido({{ contenido.id_conte }})">👍 Like</button>
+                                    <span id="like-count-{{ contenido.id_conte }}">{{ contenido.likes }}</span>
+                                    
+                                    <button class="unlike-button" data-id="{{ contenido.id_conte }}" onclick="unlikeContenido({{ contenido.id_conte }})">👎 Unlike</button>
+                                    <span id="unlike-count-{{ contenido.id_conte }}">{{ contenido.unlikes }}</span>
+                                </div>
+                
+                                <!-- Enlace para leer más -->
+                                <div class="btn-container">
+                                    <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                                </div>        
+                            </div>
+                    </div>
+                {% endfor %}
+
+           
+                {% endif %}
                 {% if contenidos %}
                     {% for contenido in contenidos %}
                         <div class="contenidoRelleno">

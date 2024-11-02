@@ -75,7 +75,16 @@ def home(request):
         categorias_accesibles = Categoria.objects.filter(es_pagada=False, para_suscriptores=False)
 
     # Filtrar los contenidos de las categorías accesibles
-    contenidos = Contenido.objects.filter(categoria__in=categorias_accesibles, estado_conte='PUBLICADO', autopublicar_conte=True, vigencia_conte=False).order_by('-fecha_publicacion')
+    contenidos = Contenido.objects.filter(categoria__in=categorias_accesibles, estado_conte='PUBLICADO', autopublicar_conte=True, vigencia_conte=False, es_destacado=False).order_by('-fecha_publicacion')
+
+    contenidos_destacados = Contenido.objects.filter(
+        categoria__in=categorias_accesibles,
+        estado_conte='PUBLICADO',
+        autopublicar_conte=True,
+        vigencia_conte=False,
+        es_destacado=True
+    ).order_by('-fecha_publicacion')
+
 
 # Verificar si se solicitó ver solo favoritos
     if request.GET.get('favoritos') == 'true' and request.user.is_authenticated:
@@ -157,6 +166,7 @@ def home(request):
     # Contexto para pasar a la plantilla
     context = {
         'contenidos': contenidos,
+        'contenidos_destacados': contenidos_destacados,
         'categorias': categorias,
         'autores': autores,  # Pasamos los autores al contexto
         'has_admin_role': user.has_role('Admin') if user.is_authenticated else False,
