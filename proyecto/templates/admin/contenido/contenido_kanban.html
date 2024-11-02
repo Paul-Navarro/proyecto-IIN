@@ -84,10 +84,19 @@
                                     <h4>{{ contenido.titulo_conte }}</h4>
                                     <a href="{% url 'contenido_delete_admin' contenido.pk %}" class="btn btn-delete">Eliminar</a>
                                     {% if contenido.es_destacado %}
-                                    <a href="{% url 'contenido_toggle_destacado' contenido.pk %}" class="btn btn-ndestacar">No destacar</a>
+                                    <a href="{% url 'contenido_toggle_destacado' contenido.pk %}" 
+                                       class="btn btn-ndestacar" 
+                                       onclick="return confirm('¿Estás seguro de que quieres quitar el destacado de este contenido?');">
+                                       No destacar
+                                    </a>
                                 {% else %}
-                                    <a href="{% url 'contenido_toggle_destacado' contenido.pk %}" class="btn btn-destacar">Destacar</a>
+                                    <a href="{% url 'contenido_toggle_destacado' contenido.pk %}" 
+                                       class="btn btn-destacar" 
+                                       onclick="return confirm('¿Estás seguro de que quieres destacar este contenido?');">
+                                       Destacar
+                                    </a>
                                 {% endif %}
+                                
                                 </div>
                             {% endif %}
                         {% endfor %}
