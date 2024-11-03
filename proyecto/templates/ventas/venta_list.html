@@ -107,13 +107,13 @@
                 <select name="categoria">
                     <option value="">Todas las Categorías</option>
                     {% for categoria in categorias %}
-                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                        <option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>{{ categoria.nombre }}</option>
                     {% endfor %}
                 </select>
                 <select name="suscriptor">
                     <option value="">Todos los Suscriptores</option>
                     {% for suscriptor in suscriptores %}
-                        <option value="{{ suscriptor.id }}">{{ suscriptor.username }}</option>
+                        <option value="{{ suscriptor.id }}" {% if request.GET.suscriptor == suscriptor.id|stringformat:"s" %}selected{% endif %}>{{ suscriptor.username }}</option>
                     {% endfor %}
                 </select>
                 <input type="date" name="fecha_desde" value="{{ request.GET.fecha_desde }}">
@@ -142,7 +142,6 @@
             <a href="{% url 'descargar_ventas_excel' %}">Descargar Datos en Excel</a>
         </div>
         
-
         <table>
             <thead>
                 <tr>

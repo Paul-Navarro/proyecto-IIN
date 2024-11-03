@@ -1061,6 +1061,16 @@ from django.http import HttpResponse
 import csv
 from .models import HistorialCompra
 
+from django.views.generic import ListView
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+import csv
+from .models import HistorialCompra
+from categorias.models import Categoria
+from django.contrib.auth import get_user_model
+
 class VentaListView(ListView):
     model = HistorialCompra
     template_name = 'ventas/venta_list.html'
@@ -1084,7 +1094,7 @@ class VentaListView(ListView):
 
         # Filtrar por suscriptor
         if suscriptor_id:
-            ventas = ventas.filter(suscriptor_id=suscriptor_id)
+            ventas = ventas.filter(usuario_id=suscriptor_id)
         
         # Filtrar por rango de fechas
         if fecha_desde:
@@ -1124,6 +1134,10 @@ class VentaListView(ListView):
             )
             categorias_por_fecha[cat] = {pago['fecha'].strftime('%Y-%m-%d'): pago['total'] for pago in pagos_categoria}
 
+        # Obtener todas las categorías y suscriptores para los filtros
+        categorias = Categoria.objects.all()
+        suscriptores = get_user_model().objects.all()
+
         context.update({
             'total_pagos': total_pagos,
             'categorias_nombres': categorias_nombres,
@@ -1132,6 +1146,8 @@ class VentaListView(ListView):
             'totales_por_fecha': totales_por_fecha,
             'categorias_por_fecha': categorias_por_fecha,
             'ventas': ventas,  # Ventas para la vista tabular
+            'categorias': categorias,
+            'suscriptores': suscriptores,
         })
         return context
 
@@ -1151,7 +1167,7 @@ class VentaListView(ListView):
         for venta in ventas:
             writer.writerow([
                 venta.fecha_transaccion.strftime('%Y-%m-%d %H:%M:%S'),
-                venta.suscriptor,
+                venta.usuario,
                 venta.categoria.nombre,
                 venta.medio_pago,
                 venta.categoria.precio,
@@ -1162,6 +1178,7 @@ class VentaListView(ListView):
         writer.writerow([])
         writer.writerow(['Total General', '', '', '', total_pagos])
         return response
+
     from django.http import HttpResponse
 import openpyxl
 from .models import HistorialCompra
