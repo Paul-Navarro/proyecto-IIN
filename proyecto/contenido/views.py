@@ -1105,7 +1105,7 @@ class VentaListView(ListView):
             ventas = ventas.filter(fecha_transaccion__lte=parse_date(fecha_hasta))
         
         # Total de pagos recibidos
-        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total']
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total'] or 0
         
         # Datos para el gráfico de torta
         categorias = ventas.values('categoria__nombre').annotate(total=Sum('categoria__precio'))
@@ -1176,7 +1176,7 @@ class VentaListView(ListView):
             ])
 
         # Agregar total general
-        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total']
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total'] or 0
         writer.writerow([])
         writer.writerow(['Total General', '', '', '', total_pagos])
         return response
@@ -1215,7 +1215,7 @@ def descargar_ventas_excel(request):
             venta.usuario.username if venta.usuario else "No disponible",
             venta.categoria.nombre if venta.categoria else "Sin categoría",
             "Método de Pago",  # Ajusta este valor si tienes otro campo correspondiente
-            "Monto"  # Ajusta este valor si tienes otro campo correspondiente
+            venta.categoria.precio if venta.categoria else 0  # Ajusta este valor si tienes otro campo correspondiente
         ])
 
     # Ajustar el ancho de las columnas automáticamente

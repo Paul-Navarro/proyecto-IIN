@@ -11,42 +11,10 @@
 
     <!-- Cargar Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% load static %} <!-- Cargar la biblioteca estática de Django -->
+    <link rel="stylesheet" href="{% static 'css/estadistica_admin.css' %}">
 
-    <style>
-        .estadisticas-container {
-            padding: 20px;
-        }
-
-        .card {
-            margin-bottom: 20px;
-        }
-
-        .card-body {
-            padding: 10px;
-        }
-
-        canvas {
-            max-height: 250px;
-        }
-
-        .estadisticas-container h5 {
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-
-        /* Estilo para mostrar solo un slide a la vez */
-        .slide {
-            display: none;
-        }
-
-        .active-slide {
-            display: block;
-        }
-
-        .text-center {
-            margin-top: 20px;
-        }
-    </style>
+    
 </head>
 
 <body>

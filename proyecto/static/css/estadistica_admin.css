@@ -1,0 +1,102 @@
+.estadisticas-container {
+    padding: 20px;
+    background-color: #f3f4f6;
+    border-radius: 10px;
+}
+
+.card {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 15px;
+    color: #ffffff;
+}
+
+.bg-info {
+    background-color: #00796b !important;
+}
+
+.bg-success {
+    background-color: #388e3c !important;
+}
+
+.bg-warning {
+    background-color: #f39c12 !important;
+    color: #333;
+}
+
+.bg-primary {
+    background-color: #3498db !important;
+}
+
+canvas {
+    max-height: 250px;
+}
+
+h5.card-title {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+h1, h3 {
+    color: #2e7d32;
+}
+
+form label {
+    font-weight: bold;
+    color: #00796b;
+}
+
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #e0f2f1;
+}
+
+.btn-primary {
+    background-color: #00796b;
+    border: none;
+    color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #00695c;
+}
+
+.btn-secondary {
+    background-color: #757575;
+    border: none;
+    color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #616161;
+}
+
+/* Slide controls */
+#prevSlide, #nextSlide {
+    margin: 10px 5px;
+    padding: 8px 16px;
+    border-radius: 5px;
+}
+
+/* Style for slides */
+.slide {
+    display: none;
+}
+
+.active-slide {
+    display: block;
+}
+
+/* Responsive grid layout for cards */
+@media (min-width: 768px) {
+    .row .col-md-4 {
+        padding: 0 10px;
+    }
+}

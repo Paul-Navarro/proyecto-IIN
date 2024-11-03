@@ -5,103 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo Financiero - Ventas</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f4f6;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #2c3e50;
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .total-pagos {
-            font-size: 1.4rem;
-            color: #16a085;
-            text-align: center;
-            margin: 15px 0;
-        }
-        .chart-container {
-            margin: 15px 0;
-            width: 100%;
-        }
-        h3 {
-            font-size: 1.2rem;
-            color: #34495e;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .filter-container {
-            margin: 20px 0;
-            text-align: center;
-        }
-        .filter-container select,
-        .filter-container input {
-            margin: 5px;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        .filter-container button {
-            padding: 8px 16px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .filter-container button:hover {
-            background-color: #2980b9;
-        }
-        .download-button {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .download-button a {
-            padding: 10px 20px;
-            background-color: #e67e22;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .download-button a:hover {
-            background-color: #d35400;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-            color: #333;
-        }
-    </style>
+    {% load static %} <!-- Cargar la biblioteca estática de Django -->
+    <link rel="stylesheet" href="{% static 'css/ventas.css' %}">
+    
 </head>
 <body>
     <div class="container">
         <h1>Módulo Financiero - Ventas</h1>
+        <div>
+            <a class="boton_atras" href="{% url 'home' %}">
+                <i class="fas fa-arrow-left"></i> Atrás
+            </a>
+        </div>
         <div class="filter-container">
             <form method="get">
                 <select name="categoria">
@@ -121,27 +36,7 @@
                 <button type="submit">Filtrar</button>
             </form>
         </div>
-        <p class="total-pagos">Total de Pagos Recibidos: ${{ total_pagos }}</p>
-
-        <div class="chart-container">
-            <h3>Total Comprado por Categoría</h3>
-            <canvas id="tortaCategorias" style="max-height: 250px;"></canvas>
-        </div>
-        
-        <div class="chart-container">
-            <h3>Pagos Recibidos por Fecha</h3>
-            <canvas id="barrasPagosPorFecha" style="max-height: 250px;"></canvas>
-        </div>
-        
-        <div class="chart-container">
-            <h3>Comparativa de Categorías Compradas por Fecha</h3>
-            <canvas id="lineasComparativaCategorias" style="max-height: 250px;"></canvas>
-        </div>
-
-        <div class="download-button">
-            <a href="{% url 'descargar_ventas_excel' %}">Descargar Datos en Excel</a>
-        </div>
-        
+        <p class="total-pagos">Total de Pagos Recibidos: Gs. {{ total_pagos }}</p>
         <table>
             <thead>
                 <tr>
@@ -159,15 +54,36 @@
                         <td>{{ venta.usuario.username }}</td>
                         <td>{{ venta.categoria.nombre }}</td>
                         <td>{{ venta.metodo_pago }}</td>
-                        <td>${{ venta.categoria.precio }}</td>
+                        <td>Gs. {{ venta.categoria.precio }}</td>
                     </tr>
                 {% endfor %}
                 <tr>
                     <td colspan="4"><strong>Total General</strong></td>
-                    <td><strong>${{ total_pagos }}</strong></td>
+                    <td><strong>Gs. {{ total_pagos }}</strong></td>
                 </tr>
             </tbody>
         </table>
+        <div class="download-button">
+            <a href="{% url 'descargar_ventas_excel' %}">Descargar Datos en Excel</a>
+        </div>
+        <div class="chart-container">
+            <h3>Total Comprado por Categoría</h3>
+            <canvas id="tortaCategorias" style="max-height: 250px;"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Pagos Recibidos por Fecha</h3>
+            <canvas id="barrasPagosPorFecha" style="max-height: 250px;"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Comparativa de Categorías Compradas por Fecha</h3>
+            <canvas id="lineasComparativaCategorias" style="max-height: 250px;"></canvas>
+        </div>
+
+        
+        
+        
     </div>
 
     <script>
