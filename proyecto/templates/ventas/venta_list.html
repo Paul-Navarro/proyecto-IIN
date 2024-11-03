@@ -150,6 +150,7 @@
                     <th>Suscriptor</th>
                     <th>Categoría</th>
                     <th>Método de Pago</th>
+                    <th>Monto</th>
                 </tr>
             </thead>
             <tbody>
@@ -159,10 +160,11 @@
                         <td>{{ venta.usuario.username }}</td>
                         <td>{{ venta.categoria.nombre }}</td>
                         <td>{{ venta.metodo_pago }}</td>
+                        <td>${{ venta.categoria.precio }}</td>
                     </tr>
                 {% endfor %}
                 <tr>
-                    <td colspan="3"><strong>Total General</strong></td>
+                    <td colspan="4"><strong>Total General</strong></td>
                     <td><strong>${{ total_pagos }}</strong></td>
                 </tr>
             </tbody>

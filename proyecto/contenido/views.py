@@ -1163,7 +1163,8 @@ class VentaListView(ListView):
         writer.writerow(['Total General', '', '', '', total_pagos])
         return response
     from django.http import HttpResponse
-
+import openpyxl
+from .models import HistorialCompra
 
 from django.http import HttpResponse
 import openpyxl
