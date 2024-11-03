@@ -45,11 +45,82 @@
             margin-bottom: 10px;
             text-align: center;
         }
+        .filter-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .filter-container select,
+        .filter-container input {
+            margin: 5px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .filter-container button {
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .filter-container button:hover {
+            background-color: #2980b9;
+        }
+        .download-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .download-button a {
+            padding: 10px 20px;
+            background-color: #e67e22;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .download-button a:hover {
+            background-color: #d35400;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Módulo Financiero - Ventas</h1>
+        <div class="filter-container">
+            <form method="get">
+                <select name="categoria">
+                    <option value="">Todas las Categorías</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <select name="suscriptor">
+                    <option value="">Todos los Suscriptores</option>
+                    {% for suscriptor in suscriptores %}
+                        <option value="{{ suscriptor.id }}">{{ suscriptor.username }}</option>
+                    {% endfor %}
+                </select>
+                <input type="date" name="fecha_desde" value="{{ request.GET.fecha_desde }}">
+                <input type="date" name="fecha_hasta" value="{{ request.GET.fecha_hasta }}">
+                <button type="submit">Filtrar</button>
+            </form>
+        </div>
         <p class="total-pagos">Total de Pagos Recibidos: ${{ total_pagos }}</p>
 
         <div class="chart-container">
@@ -66,6 +137,38 @@
             <h3>Comparativa de Categorías Compradas por Fecha</h3>
             <canvas id="lineasComparativaCategorias" style="max-height: 250px;"></canvas>
         </div>
+
+        <div class="download-button">
+            <a href="{% url 'descargar_ventas_excel' %}">Descargar Datos en Excel</a>
+        </div>
+        
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Suscriptor</th>
+                    <th>Categoría</th>
+                    <th>Método de Pago</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.fecha_transaccion }}</td>
+                        <td>{{ venta.suscriptor.username }}</td>
+                        <td>{{ venta.categoria.nombre }}</td>
+                        <td>{{ venta.metodo_pago }}</td>
+                        <td>${{ venta.monto }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4"><strong>Total General</strong></td>
+                    <td><strong>${{ total_pagos }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <script>

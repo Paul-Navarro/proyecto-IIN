@@ -80,6 +80,7 @@ urlpatterns = [
     path('contenido/<int:contenido_id>/eliminar_favorito/', views.eliminar_favorito, name='eliminar_favorito'),
     path('favoritos/', views.lista_favoritos, name='lista_favoritos'),
 
+    path('ventas/descargar/', views.descargar_ventas_excel, name='descargar_ventas_excel'),
 ]
 
 '''

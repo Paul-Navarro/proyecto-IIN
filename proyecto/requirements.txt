@@ -7,3 +7,4 @@ Pillow
 django-ckeditor
 django-cron
 stripe
+openpyxl

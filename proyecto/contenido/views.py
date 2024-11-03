@@ -1054,6 +1054,13 @@ from django.utils import timezone
 from django.db.models.functions import TruncDate
 from django.http import JsonResponse
 
+from django.views.generic import ListView
+from django.db.models import Q, Sum
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+import csv
+from .models import HistorialCompra
+
 class VentaListView(ListView):
     model = HistorialCompra
     template_name = 'ventas/venta_list.html'
@@ -1062,17 +1069,40 @@ class VentaListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
+        # Filtros
+        categoria_id = self.request.GET.get('categoria')
+        suscriptor_id = self.request.GET.get('suscriptor')
+        fecha_desde = self.request.GET.get('fecha_desde')
+        fecha_hasta = self.request.GET.get('fecha_hasta')
+
+        # Inicializar queryset
+        ventas = HistorialCompra.objects.all()
+        
+        # Filtrar por categoría
+        if categoria_id:
+            ventas = ventas.filter(categoria_id=categoria_id)
+
+        # Filtrar por suscriptor
+        if suscriptor_id:
+            ventas = ventas.filter(suscriptor_id=suscriptor_id)
+        
+        # Filtrar por rango de fechas
+        if fecha_desde:
+            ventas = ventas.filter(fecha_transaccion__gte=parse_date(fecha_desde))
+        if fecha_hasta:
+            ventas = ventas.filter(fecha_transaccion__lte=parse_date(fecha_hasta))
+        
         # Total de pagos recibidos
-        total_pagos = HistorialCompra.objects.aggregate(total=Sum('categoria__precio'))['total']
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total']
         
         # Datos para el gráfico de torta
-        categorias = HistorialCompra.objects.values('categoria__nombre').annotate(total=Sum('categoria__precio'))
+        categorias = ventas.values('categoria__nombre').annotate(total=Sum('categoria__precio'))
         categorias_nombres = [cat['categoria__nombre'] for cat in categorias]
         categorias_totales = [cat['total'] for cat in categorias]
         
         # Datos para el gráfico de barras y líneas
         pagos_por_fecha = (
-            HistorialCompra.objects
+            ventas
             .annotate(fecha=TruncDate('fecha_transaccion'))
             .values('fecha')
             .annotate(total=Sum('categoria__precio'))
@@ -1085,7 +1115,7 @@ class VentaListView(ListView):
         categorias_por_fecha = {}
         for cat in categorias_nombres:
             pagos_categoria = (
-                HistorialCompra.objects
+                ventas
                 .filter(categoria__nombre=cat)
                 .annotate(fecha=TruncDate('fecha_transaccion'))
                 .values('fecha')
@@ -1101,8 +1131,76 @@ class VentaListView(ListView):
             'fechas': fechas,
             'totales_por_fecha': totales_por_fecha,
             'categorias_por_fecha': categorias_por_fecha,
+            'ventas': ventas,  # Ventas para la vista tabular
         })
         return context
+
+    def get(self, request, *args, **kwargs):
+        # Exportar a Excel si se solicita
+        if 'exportar' in request.GET:
+            return self.exportar_excel()
+        return super().get(request, *args, **kwargs)
+
+    def exportar_excel(self):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="ventas.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Fecha', 'Suscriptor', 'Categoría', 'Medio de Pago', 'Monto'])
+
+        ventas = self.get_queryset()
+        for venta in ventas:
+            writer.writerow([
+                venta.fecha_transaccion.strftime('%Y-%m-%d %H:%M:%S'),
+                venta.suscriptor,
+                venta.categoria.nombre,
+                venta.medio_pago,
+                venta.categoria.precio,
+            ])
+
+        # Agregar total general
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total']
+        writer.writerow([])
+        writer.writerow(['Total General', '', '', '', total_pagos])
+        return response
+    from django.http import HttpResponse
+import openpyxl
+from .models import HistorialCompra
+
+def descargar_ventas_excel(request):
+    '''
+    @function descargar_ventas_excel
+    @description Genera y descarga un archivo Excel con las ventas filtradas.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @returns {HttpResponse} Retorna un archivo Excel descargable con las ventas.
+    '''
+    # Crear el libro de trabajo y la hoja de cálculo
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'Ventas'
+
+    # Agregar encabezados
+    headers = ['Fecha y Hora', 'Usuario', 'Categoría', 'Método de Pago', 'Monto']
+    worksheet.append(headers)
+
+    # Obtener los datos de las ventas
+    ventas = HistorialCompra.objects.all()  # Aquí puedes aplicar filtros si es necesario
+    for venta in ventas:
+        worksheet.append([
+            venta.fecha_transaccion,
+            venta.usuario.username,
+            venta.categoria.nombre if venta.categoria else "Sin categoría",
+            "Método de Pago"  # Ajusta este valor si tienes otro campo correspondiente
+            "Monto"  # Ajusta este valor si tienes otro campo correspondiente
+        ])
+
+    # Preparar la respuesta HTTP
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=ventas.xlsx'
+    workbook.save(response)
+
+    return response
 
 
 #Notificación al correo
