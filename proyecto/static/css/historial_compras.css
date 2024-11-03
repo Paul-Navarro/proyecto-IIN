@@ -214,3 +214,18 @@ header {
 .btn-filtrar:hover {
     background-color: #12746b;
 }
+
+
+.btn-exportar {
+    padding: 6px 12px;
+    background-color: #4CAF50; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-exportar:hover {
+    background-color: #45a049;
+}

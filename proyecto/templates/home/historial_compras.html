@@ -30,6 +30,8 @@
                 <input type="date" id="fecha-hasta" name="fecha-hasta">
     
                 <button onclick="filtrarFechas()" class="btn-filtrar">Filtrar</button>
+
+                <button onclick="location.href='{% url 'exportar_excel' %}'" class="btn-exportar">Exportar a Excel</button>
             </div>
     
             <div class="historial-container">

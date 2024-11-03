@@ -26,6 +26,8 @@ from django.db.models import Avg,Count, Sum
 from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.sessions.models import Session
 
+import pandas as pd
+from django.http import HttpResponse
 
 #para rol financiero
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -1548,3 +1550,25 @@ def ver_estadisticas_todos_autores(request):
 
     return render(request, 'admin/estadisticas.html', context)
 
+def exportar_excel(request):
+    # Obtén los datos de compras del modelo
+    compras = HistorialCompra.objects.all()
+
+    # Organiza los datos en una lista de diccionarios para fácil conversión a DataFrame
+    data = [{
+        "Compra N°": i + 1,
+        "Suscripción a": compra.categoria.nombre,
+        "Precio": f"{compra.categoria.precio} GS",
+        "Fecha de Transacción": compra.fecha_transaccion.strftime("%d %b %Y %H:%M")
+    } for i, compra in enumerate(compras)]
+
+    # Crear un DataFrame de Pandas con los datos
+    df = pd.DataFrame(data)
+
+    # Crear un archivo Excel en memoria
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=historial_compras.xlsx'
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Historial de Compras')
+
+    return response

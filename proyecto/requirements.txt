@@ -7,3 +7,5 @@ Pillow
 django-ckeditor
 django-cron
 stripe
+pandas>=1.0.0
+openpyxl>=3.0.0
