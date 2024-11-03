@@ -20,7 +20,6 @@ header {
     padding: 20px;
     text-align: center;
     margin-bottom: 20px;
-    height: 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -55,52 +54,163 @@ header {
     align-items: center;
 }
 
-.header h1 i {
-    margin-right: 10px;
-}
-
-/* Contenedor del historial */
-.historial-container {
-    margin-top: 40px;
+/* Tabla de compras estilo */
+.compra-table {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-/* Estilo de las tarjetas de compra */
-.compra-card {
-    background-color: #eaeaea;
-    margin-bottom: 20px;
-    padding: 25px;
-    border-radius: 10px;
-    width: 80%;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
-}
-
-.compra-card:hover {
-    transform: scale(1.02);
-}
-
-/* Detalles de la compra */
-.compra-info {
+.compra-table-header, .compra-row {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.compra-table-header {
+    background-color: #16a085;
+    color: white;
+    font-weight: bold;
+}
+
+.compra-header-item, .compra-item {
+    flex: 1;
     text-align: center;
+    font-size: 1em;
 }
 
-.compra-detalle h3 {
-    font-size: 20px;
+.compra-item p {
+    margin: 0;
     color: #333;
-    margin-bottom: 5px;
+}
+
+.compra-row:hover {
+    background-color: #f2f2f2;
+}
+
+/* Botón de Ver Detalle */
+.btn-ver-detalle {
+    padding: 6px 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-ver-detalle:hover {
+    background-color: #2980b9;
+}
+
+/* Modal de detalles */
+.modal {
+    display: none; /* Esto asegura que el modal esté oculto al inicio */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Modal de detalles con el mismo estilo que la página */
+.modal-content {
+    background-color: #eef2f3; /* Mismo color de fondo que el body */
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    color: #333; /* Color de texto principal */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Botón de cerrar en el modal */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #16a085; /* Color de hover igual que el botón de cerrar sesión */
+}
+
+.modal h2 {
+    font-size: 1.5em;
+    color: #16a085; /* Color de encabezado similar al header */
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* Botón de Ver Detalle dentro del modal */
+.btn-ver-detalle-modal {
+    padding: 6px 12px;
+    background-color: #16a085;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1em;
+}
+
+.btn-ver-detalle-modal:hover {
+    background-color: #12746b;
+}
+
+/* Estilos para el contenido del modal */
+.modal-content p {
+    font-size: 1em;
+    color: #555;
+    margin: 10px 0;
+}
+
+
+
+/* Estilos para el filtro de fecha */
+.filtro-fecha {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-.compra-detalle p {
-    font-size: 18px;
-    color: #555;
-    margin: 0;
+.filtro-fecha label {
+    font-weight: bold;
+    color: #333;
+}
+
+.filtro-fecha input[type="date"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.btn-filtrar {
+    padding: 6px 12px;
+    background-color: #16a085;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-filtrar:hover {
+    background-color: #12746b;
 }
