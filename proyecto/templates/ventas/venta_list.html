@@ -150,21 +150,19 @@
                     <th>Suscriptor</th>
                     <th>Categoría</th>
                     <th>Método de Pago</th>
-                    <th>Monto</th>
                 </tr>
             </thead>
             <tbody>
                 {% for venta in ventas %}
                     <tr>
                         <td>{{ venta.fecha_transaccion }}</td>
-                        <td>{{ venta.suscriptor.username }}</td>
+                        <td>{{ venta.usuario.username }}</td>
                         <td>{{ venta.categoria.nombre }}</td>
                         <td>{{ venta.metodo_pago }}</td>
-                        <td>${{ venta.monto }}</td>
                     </tr>
                 {% endfor %}
                 <tr>
-                    <td colspan="4"><strong>Total General</strong></td>
+                    <td colspan="3"><strong>Total General</strong></td>
                     <td><strong>${{ total_pagos }}</strong></td>
                 </tr>
             </tbody>

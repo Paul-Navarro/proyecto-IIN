@@ -1163,7 +1163,11 @@ class VentaListView(ListView):
         writer.writerow(['Total General', '', '', '', total_pagos])
         return response
     from django.http import HttpResponse
+
+
+from django.http import HttpResponse
 import openpyxl
+from openpyxl.utils import get_column_letter
 from .models import HistorialCompra
 
 def descargar_ventas_excel(request):
@@ -1179,19 +1183,25 @@ def descargar_ventas_excel(request):
     worksheet.title = 'Ventas'
 
     # Agregar encabezados
-    headers = ['Fecha y Hora', 'Usuario', 'Categoría', 'Método de Pago', 'Monto']
+    headers = ['Fecha y Hora', 'Suscriptor', 'Categoría', 'Método de Pago', 'Monto']
     worksheet.append(headers)
 
     # Obtener los datos de las ventas
     ventas = HistorialCompra.objects.all()  # Aquí puedes aplicar filtros si es necesario
     for venta in ventas:
+        fecha_sin_tz = venta.fecha_transaccion.replace(tzinfo=None)  # Eliminar la zona horaria
         worksheet.append([
-            venta.fecha_transaccion,
-            venta.usuario.username,
+            fecha_sin_tz,
+            venta.usuario.username if venta.usuario else "No disponible",
             venta.categoria.nombre if venta.categoria else "Sin categoría",
-            "Método de Pago"  # Ajusta este valor si tienes otro campo correspondiente
+            "Método de Pago",  # Ajusta este valor si tienes otro campo correspondiente
             "Monto"  # Ajusta este valor si tienes otro campo correspondiente
         ])
+
+    # Ajustar el ancho de las columnas automáticamente
+    for col_num, column_title in enumerate(headers, 1):
+        column_letter = get_column_letter(col_num)
+        worksheet.column_dimensions[column_letter].width = 20
 
     # Preparar la respuesta HTTP
     response = HttpResponse(
