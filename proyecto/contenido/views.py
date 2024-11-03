@@ -1048,45 +1048,191 @@ def historial_compras_view(request):
     return render(request, 'home/historial_compras.html', {'historial_compras': []})
 
 #para rol financiero
+from django.views.generic import ListView
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import HistorialCompra
+from django.utils import timezone
+from django.db.models.functions import TruncDate
+from django.http import JsonResponse
+
+from django.views.generic import ListView
+from django.db.models import Q, Sum
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+import csv
+from .models import HistorialCompra
+
+from django.views.generic import ListView
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+import csv
+from .models import HistorialCompra
+from categorias.models import Categoria
+from django.contrib.auth import get_user_model
 
 class VentaListView(ListView):
-    '''
-    @class VentaListView
-    @extends ListView
-    @description Muestra una lista de todas las ventas registradas en el sistema (basado en el modelo `HistorialCompra`). Permite filtrar las ventas por rango de fechas y nombre de cliente.
-    @permission_required users.view_sales - Asegura que solo los usuarios con el permiso adecuado puedan acceder a esta vista.
-    @template ventas/venta_list.html - La plantilla utilizada para mostrar la lista de ventas.
-    @context ventas - El contexto que contiene la lista de ventas.
-    '''
-    model = HistorialCompra  # Modelo correcto para las compras
-    template_name = 'ventas/venta_list.html'  # Ruta de la plantilla correcta
+    model = HistorialCompra
+    template_name = 'ventas/venta_list.html'
     context_object_name = 'ventas'
-    permission_required = 'users.view_sales'  # Asegura que solo roles con permiso puedan verlo
-    def get_queryset(self):
-        queryset = super().get_queryset()
 
-        # Filtrar las ventas según los parámetros
-        fecha_inicio = self.request.GET.get('fecha_inicio')
-        fecha_fin = self.request.GET.get('fecha_fin')
-        cliente = self.request.GET.get('cliente')
-         # Depurar las fechas
-        print(f"Filtrando desde {fecha_inicio} hasta {fecha_fin}")
-        if fecha_inicio and fecha_fin:
-            queryset = queryset.filter(fecha_transaccion__range=[fecha_inicio, fecha_fin])  # Campo de fecha en HistorialCompra
-        if cliente:
-            queryset = queryset.filter(usuario__username__icontains=cliente)  # Filtrar por usuario (cliente)
-
-        return queryset
-    #Para sumar el total de lo vendido
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ventas = context['ventas']
         
-        # Calcular la suma total de los precios de las categorías compradas
-        total_vendido = sum(venta.categoria.precio for venta in ventas if venta.categoria and venta.categoria.precio)
-        context['total_vendido'] = total_vendido
+        # Filtros
+        categoria_id = self.request.GET.get('categoria')
+        suscriptor_id = self.request.GET.get('suscriptor')
+        fecha_desde = self.request.GET.get('fecha_desde')
+        fecha_hasta = self.request.GET.get('fecha_hasta')
+
+        # Inicializar queryset
+        ventas = HistorialCompra.objects.all()
         
+        # Filtrar por categoría
+        if categoria_id:
+            ventas = ventas.filter(categoria_id=categoria_id)
+
+        # Filtrar por suscriptor
+        if suscriptor_id:
+            ventas = ventas.filter(usuario_id=suscriptor_id)
+        
+        # Filtrar por rango de fechas
+        if fecha_desde:
+            ventas = ventas.filter(fecha_transaccion__gte=parse_date(fecha_desde))
+        if fecha_hasta:
+            ventas = ventas.filter(fecha_transaccion__lte=parse_date(fecha_hasta))
+        
+        # Total de pagos recibidos
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total']
+        
+        # Datos para el gráfico de torta
+        categorias = ventas.values('categoria__nombre').annotate(total=Sum('categoria__precio'))
+        categorias_nombres = [cat['categoria__nombre'] for cat in categorias]
+        categorias_totales = [cat['total'] for cat in categorias]
+        
+        # Datos para el gráfico de barras y líneas
+        pagos_por_fecha = (
+            ventas
+            .annotate(fecha=TruncDate('fecha_transaccion'))
+            .values('fecha')
+            .annotate(total=Sum('categoria__precio'))
+            .order_by('fecha')
+        )
+        fechas = [pago['fecha'].strftime('%Y-%m-%d') for pago in pagos_por_fecha]
+        totales_por_fecha = [pago['total'] for pago in pagos_por_fecha]
+        
+        # Datos por categoría para el gráfico de líneas
+        categorias_por_fecha = {}
+        for cat in categorias_nombres:
+            pagos_categoria = (
+                ventas
+                .filter(categoria__nombre=cat)
+                .annotate(fecha=TruncDate('fecha_transaccion'))
+                .values('fecha')
+                .annotate(total=Sum('categoria__precio'))
+                .order_by('fecha')
+            )
+            categorias_por_fecha[cat] = {pago['fecha'].strftime('%Y-%m-%d'): pago['total'] for pago in pagos_categoria}
+
+        # Obtener todas las categorías y suscriptores para los filtros
+        categorias = Categoria.objects.all()
+        suscriptores = get_user_model().objects.all()
+
+        context.update({
+            'total_pagos': total_pagos,
+            'categorias_nombres': categorias_nombres,
+            'categorias_totales': categorias_totales,
+            'fechas': fechas,
+            'totales_por_fecha': totales_por_fecha,
+            'categorias_por_fecha': categorias_por_fecha,
+            'ventas': ventas,  # Ventas para la vista tabular
+            'categorias': categorias,
+            'suscriptores': suscriptores,
+        })
         return context
+
+    def get(self, request, *args, **kwargs):
+        # Exportar a Excel si se solicita
+        if 'exportar' in request.GET:
+            return self.exportar_excel()
+        return super().get(request, *args, **kwargs)
+
+    def exportar_excel(self):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="ventas.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Fecha', 'Suscriptor', 'Categoría', 'Medio de Pago', 'Monto'])
+
+        ventas = self.get_queryset()
+        for venta in ventas:
+            writer.writerow([
+                venta.fecha_transaccion.strftime('%Y-%m-%d %H:%M:%S'),
+                venta.usuario,
+                venta.categoria.nombre,
+                venta.medio_pago,
+                venta.categoria.precio,
+            ])
+
+        # Agregar total general
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total']
+        writer.writerow([])
+        writer.writerow(['Total General', '', '', '', total_pagos])
+        return response
+
+    from django.http import HttpResponse
+import openpyxl
+from .models import HistorialCompra
+
+from django.http import HttpResponse
+import openpyxl
+from openpyxl.utils import get_column_letter
+from .models import HistorialCompra
+
+def descargar_ventas_excel(request):
+    '''
+    @function descargar_ventas_excel
+    @description Genera y descarga un archivo Excel con las ventas filtradas.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @returns {HttpResponse} Retorna un archivo Excel descargable con las ventas.
+    '''
+    # Crear el libro de trabajo y la hoja de cálculo
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'Ventas'
+
+    # Agregar encabezados
+    headers = ['Fecha y Hora', 'Suscriptor', 'Categoría', 'Método de Pago', 'Monto']
+    worksheet.append(headers)
+
+    # Obtener los datos de las ventas
+    ventas = HistorialCompra.objects.all()  # Aquí puedes aplicar filtros si es necesario
+    for venta in ventas:
+        fecha_sin_tz = venta.fecha_transaccion.replace(tzinfo=None)  # Eliminar la zona horaria
+        worksheet.append([
+            fecha_sin_tz,
+            venta.usuario.username if venta.usuario else "No disponible",
+            venta.categoria.nombre if venta.categoria else "Sin categoría",
+            "Método de Pago",  # Ajusta este valor si tienes otro campo correspondiente
+            "Monto"  # Ajusta este valor si tienes otro campo correspondiente
+        ])
+
+    # Ajustar el ancho de las columnas automáticamente
+    for col_num, column_title in enumerate(headers, 1):
+        column_letter = get_column_letter(col_num)
+        worksheet.column_dimensions[column_letter].width = 20
+
+    # Preparar la respuesta HTTP
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=ventas.xlsx'
+    workbook.save(response)
+
+    return response
+
+
 #Notificación al correo
 from django.core.mail import send_mail
 from django.conf import settings

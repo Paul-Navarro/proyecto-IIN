@@ -82,6 +82,7 @@ urlpatterns = [
     path('contenido/<int:pk>/toggle_destacado/', views.toggle_destacado, name='contenido_toggle_destacado'),
     path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
 
+    path('ventas/descargar/', views.descargar_ventas_excel, name='descargar_ventas_excel'),
 ]
 
 '''

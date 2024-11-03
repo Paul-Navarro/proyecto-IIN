@@ -3,73 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/ventas.css' %}">
-    <title>Historial de Ventas</title>
+    <title>Módulo Financiero - Ventas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .total-pagos {
+            font-size: 1.4rem;
+            color: #16a085;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .chart-container {
+            margin: 15px 0;
+            width: 100%;
+        }
+        h3 {
+            font-size: 1.2rem;
+            color: #34495e;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .filter-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .filter-container select,
+        .filter-container input {
+            margin: 5px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .filter-container button {
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .filter-container button:hover {
+            background-color: #2980b9;
+        }
+        .download-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .download-button a {
+            padding: 10px 20px;
+            background-color: #e67e22;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .download-button a:hover {
+            background-color: #d35400;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-    <header class="header">
-        <div><a class="boton_atras" href="{% url 'home' %}">Atrás</a></div>
-        <h1>Historial de Ventas</h1>
-        <!-- Mostrar el total vendido -->
-        <div class="total-vendido">
-            <h3>Total Vendido</h3>
-            <p>{{ total_vendido }} GS</p>
-        </div>
-    </header>
-    <div class="contenedor">
-        <main>
-            
-
-            <!-- Formulario de filtros -->
-            <form class="filtro-form" method="GET">
-                <label for="fecha_inicio">Fecha inicio:</label>
-                <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
-
-                <label for="fecha_fin">Fecha fin:</label>
-                <input type="date" name="fecha_fin" id="fecha_fin" value="{{ request.GET.fecha_fin }}">
-
-                <label for="cliente">Cliente:</label>
-                <input type="text" name="cliente" id="cliente" value="{{ request.GET.cliente }}">
-
+    <div class="container">
+        <h1>Módulo Financiero - Ventas</h1>
+        <div class="filter-container">
+            <form method="get">
+                <select name="categoria">
+                    <option value="">Todas las Categorías</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>{{ categoria.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <select name="suscriptor">
+                    <option value="">Todos los Suscriptores</option>
+                    {% for suscriptor in suscriptores %}
+                        <option value="{{ suscriptor.id }}" {% if request.GET.suscriptor == suscriptor.id|stringformat:"s" %}selected{% endif %}>{{ suscriptor.username }}</option>
+                    {% endfor %}
+                </select>
+                <input type="date" name="fecha_desde" value="{{ request.GET.fecha_desde }}">
+                <input type="date" name="fecha_hasta" value="{{ request.GET.fecha_hasta }}">
                 <button type="submit">Filtrar</button>
             </form>
+        </div>
+        <p class="total-pagos">Total de Pagos Recibidos: ${{ total_pagos }}</p>
 
-            <div class="historial-container">
-                {% if ventas %}
-                    {% for venta in ventas %}
-                        <div class="compra-card">
-                            <div class="compra-info">
-                                <div class="compra-detalle">
-                                    <h3>ID Venta</h3>
-                                    <p>{{ venta.id }}</p> <!-- ID de la compra -->
-                                </div>
-                                <div class="compra-detalle">
-                                    <h3>Cliente</h3>
-                                    <p>{{ venta.usuario.username }}</p> <!-- Nombre del cliente -->
-                                </div>
-                                <div class="compra-detalle">
-                                    <h3>Categoría</h3>
-                                    <p>{{ venta.categoria.nombre }}</p> <!-- Nombre de la categoría -->
-                                </div>
-                                <div class="compra-detalle">
-                                    <h3>Precio</h3>
-                                    <p>{{ venta.categoria.precio }} PYG</p> <!-- Precio de la categoría -->
-                                </div>
-                                <div class="compra-detalle">
-                                    <h3>Fecha</h3>
-                                    <p>{{ venta.fecha_transaccion|date:"d M Y H:i" }}</p> <!-- Fecha de la transacción -->
-                                </div>
-                                <!-- Si tienes un campo de total en el modelo, puedes agregarlo aquí. Si no, lo puedes eliminar -->
-                            </div>
-                        </div>
-                    {% endfor %}
-                    
-                {% else %}
-                    <p>No hay ventas que mostrar.</p>
-                {% endif %}
-            </div>
-        </main>
+        <div class="chart-container">
+            <h3>Total Comprado por Categoría</h3>
+            <canvas id="tortaCategorias" style="max-height: 250px;"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Pagos Recibidos por Fecha</h3>
+            <canvas id="barrasPagosPorFecha" style="max-height: 250px;"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Comparativa de Categorías Compradas por Fecha</h3>
+            <canvas id="lineasComparativaCategorias" style="max-height: 250px;"></canvas>
+        </div>
+
+        <div class="download-button">
+            <a href="{% url 'descargar_ventas_excel' %}">Descargar Datos en Excel</a>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Suscriptor</th>
+                    <th>Categoría</th>
+                    <th>Método de Pago</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.fecha_transaccion }}</td>
+                        <td>{{ venta.usuario.username }}</td>
+                        <td>{{ venta.categoria.nombre }}</td>
+                        <td>{{ venta.metodo_pago }}</td>
+                        <td>${{ venta.categoria.precio }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4"><strong>Total General</strong></td>
+                    <td><strong>${{ total_pagos }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+
+    <script>
+        // Gráfico de torta - Total comprado por categoría
+        const categoriasNombres = {{ categorias_nombres|safe }};
+        const categoriasTotales = {{ categorias_totales|safe }};
+        new Chart(document.getElementById('tortaCategorias').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: categoriasNombres,
+                datasets: [{
+                    data: categoriasTotales,
+                    backgroundColor: ['#3498db', '#e74c3c', '#f39c12', '#1abc9c', '#9b59b6', '#95a5a6'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12 } },
+                    tooltip: { enabled: true, callbacks: { label: (ctx) => `$${ctx.raw}` } }
+                }
+            }
+        });
+
+        // Gráfico de barras - Pagos recibidos por fecha
+        const fechas = {{ fechas|safe }};
+        const totalesPorFecha = {{ totales_por_fecha|safe }};
+        new Chart(document.getElementById('barrasPagosPorFecha').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: fechas,
+                datasets: [{
+                    label: 'Monto Total',
+                    data: totalesPorFecha,
+                    backgroundColor: '#3498db',
+                    barPercentage: 0.6,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { ticks: { callback: (value) => `$${value}` } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (ctx) => `$${ctx.raw}` } }
+                }
+            }
+        });
+
+        // Gráfico de líneas - Comparativa de categorías compradas por fecha
+        const categoriasPorFecha = {{ categorias_por_fecha|safe }};
+        const lineasComparativaCategoriasCtx = document.getElementById('lineasComparativaCategorias').getContext('2d');
+        const datasets = Object.keys(categoriasPorFecha).map((categoria, index) => ({
+            label: categoria,
+            data: fechas.map(fecha => categoriasPorFecha[categoria][fecha] || 0),
+            fill: false,
+            borderColor: ['#3498db', '#e74c3c', '#f39c12', '#1abc9c', '#9b59b6', '#95a5a6'][index % 6],
+            tension: 0.3,
+            pointRadius: 3,
+        }));
+        new Chart(lineasComparativaCategoriasCtx, {
+            type: 'line',
+            data: {
+                labels: fechas,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { ticks: { callback: (value) => `$${value}` } }
+                },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { callbacks: { label: (ctx) => `$${ctx.raw}` } }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
