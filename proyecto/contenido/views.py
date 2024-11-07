@@ -64,6 +64,9 @@ def contenido_detail(request, pk):
     contenido.cant_visualiz_conte += 1
     contenido.save()  # Guardar el cambio en la base de datos
     
+    # Obtener URL completa para compartir
+    share_url = request.build_absolute_uri()
+
     # Obtener la calificación previa del usuario si existe
     user_rating = None
     if request.user.is_authenticated:
@@ -82,6 +85,7 @@ def contenido_detail(request, pk):
     return render(request, 'home/contenido_detail.html', {
         'contenido': contenido,
         'user_rating': user_rating,
+        'share_url': share_url,
     })
 
 def contenido_detail_editor(request, pk):
@@ -1719,3 +1723,4 @@ def exportar_excel(request):
         df.to_excel(writer, index=False, sheet_name='Historial de Compras')
 
     return response
+
