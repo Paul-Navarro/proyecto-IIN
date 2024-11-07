@@ -303,7 +303,8 @@ class HistorialCompra(models.Model):
     numero_compra = models.CharField(max_length=100)  # Número o ID de la compra de Stripe
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
     fecha_transaccion = models.DateTimeField(auto_now_add=True)  # Fecha de la compra
-
+    metodo_pago = models.CharField(max_length=50, default="stripe")
+    
     def __str__(self):
         return f"Compra {self.numero_compra} - {self.categoria.nombre}"
 

@@ -870,7 +870,8 @@ def suscripcion_exitosa(request):
                 HistorialCompra.objects.create(
                     usuario=usuario,
                     numero_compra=session.id,  # Guardar el session.id de Stripe como número de compra
-                    categoria=categoria
+                    categoria=categoria,
+                    metodo_pago="Pago con tarjeta"
                 )
 
             # Renderizar el template de éxito
@@ -1214,11 +1215,11 @@ def descargar_ventas_excel(request):
             fecha_sin_tz,
             venta.usuario.username if venta.usuario else "No disponible",
             venta.categoria.nombre if venta.categoria else "Sin categoría",
-            "Método de Pago",  # Ajusta este valor si tienes otro campo correspondiente
-            venta.categoria.precio if venta.categoria else 0  # Ajusta este valor si tienes otro campo correspondiente
+            venta.metodo_pago if venta.metodo_pago else "Método de pago no disponible",  
+            venta.categoria.precio if venta.categoria else 0  
         ])
 
-    # Ajustar el ancho de las columnas automáticamente
+    
     for col_num, column_title in enumerate(headers, 1):
         column_letter = get_column_letter(col_num)
         worksheet.column_dimensions[column_letter].width = 20
