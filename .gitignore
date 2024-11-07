@@ -43,7 +43,10 @@ var/
 
 # Archivos estáticos y multimedia
 staticfiles/
-media/*
+#media/*
+media/images/*
+media/imagenes_contenido/*
+
 
 # Django stuff:
 *.log
