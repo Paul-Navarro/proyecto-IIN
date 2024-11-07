@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas de Todos los Autores</title>
+
+    <!-- Cargar CSS de Bootstrap para diseño responsivo -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Cargar Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% load static %} <!-- Cargar la biblioteca estática de Django -->
+    <link rel="stylesheet" href="{% static 'css/estadistica_admin.css' %}">
+
+    
+</head>
+
+<body>
+
+<div class="container estadisticas-container">
+    <h1 class="mb-4">Estadísticas de Todos los Autores</h1>
+
+    <!-- Botón para volver al panel del administrador -->
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mb-3">Volver al Panel de Administración</a>
+
+    <!-- Filtros -->
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="month">Mes:</label>
+                <select class="form-control" name="month" id="month">
+                    <option value="all">Todos</option>
+                    {% for month in months %}
+                        <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>{{ month }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="year">Año:</label>
+                <select class="form-control" name="year" id="year">
+                    <option value="all">Todos</option>
+                    {% for year in years %}
+                        <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="category">Categoría:</label>
+                <select class="form-control" name="category" id="category">
+                    <option value="all">Todas</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}" {% if categoria.id == selected_category %}selected{% endif %}>{{ categoria.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="author">Autor:</label>
+                <select class="form-control" name="author" id="author">
+                    <option value="all">Todos</option>
+                    {% for estadistica in autores_estadisticas %}
+                        <option value="{{ estadistica.autor__id }}" {% if estadistica.autor__id == selected_author %}selected{% endif %}>{{ estadistica.autor__username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
+    </form>
+
+    <!-- Slider de gráficos -->
+    <div id="estadisticasSlides">
+        {% for autor in autores_contenidos %}
+        <div class="slide {% if forloop.first %}active-slide{% endif %}" id="slide{{ forloop.counter }}">
+            <h3>Estadísticas de {{ autor.autor }}</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-white bg-info">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Visualizaciones</h5>
+                            <p class="card-text">{{ autor.total_visualizaciones }} visualizaciones</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Likes</h5>
+                            <p class="card-text">{{ autor.total_likes }} likes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Unlikes</h5>
+                            <p class="card-text">{{ autor.total_unlikes }} unlikes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tarjeta del contenido más popular -->
+            <div class="card text-white bg-primary mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Contenido Más Popular</h5>
+                    <p class="card-text">
+                        {% if autor.mejor_contenido %}
+                            {{ autor.mejor_contenido.titulo_conte }} con {{ autor.mejor_contenido.likes }} likes
+                        {% else %}
+                            No hay datos disponibles
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <!-- Gráficos -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5>Likes por Contenido</h5>
+                    <canvas id="likesChart{{ forloop.counter }}"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <h5>Visualizaciones por Contenido</h5>
+                    <canvas id="visualizacionesChart{{ forloop.counter }}"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Controles del slider -->
+    <div class="text-center mt-4">
+        <button class="btn btn-primary" id="prevSlide">Anterior</button>
+        <button class="btn btn-primary" id="nextSlide">Siguiente</button>
+    </div>
+</div>
+
+<!-- Cargar Bootstrap y jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script>
+    // Script para manejar el slider
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+
+    function showSlide(index) {
+        slides[currentSlide].classList.remove('active-slide');
+        currentSlide = (index + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active-slide');
+    }
+
+    document.getElementById('prevSlide').addEventListener('click', () => {
+        showSlide(currentSlide - 1);
+    });
+
+    document.getElementById('nextSlide').addEventListener('click', () => {
+        showSlide(currentSlide + 1);
+    });
+
+    // Script para los gráficos
+    {% for autor in autores_contenidos %}
+    const likesCtx{{ forloop.counter }} = document.getElementById('likesChart{{ forloop.counter }}').getContext('2d');
+    new Chart(likesCtx{{ forloop.counter }}, {
+        type: 'bar',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                label: 'Likes',
+                data: {{ autor.likes|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    const visualizacionesCtx{{ forloop.counter }} = document.getElementById('visualizacionesChart{{ forloop.counter }}').getContext('2d');
+    new Chart(visualizacionesCtx{{ forloop.counter }}, {
+        type: 'line',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                label: 'Visualizaciones',
+                data: {{ autor.visualizaciones|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.4)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+    {% endfor %}
+</script>
+
+</body>
+</html>

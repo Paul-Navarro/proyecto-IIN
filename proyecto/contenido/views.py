@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Contenido, Rating,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado
+from .models import Contenido, Rating,Rechazo,VotoContenido,VersionContenido,CambioBorrador,ReporteContenido,CambioEstado,Favorito
 from .forms import ContenidoForm,ReporteContenidoForm
 from categorias.models import Categoria
 from django.shortcuts import render, redirect
@@ -26,6 +26,8 @@ from django.db.models import Avg,Count, Sum
 from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.sessions.models import Session
 
+import pandas as pd
+from django.http import HttpResponse
 
 #para rol financiero
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -1046,45 +1048,191 @@ def historial_compras_view(request):
     return render(request, 'home/historial_compras.html', {'historial_compras': []})
 
 #para rol financiero
+from django.views.generic import ListView
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import HistorialCompra
+from django.utils import timezone
+from django.db.models.functions import TruncDate
+from django.http import JsonResponse
+
+from django.views.generic import ListView
+from django.db.models import Q, Sum
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+import csv
+from .models import HistorialCompra
+
+from django.views.generic import ListView
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+import csv
+from .models import HistorialCompra
+from categorias.models import Categoria
+from django.contrib.auth import get_user_model
 
 class VentaListView(ListView):
-    '''
-    @class VentaListView
-    @extends ListView
-    @description Muestra una lista de todas las ventas registradas en el sistema (basado en el modelo `HistorialCompra`). Permite filtrar las ventas por rango de fechas y nombre de cliente.
-    @permission_required users.view_sales - Asegura que solo los usuarios con el permiso adecuado puedan acceder a esta vista.
-    @template ventas/venta_list.html - La plantilla utilizada para mostrar la lista de ventas.
-    @context ventas - El contexto que contiene la lista de ventas.
-    '''
-    model = HistorialCompra  # Modelo correcto para las compras
-    template_name = 'ventas/venta_list.html'  # Ruta de la plantilla correcta
+    model = HistorialCompra
+    template_name = 'ventas/venta_list.html'
     context_object_name = 'ventas'
-    permission_required = 'users.view_sales'  # Asegura que solo roles con permiso puedan verlo
-    def get_queryset(self):
-        queryset = super().get_queryset()
 
-        # Filtrar las ventas según los parámetros
-        fecha_inicio = self.request.GET.get('fecha_inicio')
-        fecha_fin = self.request.GET.get('fecha_fin')
-        cliente = self.request.GET.get('cliente')
-         # Depurar las fechas
-        print(f"Filtrando desde {fecha_inicio} hasta {fecha_fin}")
-        if fecha_inicio and fecha_fin:
-            queryset = queryset.filter(fecha_transaccion__range=[fecha_inicio, fecha_fin])  # Campo de fecha en HistorialCompra
-        if cliente:
-            queryset = queryset.filter(usuario__username__icontains=cliente)  # Filtrar por usuario (cliente)
-
-        return queryset
-    #Para sumar el total de lo vendido
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ventas = context['ventas']
         
-        # Calcular la suma total de los precios de las categorías compradas
-        total_vendido = sum(venta.categoria.precio for venta in ventas if venta.categoria and venta.categoria.precio)
-        context['total_vendido'] = total_vendido
+        # Filtros
+        categoria_id = self.request.GET.get('categoria')
+        suscriptor_id = self.request.GET.get('suscriptor')
+        fecha_desde = self.request.GET.get('fecha_desde')
+        fecha_hasta = self.request.GET.get('fecha_hasta')
+
+        # Inicializar queryset
+        ventas = HistorialCompra.objects.all()
         
+        # Filtrar por categoría
+        if categoria_id:
+            ventas = ventas.filter(categoria_id=categoria_id)
+
+        # Filtrar por suscriptor
+        if suscriptor_id:
+            ventas = ventas.filter(usuario_id=suscriptor_id)
+        
+        # Filtrar por rango de fechas
+        if fecha_desde:
+            ventas = ventas.filter(fecha_transaccion__gte=parse_date(fecha_desde))
+        if fecha_hasta:
+            ventas = ventas.filter(fecha_transaccion__lte=parse_date(fecha_hasta))
+        
+        # Total de pagos recibidos
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total'] or 0
+        
+        # Datos para el gráfico de torta
+        categorias = ventas.values('categoria__nombre').annotate(total=Sum('categoria__precio'))
+        categorias_nombres = [cat['categoria__nombre'] for cat in categorias]
+        categorias_totales = [cat['total'] for cat in categorias]
+        
+        # Datos para el gráfico de barras y líneas
+        pagos_por_fecha = (
+            ventas
+            .annotate(fecha=TruncDate('fecha_transaccion'))
+            .values('fecha')
+            .annotate(total=Sum('categoria__precio'))
+            .order_by('fecha')
+        )
+        fechas = [pago['fecha'].strftime('%Y-%m-%d') for pago in pagos_por_fecha]
+        totales_por_fecha = [pago['total'] for pago in pagos_por_fecha]
+        
+        # Datos por categoría para el gráfico de líneas
+        categorias_por_fecha = {}
+        for cat in categorias_nombres:
+            pagos_categoria = (
+                ventas
+                .filter(categoria__nombre=cat)
+                .annotate(fecha=TruncDate('fecha_transaccion'))
+                .values('fecha')
+                .annotate(total=Sum('categoria__precio'))
+                .order_by('fecha')
+            )
+            categorias_por_fecha[cat] = {pago['fecha'].strftime('%Y-%m-%d'): pago['total'] for pago in pagos_categoria}
+
+        # Obtener todas las categorías y suscriptores para los filtros
+        categorias = Categoria.objects.all()
+        suscriptores = get_user_model().objects.all()
+
+        context.update({
+            'total_pagos': total_pagos,
+            'categorias_nombres': categorias_nombres,
+            'categorias_totales': categorias_totales,
+            'fechas': fechas,
+            'totales_por_fecha': totales_por_fecha,
+            'categorias_por_fecha': categorias_por_fecha,
+            'ventas': ventas,  # Ventas para la vista tabular
+            'categorias': categorias,
+            'suscriptores': suscriptores,
+        })
         return context
+
+    def get(self, request, *args, **kwargs):
+        # Exportar a Excel si se solicita
+        if 'exportar' in request.GET:
+            return self.exportar_excel()
+        return super().get(request, *args, **kwargs)
+
+    def exportar_excel(self):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="ventas.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Fecha', 'Suscriptor', 'Categoría', 'Medio de Pago', 'Monto'])
+
+        ventas = self.get_queryset()
+        for venta in ventas:
+            writer.writerow([
+                venta.fecha_transaccion.strftime('%Y-%m-%d %H:%M:%S'),
+                venta.usuario,
+                venta.categoria.nombre,
+                venta.medio_pago,
+                venta.categoria.precio,
+            ])
+
+        # Agregar total general
+        total_pagos = ventas.aggregate(total=Sum('categoria__precio'))['total'] or 0
+        writer.writerow([])
+        writer.writerow(['Total General', '', '', '', total_pagos])
+        return response
+
+    from django.http import HttpResponse
+import openpyxl
+from .models import HistorialCompra
+
+from django.http import HttpResponse
+import openpyxl
+from openpyxl.utils import get_column_letter
+from .models import HistorialCompra
+
+def descargar_ventas_excel(request):
+    '''
+    @function descargar_ventas_excel
+    @description Genera y descarga un archivo Excel con las ventas filtradas.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @returns {HttpResponse} Retorna un archivo Excel descargable con las ventas.
+    '''
+    # Crear el libro de trabajo y la hoja de cálculo
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'Ventas'
+
+    # Agregar encabezados
+    headers = ['Fecha y Hora', 'Suscriptor', 'Categoría', 'Método de Pago', 'Monto']
+    worksheet.append(headers)
+
+    # Obtener los datos de las ventas
+    ventas = HistorialCompra.objects.all()  # Aquí puedes aplicar filtros si es necesario
+    for venta in ventas:
+        fecha_sin_tz = venta.fecha_transaccion.replace(tzinfo=None)  # Eliminar la zona horaria
+        worksheet.append([
+            fecha_sin_tz,
+            venta.usuario.username if venta.usuario else "No disponible",
+            venta.categoria.nombre if venta.categoria else "Sin categoría",
+            "Método de Pago",  # Ajusta este valor si tienes otro campo correspondiente
+            venta.categoria.precio if venta.categoria else 0  # Ajusta este valor si tienes otro campo correspondiente
+        ])
+
+    # Ajustar el ancho de las columnas automáticamente
+    for col_num, column_title in enumerate(headers, 1):
+        column_letter = get_column_letter(col_num)
+        worksheet.column_dimensions[column_letter].width = 20
+
+    # Preparar la respuesta HTTP
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=ventas.xlsx'
+    workbook.save(response)
+
+    return response
+
+
 #Notificación al correo
 from django.core.mail import send_mail
 from django.conf import settings
@@ -1441,3 +1589,132 @@ def inhabilitar_contenido(request, pk):
     else:
         # Si el método no es POST, redirige a otra página
         return redirect('autor_dashboard')  # Cambia esto por la vista adecuada
+    
+    
+    
+@login_required
+def agregar_favorito(request, contenido_id):
+    contenido = get_object_or_404(Contenido, id_conte=contenido_id)
+    Favorito.objects.get_or_create(usuario=request.user, contenido=contenido)
+    return JsonResponse({"status": "ok", "message": "Añadido a favoritos"})
+
+@login_required
+def eliminar_favorito(request, contenido_id):
+    contenido = get_object_or_404(Contenido, id_conte=contenido_id)
+    Favorito.objects.filter(usuario=request.user, contenido=contenido).delete()
+    return JsonResponse({"status": "ok", "message": "Eliminado de favoritos"})
+
+@login_required
+def lista_favoritos(request):
+    favoritos = Favorito.objects.filter(usuario=request.user).select_related('contenido')
+    return render(request, 'home/favoritos.html', {'favoritos': favoritos})
+
+
+def toggle_destacado(request, pk):
+    contenido = get_object_or_404(Contenido, pk=pk)
+    contenido.es_destacado = not contenido.es_destacado
+    contenido.save()
+    return redirect(reverse('administrador_KANBAN'))
+
+def ver_estadisticas_todos_autores(request):
+    """
+    Muestra las estadísticas de todos los autores para el administrador.
+    Permite filtrar por mes, año, categorías y autor.
+    """
+    # Lista de meses y años para los filtros
+    months = list(range(1, 13))  # Del 1 al 12
+    current_year = datetime.now().year
+    years = list(range(current_year, current_year - 10, -1))  # Los últimos 10 años
+
+    # Categorías disponibles
+    categorias = Categoria.objects.all()
+    
+    # Filtrar contenidos por parámetros de la solicitud
+    contenidos = Contenido.objects.all()
+    selected_month = request.GET.get('month', 'all')
+    selected_year = request.GET.get('year', 'all')
+    selected_category = request.GET.get('category', 'all')
+    selected_author = request.GET.get('author', 'all')
+
+    if selected_month != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__month=int(selected_month))
+    if selected_year != 'all':
+        contenidos = contenidos.filter(fecha_publicacion__year=int(selected_year))
+    if selected_category != 'all':
+        contenidos = contenidos.filter(categoria__id=int(selected_category))
+    if selected_author != 'all':
+        contenidos = contenidos.filter(autor__id=int(selected_author))
+
+    # Obtener los datos de estadísticas
+    autores_estadisticas = contenidos.values('autor__id', 'autor__username')\
+        .annotate(total_visualizaciones=Sum('cant_visualiz_conte'),
+                  total_likes=Sum('likes'),
+                  total_unlikes=Sum('unlikes'))
+
+    # Autor con más visualizaciones, más likes y más unlikes
+    autor_mas_visualizaciones = autores_estadisticas.order_by('-total_visualizaciones').first()
+    autor_mas_likes = autores_estadisticas.order_by('-total_likes').first()
+    autor_mas_unlikes = autores_estadisticas.order_by('-total_unlikes').first()
+
+    # Extraer los contenidos de cada autor para los gráficos
+    autores_contenidos = []
+    for autor in autores_estadisticas:
+        contenidos_autor = contenidos.filter(autor__id=autor['autor__id'])
+        titulos = [c.titulo_conte for c in contenidos_autor]
+        likes = [c.likes for c in contenidos_autor]
+        unlikes = [c.unlikes for c in contenidos_autor]
+        visualizaciones = [c.cant_visualiz_conte for c in contenidos_autor]
+        mejor_contenido = contenidos_autor.order_by('-likes').first()
+
+        autores_contenidos.append({
+            'autor': autor['autor__username'],
+            'total_visualizaciones': autor['total_visualizaciones'],
+            'total_likes': autor['total_likes'],
+            'total_unlikes': autor['total_unlikes'],
+            'titulos': titulos,
+            'likes': likes,
+            'unlikes': unlikes,
+            'visualizaciones': visualizaciones,
+            'mejor_contenido': mejor_contenido
+        })
+
+    # Preparar datos para la plantilla
+    context = {
+        'autores_estadisticas': autores_estadisticas,
+        'autor_mas_visualizaciones': autor_mas_visualizaciones,
+        'autor_mas_likes': autor_mas_likes,
+        'autor_mas_unlikes': autor_mas_unlikes,
+        'autores_contenidos': autores_contenidos,
+        'months': months,
+        'years': years,
+        'categorias': categorias,
+        'selected_month': selected_month,
+        'selected_year': selected_year,
+        'selected_category': selected_category,
+        'selected_author': selected_author,
+    }
+
+    return render(request, 'admin/estadisticas.html', context)
+
+def exportar_excel(request):
+    # Obtén los datos de compras del modelo
+    compras = HistorialCompra.objects.all()
+
+    # Organiza los datos en una lista de diccionarios para fácil conversión a DataFrame
+    data = [{
+        "Compra N°": i + 1,
+        "Suscripción a": compra.categoria.nombre,
+        "Precio": f"{compra.categoria.precio} GS",
+        "Fecha de Transacción": compra.fecha_transaccion.strftime("%d %b %Y %H:%M")
+    } for i, compra in enumerate(compras)]
+
+    # Crear un DataFrame de Pandas con los datos
+    df = pd.DataFrame(data)
+
+    # Crear un archivo Excel en memoria
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=historial_compras.xlsx'
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Historial de Compras')
+
+    return response

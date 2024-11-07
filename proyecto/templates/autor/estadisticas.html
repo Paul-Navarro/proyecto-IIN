@@ -11,50 +11,10 @@
 
     <!-- Cargar Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% load static %} <!-- Cargar la biblioteca estática de Django -->
+    <link rel="stylesheet" href="{% static 'css/estadistica_autor.css' %}">
 
-    <style>
-        .estadisticas-container {
-            padding: 20px;
-        }
-
-        .card {
-            margin-bottom: 20px;
-        }
-
-        /* Estilo específico para la impresión en PDF */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            .printable-area,
-            .printable-area * {
-                visibility: visible;
-            }
-
-            .printable-area {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                padding: 20px;
-                font-family: Arial, sans-serif;
-            }
-
-            /* Ocultar elementos que no son necesarios al imprimir */
-            .no-print {
-                display: none;
-            }
-
-            .card {
-                page-break-inside: avoid;
-            }
-
-            h1 {
-                text-align: center;
-            }
-        }
-    </style>
+    
 </head>
 
 <body>
@@ -114,84 +74,69 @@
             <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
         </form>
 
-        <!-- Tarjetas con estadísticas generales -->
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card text-white bg-info">
-                    <div class="card-body">
-                        <h5 class="card-title">Total de Visualizaciones</h5>
-                        <p class="card-text">{{ total_visualizaciones }}</p>
-                    </div>
+        <!-- Tarjetas con estadísticas generales y gráficos en una cuadrícula -->
+        <div class="grid-container">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Visualizaciones</h5>
+                    <p class="card-text">{{ total_visualizaciones }}</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-success">
-                    <div class="card-body">
-                        <h5 class="card-title">Categorías Más Relevantes</h5>
-                        <ul>
-                            {% for categoria in categorias_relevantes %}
-                                <li>{{ categoria.categoria__nombre }}: {{ categoria.total_likes }} Likes</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Categorías Más Relevantes</h5>
+                    <ul>
+                        {% for categoria in categorias_relevantes %}
+                            <li>{{ categoria.categoria__nombre }}: {{ categoria.total_likes }} Likes</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-warning">
-                    <div class="card-body">
-                        <h5 class="card-title">Mejor Mes</h5>
-                        <p class="card-text">
-                            {% if mejor_mes %}
-                                {{ mejor_mes|date:"F Y" }}
-                            {% else %}
-                                No hay datos disponibles
-                            {% endif %}
-                        </p>
-                    </div>
+
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Mejor Mes</h5>
+                    <p class="card-text">
+                        {% if mejor_mes %}
+                            {{ mejor_mes|date:"F Y" }}
+                        {% else %}
+                            No hay datos disponibles
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Likes y Unlikes por Contenido</h5>
+                    <canvas id="likesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Popularidad de Contenidos (Promedio de Estrellas)</h5>
+                    <canvas id="popularidadChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Visualizaciones por Contenido</h5>
+                    <canvas id="visualizacionesChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Gráfico de barras de Likes y Unlikes -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">Likes y Unlikes por Contenido</h5>
-                <canvas id="likesChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Gráfico de torta de Popularidad (Promedio de Estrellas) -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">Popularidad de Contenidos (Promedio de Estrellas)</h5>
-                <canvas id="popularidadChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Gráfico de líneas de Visualizaciones -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">Visualizaciones por Contenido</h5>
-                <canvas id="visualizacionesChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Botón para enviar informe -->
+        <!-- Botones de acciones -->
         <div class="text-center mt-4 no-print">
             <button class="btn btn-primary" data-toggle="modal" data-target="#successModal" id="sendReportButton">
                 <i class="fas fa-envelope"></i> Enviar Informe por Correo
             </button>
-        </div>
-
-        <!-- Botón para volver al panel del autor -->
-        <div class="text-center back-button no-print">
             <a href="{% url 'autor_dashboard' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Volver al Panel
             </a>
-        </div>
-
-        <!-- Botón para imprimir en PDF -->
-        <div class="text-center mt-3 no-print">
             <button class="btn btn-dark" onclick="window.print()">
                 <i class="fas fa-file-pdf"></i> Imprimir en PDF
             </button>
@@ -246,9 +191,20 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
+                x: {
+                    ticks: { font: { size: 10 } }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 } }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
                 }
             }
         }
@@ -282,7 +238,14 @@
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
+                }
+            }
         }
     });
 
@@ -303,10 +266,13 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
-                y: {
-                    beginAtZero: true
-                }
+                x: { ticks: { font: { size: 10 } } },
+                y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+            },
+            plugins: {
+                legend: { display: false }
             }
         }
     });

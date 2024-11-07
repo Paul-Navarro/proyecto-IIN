@@ -6,45 +6,135 @@
     <title>Historial de Compras</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/historial_compras.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header class="header">
-        <div><a class="boton_atras" href="{% url 'home' %}">Atras</a></div>
-        <h1>Historial de compras</h1>
+        <div>
+            <a class="boton_atras" href="{% url 'home' %}">
+                <i class="fas fa-arrow-left"></i> Atrás
+            </a>
+        </div>
+        <h1><i class="fas fa-shopping-cart"></i> Historial de Compras</h1>
         <div></div>
     </header>
+
     <div class="contenedor">
         <main>
+            <!-- Filtro de fecha -->
+            <div class="filtro-fecha">
+                <label for="fecha-desde">Fecha desde:</label>
+                <input type="date" id="fecha-desde" name="fecha-desde">
+    
+                <label for="fecha-hasta">Fecha hasta:</label>
+                <input type="date" id="fecha-hasta" name="fecha-hasta">
+    
+                <button onclick="filtrarFechas()" class="btn-filtrar">Filtrar</button>
+
+                <button onclick="location.href='{% url 'exportar_excel' %}'" class="btn-exportar">Exportar a Excel</button>
+            </div>
+    
             <div class="historial-container">
                 {% if historial_compras %}
-                    {% for compra in historial_compras %}
-                        <div class="compra-card">
-                            <div class="compra-info">
-                                <div class="compra-detalle">
-                                    <h3>Compra N°</h3>
-                                    <p>{{ forloop.counter }}</p>
-                                </div>
-                                <div class="compra-detalle">
-                                    <h3>Suscripción a</h3>
-                                    <p>{{ compra.categoria.nombre }}</p>
-                                </div>
-                                <!-- Mostrar precio -->
-                                <div class="compra-detalle">
-                                    <h3>Precio</h3>
-                                    <p>{{ compra.categoria.precio }} GS</p>  
-                                </div>
-                                <div class="compra-detalle">
-                                    <h3>Fecha de transacción</h3>
-                                    <p>{{ compra.fecha_transaccion|date:"d M Y H:i" }}</p>
-                                </div>
+                    <div class="compra-table">
+                        <div class="compra-table-header">
+                            <div class="compra-header-item"><i class="fas fa-receipt"></i> Compra N°</div>
+                            <div class="compra-header-item"><i class="fas fa-tag"></i> Suscripción a</div>
+                            <div class="compra-header-item"><i class="fas fa-dollar-sign"></i> Precio</div>
+                            <div class="compra-header-item"><i class="fas fa-calendar-alt"></i> Fecha de Transacción</div>
+                            <div class="compra-header-item"><i class="fas fa-tasks"></i> Acciones</div>
+                        </div>
+                        {% for compra in historial_compras %}
+                        <div class="compra-row" id="item{{ forloop.counter }}">
+                            <div class="compra-item">
+                                <p>{{ forloop.counter }}</p>
+                            </div>
+                            <div class="compra-item">
+                                <p>{{ compra.categoria.nombre }}</p>
+                            </div>
+                            <div class="compra-item">
+                                <p>{{ compra.categoria.precio }} GS</p>
+                            </div>
+                            <div class="compra-item">
+                                <p class="compra-fecha">{{ compra.fecha_transaccion|date:"Y-m-d" }}</p>
+                            </div>
+                            <div class="compra-item">
+                                <button onclick="verDetalle({{ forloop.counter }})" class="btn-ver-detalle">Ver Detalle</button>
                             </div>
                         </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% else %}
                     <p>No tienes compras registradas.</p>
                 {% endif %}
             </div>
         </main>
     </div>
+    
+
+    <!-- Modal de Detalles -->
+    <div id="modalDetalle" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+            <h2>Detalles de la Compra</h2>
+            <div id="detalleContenido">
+                <!-- Contenido dinámico de los detalles de la compra -->
+                <p><strong>Compra N°:</strong> <span id="detalleCompraNumero"></span></p>
+                <p><strong>Suscripción a:</strong> <span id="detalleSuscripcion"></span></p>
+                <p><strong>Precio:</strong> <span id="detallePrecio"></span> GS</p>
+                <p><strong>Fecha de transacción:</strong> <span id="detalleFecha"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function verDetalle(id) {
+            const compraNumero = document.querySelector(`#item${id} .compra-item p`).textContent;
+            const suscripcion = document.querySelector(`#item${id} .compra-item:nth-child(2) p`).textContent;
+            const precio = document.querySelector(`#item${id} .compra-item:nth-child(3) p`).textContent;
+            const fecha = document.querySelector(`#item${id} .compra-item:nth-child(4) p`).textContent;
+
+            document.getElementById("detalleCompraNumero").textContent = compraNumero;
+            document.getElementById("detalleSuscripcion").textContent = suscripcion;
+            document.getElementById("detallePrecio").textContent = precio;
+            document.getElementById("detalleFecha").textContent = fecha;
+
+            document.getElementById("modalDetalle").style.display = "flex";
+        }
+
+        function cerrarModal() {
+            document.getElementById("modalDetalle").style.display = "none";
+        }
+
+        function filtrarFechas() {
+            const fechaDesde = document.getElementById('fecha-desde').value;
+            const fechaHasta = document.getElementById('fecha-hasta').value;
+    
+            if (!fechaDesde || !fechaHasta) {
+                alert('Por favor, selecciona ambas fechas para filtrar.');
+                return;
+            }
+    
+            // Convertir las fechas a objetos Date para comparar
+            const desde = new Date(fechaDesde);
+            const hasta = new Date(fechaHasta);
+    
+            // Obtener todas las filas de compras
+            const filas = document.querySelectorAll('.compra-row');
+    
+            filas.forEach(fila => {
+                // Obtener la fecha de la fila
+                const fechaTexto = fila.querySelector('.compra-fecha').textContent;
+                const fechaCompra = new Date(fechaTexto);
+    
+                // Mostrar u ocultar la fila según el rango de fechas
+                if (fechaCompra >= desde && fechaCompra <= hasta) {
+                    fila.style.display = 'flex';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>

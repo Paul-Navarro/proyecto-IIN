@@ -1,0 +1,134 @@
+.estadisticas-container {
+    padding: 30px; /* Aumentar el padding de la contenedor */
+    background-color: #f3f4f6;
+    border-radius: 10px;
+}
+
+.card {
+    margin-bottom: 30px; /* Aumentar el margen inferior de las tarjetas */
+    border-radius: 10px; /* Rounding más pronunciado */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra más marcada */
+}
+
+.card-body {
+    padding: 20px; /* Aumentar el padding en la tarjeta */
+    color: #ffffff;
+}
+
+.bg-info {
+    background-color: #00796b !important;
+}
+
+.bg-success {
+    background-color: #388e3c !important;
+}
+
+.bg-warning {
+    background-color: #f39c12 !important;
+    color: #333;
+}
+
+canvas {
+    max-height: 300px; /* Aumentar la altura máxima de los gráficos */
+}
+
+h5.card-title {
+    font-size: 1.2rem; /* Aumentar el tamaño del texto del título */
+    margin-bottom: 10px; /* Aumentar el espacio inferior */
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Ajustar el mínimo del grid */
+    gap: 20px; /* Aumentar el espacio entre tarjetas */
+}
+
+.no-print .btn-primary,
+.no-print .btn-secondary,
+.no-print .btn-dark {
+    margin: 15px 8px; /* Aumentar márgenes de botones */
+    padding: 10px 20px; /* Aumentar padding en botones */
+    border-radius: 5px;
+    color: #ffffff;
+}
+
+.btn-primary {
+    background-color: #00796b;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #00695c;
+}
+
+.btn-secondary {
+    background-color: #757575;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #616161;
+}
+
+.btn-dark {
+    background-color: #455a64;
+    border: none;
+}
+
+.btn-dark:hover {
+    background-color: #37474f;
+}
+
+.no-print button,
+.no-print a {
+    transition: background-color 0.3s ease;
+}
+
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #e0f2f1;
+}
+
+.modal-header,
+.modal-footer {
+    border: none;
+    color: #ffffff;
+    background-color: #00796b;
+}
+
+.modal-content {
+    border-radius: 10px; /* Aumentar el redondeo del contenido modal */
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .printable-area,
+    .printable-area * {
+        visibility: visible;
+    }
+
+    .printable-area {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
+
+    .no-print {
+        display: none;
+    }
+
+    .card {
+        page-break-inside: avoid;
+    }
+
+    h1 {
+        text-align: center;
+    }
+}

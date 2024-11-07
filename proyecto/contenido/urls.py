@@ -72,8 +72,17 @@ urlpatterns = [
 
     path('estadisticas/', ver_estadisticas, name='ver_estadisticas'),
     path('enviar-informe/', enviar_informe, name='enviar_informe'),  # Ruta para enviar el informe por correo
+    path('ver_estadisticas_todos_autores/', views.ver_estadisticas_todos_autores, name='ver_estadisticas_todos_autores'),
     
     path('inhabilitar/<int:pk>/', views.inhabilitar_contenido, name='inhabilitar_contenido'),
+    
+    path('contenido/<int:contenido_id>/agregar_favorito/', views.agregar_favorito, name='agregar_favorito'),
+    path('contenido/<int:contenido_id>/eliminar_favorito/', views.eliminar_favorito, name='eliminar_favorito'),
+    path('favoritos/', views.lista_favoritos, name='lista_favoritos'),
+    path('contenido/<int:pk>/toggle_destacado/', views.toggle_destacado, name='contenido_toggle_destacado'),
+    path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
+
+    path('ventas/descargar/', views.descargar_ventas_excel, name='descargar_ventas_excel'),
 ]
 
 '''

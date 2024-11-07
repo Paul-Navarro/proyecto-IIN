@@ -50,6 +50,7 @@ class Contenido(models.Model):
     unlikes = models.IntegerField(default=0)
     autopublicar_conte = models.BooleanField(default=False)
     vigencia_conte = models.BooleanField(default=False)
+    es_destacado = models.BooleanField(default=False)
     
 
     # Relación con el autor del contenido
@@ -346,3 +347,14 @@ class Rating(models.Model):
 
     def __str__(self):
         return f'{self.usuario} - {self.contenido}: {self.estrellas} estrellas'
+
+class Favorito(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favoritos")
+    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name="favoritos")
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'contenido')
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.contenido.titulo_conte}"
