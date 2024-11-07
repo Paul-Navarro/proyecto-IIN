@@ -467,16 +467,80 @@
                                     <div class="btn-container">
                                         <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
                                     </div>
-
                                     {% if user.is_authenticated %}
-                                    <button class="favorito-btn" id="favorito-btn-{{ contenido.id_conte }}" onclick="toggleFavorito({{ contenido.id_conte }})">
-                                        {% if contenido.es_favorito %}
-                                            <span>Quitar de Favoritos ❤️</span>
-                                        {% else %}
-                                            <span>Añadir a Favoritos 🤍</span>
-                                        {% endif %}
-                                    </button>
-                                {% endif %}
+                                        <button class="favorito-btn" id="favorito-btn-{{ contenido.id_conte }}" onclick="toggleFavorito({{ contenido.id_conte }})">
+                                            <i class="fas fa-heart"></i>
+                                            <span>
+                                                {% if contenido.es_favorito %}
+                                                    Quitar de Favoritos
+                                                {% else %}
+                                                    Añadir a Favoritos
+                                                {% endif %}
+                                            </span>
+                                        </button>
+                                    {% endif %}
+
+                                    <style>
+                                        .favorito-btn {
+                                            display: inline-flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            padding: 8px 20px;
+                                            background-color: #28a745; /* Cambia el color según la estética de tu sitio */
+                                            color: white;
+                                            font-weight: bold;
+                                            font-size: 16px;
+                                            border: none;
+                                            border-radius: 25px;
+                                            cursor: pointer;
+                                            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+                                            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                                            margin-bottom: 20px;
+                                        }
+
+                                        .favorito-btn:hover {
+                                            background-color: #218838; /* Color más oscuro para el efecto hover */
+                                            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+                                        }
+
+                                        .favorito-btn span {
+                                            margin-left: 8px;
+                                        }
+
+                                        .favorito-btn i {
+                                            font-size: 1.2em;
+                                        }
+                                        
+                                    </style>
+
+                                    <script>
+                                        function toggleFavorito(contenidoId) {
+                                            const btn = document.getElementById(`favorito-btn-${contenidoId}`);
+                                            const isFavorite = btn.textContent.includes('Quitar');
+                                            const url = `/contenido/contenido/${contenidoId}/${isFavorite ? 'eliminar_favorito' : 'agregar_favorito'}/`;
+
+                                            fetch(url, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                                                }
+                                            })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.status === "ok") {
+                                                    // Cambiar el texto y el color según el estado de favorito
+                                                    btn.querySelector('span').textContent = isFavorite ? 'Añadir a Favoritos' : 'Quitar de Favoritos';
+                                                    btn.querySelector('i').classList.toggle('fas', !isFavorite); // Cambiar icono si es necesario
+                                                }
+                                            })
+                                            .catch(error => console.log('Error:', error));
+                                        }
+                                    </script>
+
+                                    
+                                    
+                                    
+                    
                                     
                                 </div>
             
