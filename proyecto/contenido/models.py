@@ -349,6 +349,14 @@ class Rating(models.Model):
         return f'{self.usuario} - {self.contenido}: {self.estrellas} estrellas'
 
 class Favorito(models.Model):
+    """
+    @class Favorito
+    @extends models.Model
+    @description Modelo que representa un favorito de un usuario.
+    Este modelo asocia a un usuario con un contenido específico y almacena la fecha en que se agregó el favorito.
+    La relación es de tipo "uno a muchos" con la tabla de usuarios y con la tabla de contenidos.
+    Además, garantiza que un usuario no pueda agregar el mismo contenido como favorito más de una vez.
+    """
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favoritos")
     contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, related_name="favoritos")
     fecha_agregado = models.DateTimeField(auto_now_add=True)
