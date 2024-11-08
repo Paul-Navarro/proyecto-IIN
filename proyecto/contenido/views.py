@@ -1043,14 +1043,16 @@ def historial_compras_view(request):
         usuario = request.user
         # Ordenar las compras por fecha de transacción en orden descendente
         historial_compras = HistorialCompra.objects.filter(usuario=usuario).order_by('-fecha_transaccion')
+        total_compras = sum([compra.categoria.precio for compra in historial_compras if compra.categoria and compra.categoria.precio is not None])
 
         context = {
             'historial_compras': historial_compras,
+            'total_compras': total_compras
         }
 
         return render(request, 'home/historial_compras.html', context)
 
-    return render(request, 'home/historial_compras.html', {'historial_compras': []})
+    return render(request, 'home/historial_compras.html', {'historial_compras': [],'total_compras': 0})
 
 #para rol financiero
 from django.views.generic import ListView
@@ -1770,22 +1772,25 @@ def ver_estadisticas_todos_autores(request):
 def exportar_excel(request):
     """
     @function exportar_excel
-    @description Exporta el historial de compras a un archivo Excel (.xlsx). La información se organiza en un DataFrame
-                 de Pandas y se convierte en un archivo descargable con las columnas: "Compra N°", "Suscripción a", 
-                 "Precio" y "Fecha de Transacción".
+    @description Exporta el historial de compras del usuario autenticado a un archivo Excel (.xlsx).
+                 La información se organiza en un DataFrame de Pandas y se convierte en un archivo descargable
+                 con las columnas: "Compra N°", "Suscripción a", "Precio" y "Fecha de Transacción".
                  
     @params request: Objeto HttpRequest, contiene los datos de la solicitud.
 
     @returns HttpResponse: Respuesta con el archivo Excel generado como archivo adjunto.
     """
-    # Obtén los datos de compras del modelo
-    compras = HistorialCompra.objects.all()
+    if not request.user.is_authenticated:
+        return HttpResponse("No autorizado", status=401)
+
+    # Filtra las compras solo para el usuario autenticado
+    compras = HistorialCompra.objects.filter(usuario=request.user)
 
     # Organiza los datos en una lista de diccionarios para fácil conversión a DataFrame
     data = [{
         "Compra N°": i + 1,
-        "Suscripción a": compra.categoria.nombre,
-        "Precio": f"{compra.categoria.precio} GS",
+        "Suscripción a": compra.categoria.nombre if compra.categoria else "Sin categoría",
+        "Precio": f"{compra.categoria.precio} GS" if compra.categoria and compra.categoria.precio is not None else "N/A",
         "Fecha de Transacción": compra.fecha_transaccion.strftime("%d %b %Y %H:%M")
     } for i, compra in enumerate(compras)]
 
@@ -1799,4 +1804,6 @@ def exportar_excel(request):
         df.to_excel(writer, index=False, sheet_name='Historial de Compras')
 
     return response
+
+
 
