@@ -229,3 +229,26 @@ header {
 .btn-exportar:hover {
     background-color: #45a049;
 }
+
+.total-compras {
+    width: 30%;
+    background-color: #f8f9fa; /* Fondo claro */
+    border: 2px solid #007bff; /* Borde azul */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 10px; /* Espaciado interno reducido */
+    text-align: center; /* Centrar el texto */
+    font-size: 1.1rem; /* Tamaño de fuente más pequeño */
+    color: #343a40; /* Color de texto gris oscuro */
+    font-weight: bold; /* Texto en negrita */
+    margin-top: 15px; /* Espaciado superior */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    display: flex; /* Flexbox para alinear contenido */
+    justify-content: center; /* Centrar contenido horizontalmente */
+    align-items: center; /* Centrar contenido verticalmente */
+    gap: 8px; /* Espacio entre el ícono y el texto */
+}
+
+.total-compras i {
+    color: #007bff; /* Color azul para el ícono */
+    font-size: 1.5rem; /* Tamaño del ícono más pequeño */
+}

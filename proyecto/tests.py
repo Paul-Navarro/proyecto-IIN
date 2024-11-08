@@ -3,9 +3,10 @@ from django.test import TestCase
 from django.urls import reverse
 from contenido.models import Contenido
 from categorias.models import Categoria
-from users.models import CustomUser as User, Role  # Usamos CustomUser ya que has sustituido el User
+from users.models import CustomUser as User, Role  
 from django.db import IntegrityError
 from django.core.validators import validate_email
+
 # Tests for Contenido module
 class ContenidoModelTest(TestCase):
     def setUp(self):
@@ -16,7 +17,7 @@ class ContenidoModelTest(TestCase):
             texto_conte="Texto de prueba",
             estado_conte="Publicado",
             fecha_conte="2023-09-01",
-            autor=self.user  # Aseguramos que el contenido tenga un autor
+            autor=self.user  
         )
 
     def test_contenido_creation(self):
@@ -65,7 +66,7 @@ class ContenidoModelTest(TestCase):
 class ContenidoViewsTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", email="testuser@example.com", password="password123")
-        self.client.force_login(self.user)  # Simula que el usuario está autenticado.
+        self.client.force_login(self.user)  
 
         Contenido.objects.create(
             titulo_conte="Contenido 1",
@@ -73,7 +74,7 @@ class ContenidoViewsTest(TestCase):
             texto_conte="Texto del contenido 1",
             estado_conte="Publicado",
             fecha_conte="2023-09-01",
-            autor=self.user  # Asegúrate de asignar el autor al contenido
+            autor=self.user  
         )
         Contenido.objects.create(
             titulo_conte="Contenido 2",
@@ -98,14 +99,14 @@ def test_contenido_create_view(self):
         'titulo_conte': 'Nuevo Contenido',
         'tipo_conte': 'Tipo 3',
         'texto_conte': 'Texto del nuevo contenido',
-        'estado_conte': 'BORRADOR',  # Valor por defecto
-        'categoria': categoria.id,  # Asegúrate de pasar una categoría válida
+        'estado_conte': 'BORRADOR',  
+        'categoria': categoria.id,  
         'fecha_conte': '2023-10-01',
-        'autor': self.user.id  # Asignar el usuario autenticado como autor
+        'autor': self.user.id  
     }
     
     response = self.client.post(reverse('contenido_create'), data)
-    self.assertEqual(response.status_code, 302)  # Verifica la redirección
+    self.assertEqual(response.status_code, 302)  
     self.assertTrue(Contenido.objects.filter(titulo_conte='Nuevo Contenido').exists())
 
     def test_contenido_delete_view(self):
@@ -115,7 +116,7 @@ def test_contenido_create_view(self):
         self.assertFalse(Contenido.objects.filter(titulo_conte="Contenido 1").exists())
 
 
-# Tests for Categorias module (con los campos corregidos: nombre y descripcion)
+
 class CategoriaModelTest(TestCase):
     def setUp(self):
         self.categoria = Categoria.objects.create(nombre="Categoria Test", descripcion="Descripcion de prueba")
@@ -155,20 +156,20 @@ class CategoriaViewsTest(TestCase):
     def test_categoria_list_view(self):
         response = self.client.get(reverse('listar_categorias'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/categorias/listar_categorias.html')  # Plantilla correcta
-        self.assertContains(response, "Categoria 1")  # Verifica que el contenido aparezca en la respuesta
+        self.assertTemplateUsed(response, 'admin/categorias/listar_categorias.html')  
+        self.assertContains(response, "Categoria 1")  
 
     def test_categoria_create_view(self):
         data = {
             'nombre': 'Nueva Categoria',
             'descripcion': 'Descripcion de la nueva categoria',
-            'es_moderada': False,  # Campo obligatorio
-            'es_pagada': False,  # Campo obligatorio
-            'para_suscriptores': False,  # Campo obligatorio
-            'tipo_contenido': 'Texto'  # Asegúrate de que este valor sea válido para el campo
+            'es_moderada': False, 
+            'es_pagada': False,  
+            'para_suscriptores': False,  
+            'tipo_contenido': 'Texto'  
         }
         response = self.client.post(reverse('crear_categoria'), data)
-        self.assertEqual(response.status_code, 302)  # Verifica la redirección
+        self.assertEqual(response.status_code, 302)  
         self.assertTrue(Categoria.objects.filter(nombre='Nueva Categoria').exists())
 
 
@@ -179,7 +180,7 @@ class CategoriaViewsTest(TestCase):
         self.assertFalse(Categoria.objects.filter(nombre="Categoria 1").exists())
 
 
-# Tests for Users module (cambiando a CustomUser)
+
 class UserModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", email="testuser@example.com", password="password123")
@@ -218,19 +219,19 @@ class UserViewsTest(TestCase):
         data = {
             'username': 'newuser',
             'email': 'newuser@example.com',
-            'password1': 'P@ssw0rd12345!',  # Usamos una contraseña más segura
-            'password2': 'P@ssw0rd12345!',  # Asegúrate de que coincida con 'password1'
-            'first_name': 'New',  # Campo obligatorio
-            'last_name': 'User',  # Campo obligatorio
-            'roles': [role.id]  # Asigna el rol creado al usuario
+            'password1': 'P@ssw0rd12345!',  
+            'password2': 'P@ssw0rd12345!',  
+            'first_name': 'New',  
+            'last_name': 'User',  
+            'roles': [role.id]  
         }
 
         response = self.client.post(reverse('create_user'), data)
 
-        # Verifica si la redirección ocurre como se espera
+        
         self.assertEqual(response.status_code, 302)
 
-        # Verifica si el usuario fue creado
+        
         self.assertTrue(User.objects.filter(username='newuser').exists())
 
 
@@ -246,7 +247,7 @@ def test_create_user_view(self):
         'password2': 'password123'
     }
     response = self.client.post(reverse('create_user'), data)
-    self.assertEqual(response.status_code, 302)  # Verifica la redirección
+    self.assertEqual(response.status_code, 302)  
     self.assertTrue(User.objects.filter(username='newuser').exists())
 
     def test_user_profile_view(self):
@@ -255,7 +256,7 @@ def test_create_user_view(self):
         self.assertContains(response, self.user.username)
 
 
-# More Tests for Contenido, Categoria, and Users
+
 
 class MoreContenidoModelTests(TestCase):
     def setUp(self):
@@ -317,13 +318,52 @@ class MoreContenidoModelTests(TestCase):
         )
         self.assertEqual(contenido.categoria, categoria)
 
+    def test_contenido_creation_with_empty_fecha_conte(self):
+        with self.assertRaises(ValidationError):
+            Contenido.objects.create(
+                titulo_conte="Test Contenido",
+                tipo_conte="Tipo 1",
+                texto_conte="Texto de prueba",
+                estado_conte="Publicado",
+                fecha_conte="",
+                autor=self.user
+            )
+
+    def test_contenido_creation_with_invalid_fecha_conte(self):
+        with self.assertRaises(ValidationError):
+            Contenido.objects.create(
+                titulo_conte="Test Contenido",
+                tipo_conte="Tipo 1",
+                texto_conte="Texto de prueba",
+                estado_conte="Publicado",
+                fecha_conte="invalid-date",
+                autor=self.user
+            )
+
+    def test_contenido_update_with_new_categoria(self):
+        categoria = Categoria.objects.create(nombre="Categoria 1", descripcion="Desc 1")
+        contenido = Contenido.objects.create(
+            titulo_conte="Test Contenido",
+            tipo_conte="Tipo 1",
+            texto_conte="Texto de prueba",
+            estado_conte="Publicado",
+            fecha_conte="2023-09-01",
+            autor=self.user,
+            categoria=categoria
+        )
+        new_categoria = Categoria.objects.create(nombre="Categoria 2", descripcion="Desc 2")
+        contenido.categoria = new_categoria
+        contenido.save()
+        self.assertEqual(contenido.categoria, new_categoria)
+    
+
 class MoreCategoriaTests(TestCase):
     def setUp(self):
         self.categoria = Categoria.objects.create(nombre="Test Categoria 2", descripcion="Otra descripcion de prueba", codigo=1)
 
     def test_categoria_unique_codigo(self):
-        # Intentamos crear una nueva categoría con el mismo código
-        with self.assertRaises(IntegrityError):  # IntegrityError esperado por la violación de unicidad
+        
+        with self.assertRaises(IntegrityError):  
             Categoria.objects.create(nombre="Test Categoria 3", descripcion="Descripcion", codigo=1)
 
     def test_categoria_description_length(self):
@@ -344,6 +384,36 @@ class MoreCategoriaTests(TestCase):
         categoria.save()
         self.assertEqual(categoria.descripcion, "New Desc")
 
+    def test_categoria_creation_with_empty_nombre(self):
+        categoria = Categoria.objects.create(nombre="", descripcion="Desc 1")
+        self.assertEqual(categoria.nombre, "")
+    def test_categoria_creation_with_empty_descripcion(self):
+        categoria = Categoria.objects.create(nombre="Test Categoria", descripcion="")
+        self.assertEqual(categoria.descripcion, "")
+
+    def test_categoria_update_with_new_codigo(self):
+        categoria = Categoria.objects.create(nombre="Test Categoria", descripcion="Desc 1")
+        new_codigo = categoria.codigo + 1
+        categoria.codigo = new_codigo
+        categoria.save()
+        self.assertEqual(categoria.codigo, new_codigo)
+
+class MoreUserModelTests(TestCase):
+    
+
+    def test_user_creation_with_empty_username(self):
+        with self.assertRaises(ValueError):
+            User.objects.create_user(username="", email="testuser@example.com", password="password123")
+
+    def test_user_creation_with_empty_email(self):
+        user = User.objects.create_user(username="testuser", email="", password="password123")
+        self.assertEqual(user.email, "")
+    def test_user_update_with_new_password(self):
+        user = User.objects.create_user(username="testuser", email="testuser@example.com", password="password13")
+        user.set_password("newpassword")
+        user.save()
+        self.assertTrue(user.check_password("newpassword"))
+
 class MoreUserTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser3", email="testuser3@example.com", password="password123")
@@ -360,3 +430,5 @@ class MoreUserTests(TestCase):
         role = Role.objects.create(name='RoleForUserTest')
         self.user.roles.add(role)
         self.assertTrue(self.user.roles.filter(name='RoleForUserTest').exists())
+
+    

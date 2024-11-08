@@ -23,7 +23,12 @@
                 <p class="warning-text">¿Estás seguro de que deseas eliminar la categoría <strong>{{ categoria.nombre }}</strong>?</p>
                 <form method="post" class="delete-form">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Eliminar Categoría</button>
+                    {% if categoria.contenido_set.exists %}
+                    <button class="btn btn-secondary" disabled>Esta categoria esta en uso, no se puede eliminar!</button>
+                    {% else %}
+                        <a href="{% url 'eliminar_categoria' categoria.pk %}" class="btn btn-danger">Eliminar</a>
+                    {% endif %}
+
                 </form>
             {% endblock %}
         </div>

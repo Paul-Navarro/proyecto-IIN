@@ -130,7 +130,128 @@
                 color: gold;
             }
         </style>
-        <!-- Para las estrellas -->
+        <!-- Para compartir -->
+        <div class="share-content">
+            <h3>Comparte este contenido</h3>
+            <div class="share-icons">
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}" target="_blank" class="share-icon facebook">
+                    <i class="fab fa-facebook-square"></i> Facebook
+                </a>
+                
+                <!-- X  -->
+                <a href="https://x.com/intent/tweet?url={{ share_url }}&text={{ contenido.titulo_conte }}" target="_blank" class="share-icon x" style="display: inline-flex; align-items: center; text-decoration: none; background-color: #e0e0e0; padding: 5px 10px; border-radius: 8px; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);">
+                    <span style="display: inline-block; background-color: black; color: white; padding: 5px 8px; border-radius: 5px; font-weight: bold; margin-right: 5px;">X</span>
+                    <span style="color: #333; font-weight: bold;">Twitter</span>
+                </a>
+                
+                <!-- WhatsApp -->
+                <a href="https://api.whatsapp.com/send?text={{ share_url }}" target="_blank" class="share-icon whatsapp">
+                    <i class="fab fa-whatsapp-square"></i> WhatsApp
+                </a>
+                
+                <!-- Copiar enlace -->
+                <button onclick="copyLink('{{ share_url }}')" class="share-icon copy">
+                    <i class="fas fa-copy"></i> Copiar enlace
+                </button>
+            </div>
+        </div>
+        
+        <!-- Popup para mostrar mensaje de enlace copiado -->
+        <div id="copy-popup" class="copy-popup">
+            <p>Enlace copiado al portapapeles</p>
+        </div>
+        
+        <style>
+            /* Estilos de los íconos de compartir */
+            .share-content {
+                text-align: center;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+        
+            .share-content h3 {
+                font-size: 1.2em;
+                color: #333;
+                margin-bottom: 10px;
+            }
+        
+            .share-icons {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+            }
+        
+            .share-icon {
+                text-decoration: none;
+                font-size: 0.9em;
+                padding: 10px 15px;
+                border-radius: 5px;
+                color: #fff;
+                display: flex;
+                align-items: center;
+                transition: background-color 0.3s ease;
+            }
+        
+            .share-icon i {
+                margin-right: 8px;
+                font-size: 1.2em;
+            }
+        
+            /* Colores para cada red social */
+            .facebook { background-color: #3b5998; }
+            .twitter { background-color: #1da1f2; }
+            .whatsapp { background-color: #25d366; }
+            .copy { background-color: #333; }
+        
+            /* Efecto hover */
+            .share-icon:hover {
+                opacity: 0.9;
+            }
+        
+            /* Estilos para el popup de "Enlace copiado" */
+            .copy-popup {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: rgba(0, 0, 0, 0.8);
+                color: #fff;
+                padding: 20px 30px;
+                border-radius: 8px;
+                display: none;
+                z-index: 1000;
+                font-size: 1em;
+            }
+        
+            /* Animación para mostrar el popup */
+            .copy-popup.show {
+                display: block;
+                animation: fadeInOut 3s ease forwards;
+            }
+        
+            /* Animación fade in-out */
+            @keyframes fadeInOut {
+                0% { opacity: 0; }
+                10% { opacity: 1; }
+                90% { opacity: 1; }
+                100% { opacity: 0; }
+            }
+        </style>
+        
+        <script>
+            function copyLink(url) {
+                navigator.clipboard.writeText(url).then(function() {
+                    // Mostrar el popup
+                    const popup = document.getElementById('copy-popup');
+                    popup.classList.add('show');
+                    setTimeout(() => popup.classList.remove('show'), 3000); // Ocultar después de 3 segundos
+                }, function(err) {
+                    alert('Error al copiar el enlace: ' + err);
+                });
+            }
+        </script>
+        
 
         <!-- Insertar sección de Disqus -->
         <div id="disqus_thread"></div>

@@ -42,6 +42,7 @@
                             <div class="compra-header-item"><i class="fas fa-tag"></i> Suscripción a</div>
                             <div class="compra-header-item"><i class="fas fa-dollar-sign"></i> Precio</div>
                             <div class="compra-header-item"><i class="fas fa-calendar-alt"></i> Fecha de Transacción</div>
+                            <div class="compra-header-item"><i class="fas fa-dollar-sign"></i> Metodo de Pago</div>
                             <div class="compra-header-item"><i class="fas fa-tasks"></i> Acciones</div>
                         </div>
                         {% for compra in historial_compras %}
@@ -53,10 +54,14 @@
                                 <p>{{ compra.categoria.nombre }}</p>
                             </div>
                             <div class="compra-item">
-                                <p>{{ compra.categoria.precio }} GS</p>
+                                <p class="precio-compra">{{ compra.categoria.precio }} GS</p>
                             </div>
+                            
                             <div class="compra-item">
                                 <p class="compra-fecha">{{ compra.fecha_transaccion|date:"Y-m-d" }}</p>
+                            </div>
+                            <div class="compra-item">
+                                <p class="compra-metodo">Pago con tarjeta</p>
                             </div>
                             <div class="compra-item">
                                 <button onclick="verDetalle({{ forloop.counter }})" class="btn-ver-detalle">Ver Detalle</button>
@@ -68,6 +73,13 @@
                     <p>No tienes compras registradas.</p>
                 {% endif %}
             </div>
+
+            <div id="total-compras" class="total-compras">
+                <i class="fas fa-coins"></i> <!-- Ícono de Font Awesome -->
+                <strong>Total de Compras: </strong> {{ total_compras }} GS
+            </div>
+            
+            
         </main>
     </div>
     

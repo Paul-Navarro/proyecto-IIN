@@ -64,6 +64,9 @@ def contenido_detail(request, pk):
     contenido.cant_visualiz_conte += 1
     contenido.save()  # Guardar el cambio en la base de datos
     
+    # Obtener URL completa para compartir
+    share_url = request.build_absolute_uri()
+
     # Obtener la calificación previa del usuario si existe
     user_rating = None
     if request.user.is_authenticated:
@@ -82,6 +85,7 @@ def contenido_detail(request, pk):
     return render(request, 'home/contenido_detail.html', {
         'contenido': contenido,
         'user_rating': user_rating,
+        'share_url': share_url,
     })
 
 def contenido_detail_editor(request, pk):
@@ -870,7 +874,8 @@ def suscripcion_exitosa(request):
                 HistorialCompra.objects.create(
                     usuario=usuario,
                     numero_compra=session.id,  # Guardar el session.id de Stripe como número de compra
-                    categoria=categoria
+                    categoria=categoria,
+                    metodo_pago="Pago con tarjeta"
                 )
 
             # Renderizar el template de éxito
@@ -1038,14 +1043,16 @@ def historial_compras_view(request):
         usuario = request.user
         # Ordenar las compras por fecha de transacción en orden descendente
         historial_compras = HistorialCompra.objects.filter(usuario=usuario).order_by('-fecha_transaccion')
+        total_compras = sum([compra.categoria.precio for compra in historial_compras if compra.categoria and compra.categoria.precio is not None])
 
         context = {
             'historial_compras': historial_compras,
+            'total_compras': total_compras
         }
 
         return render(request, 'home/historial_compras.html', context)
 
-    return render(request, 'home/historial_compras.html', {'historial_compras': []})
+    return render(request, 'home/historial_compras.html', {'historial_compras': [],'total_compras': 0})
 
 #para rol financiero
 from django.views.generic import ListView
@@ -1074,6 +1081,18 @@ from categorias.models import Categoria
 from django.contrib.auth import get_user_model
 
 class VentaListView(ListView):
+    """
+    @class VentaListView
+    @extends ListView
+    @description Vista basada en clase para mostrar un listado de ventas (historial de compras).
+    Esta vista permite filtrar las ventas por categoría, suscriptor y rango de fechas. 
+    Además, proporciona datos agregados para generar gráficos y permite exportar las ventas a un archivo CSV.
+
+    @methods:
+        get_context_data: Obtiene el contexto para la vista, incluyendo las ventas filtradas y los datos agregados para los gráficos.
+        get: Maneja la solicitud GET y permite exportar las ventas a CSV si se solicita.
+        exportar_excel: Exporta el historial de compras filtrado a un archivo CSV.
+    """
     model = HistorialCompra
     template_name = 'ventas/venta_list.html'
     context_object_name = 'ventas'
@@ -1214,11 +1233,11 @@ def descargar_ventas_excel(request):
             fecha_sin_tz,
             venta.usuario.username if venta.usuario else "No disponible",
             venta.categoria.nombre if venta.categoria else "Sin categoría",
-            "Método de Pago",  # Ajusta este valor si tienes otro campo correspondiente
-            venta.categoria.precio if venta.categoria else 0  # Ajusta este valor si tienes otro campo correspondiente
+            venta.metodo_pago if venta.metodo_pago else "Método de pago no disponible",  
+            venta.categoria.precio if venta.categoria else 0  
         ])
 
-    # Ajustar el ancho de las columnas automáticamente
+    
     for col_num, column_title in enumerate(headers, 1):
         column_letter = get_column_letter(col_num)
         worksheet.column_dimensions[column_letter].width = 20
@@ -1575,6 +1594,18 @@ def enviar_informe(request):
     return redirect('autor_dashboard')
 
 def inhabilitar_contenido(request, pk):
+    """
+    @function inhabilitar_contenido
+    @description Esta función maneja la inhabilitación de un contenido mediante una solicitud POST.
+                 Actualiza el campo `vigencia_conte` de un contenido específico a `True`, 
+                 lo que indica que el contenido ha sido inhabilitado. Al finalizar la acción, 
+                 muestra un mensaje de éxito y redirige a una vista determinada.
+
+    @params request: Objeto HttpRequest, contiene los datos de la solicitud.
+    @params pk: Clave primaria del contenido a inhabilitar.
+    
+    @returns HttpResponseRedirect: Redirige a la vista de `autor_dashboard` (o la vista configurada).
+    """
     # Verifica que el método de la solicitud sea POST
     if request.method == 'POST':
         # Busca el contenido por su clave primaria (pk)
@@ -1594,23 +1625,65 @@ def inhabilitar_contenido(request, pk):
     
 @login_required
 def agregar_favorito(request, contenido_id):
+    """
+    @function agregar_favorito
+    @description Esta función maneja la solicitud para agregar un contenido a los favoritos de un usuario.
+                 Busca el contenido por su ID, y si no existe una entrada de favorito para ese usuario y contenido, 
+                 la crea. Devuelve una respuesta JSON indicando que el contenido ha sido añadido a los favoritos.
+
+    @params request: Objeto HttpRequest, contiene los datos de la solicitud, incluyendo el usuario autenticado.
+    @params contenido_id: ID del contenido que se desea agregar a los favoritos.
+    
+    @returns JsonResponse: Respuesta JSON con el estado de la operación y un mensaje de éxito.
+    """
     contenido = get_object_or_404(Contenido, id_conte=contenido_id)
     Favorito.objects.get_or_create(usuario=request.user, contenido=contenido)
     return JsonResponse({"status": "ok", "message": "Añadido a favoritos"})
 
 @login_required
 def eliminar_favorito(request, contenido_id):
+    """
+    @function eliminar_favorito
+    @description Esta función maneja la solicitud para eliminar un contenido de los favoritos de un usuario.
+                 Busca el contenido por su ID y elimina la entrada correspondiente en la tabla de favoritos 
+                 para el usuario autenticado. Devuelve una respuesta JSON indicando que el contenido ha sido 
+                 eliminado de los favoritos.
+
+    @params request: Objeto HttpRequest, contiene los datos de la solicitud, incluyendo el usuario autenticado.
+    @params contenido_id: ID del contenido que se desea eliminar de los favoritos.
+    
+    @returns JsonResponse: Respuesta JSON con el estado de la operación y un mensaje de éxito.
+    """
     contenido = get_object_or_404(Contenido, id_conte=contenido_id)
     Favorito.objects.filter(usuario=request.user, contenido=contenido).delete()
     return JsonResponse({"status": "ok", "message": "Eliminado de favoritos"})
 
 @login_required
 def lista_favoritos(request):
+    """
+    @function lista_favoritos
+    @description Obtiene los contenidos favoritos de un usuario autenticado y los pasa al contexto para ser renderizados
+                 en la plantilla 'favoritos.html'.
+
+    @params request: Objeto HttpRequest, contiene los datos de la solicitud, incluyendo el usuario autenticado.
+    
+    @returns HttpResponse: Respuesta con la plantilla renderizada que muestra los contenidos favoritos.
+    """
     favoritos = Favorito.objects.filter(usuario=request.user).select_related('contenido')
     return render(request, 'home/favoritos.html', {'favoritos': favoritos})
 
 
 def toggle_destacado(request, pk):
+    """
+    @function toggle_destacado
+    @description Cambia el estado del campo `es_destacado` de un contenido, activándolo o desactivándolo.
+                 Al finalizar, redirige al usuario a la vista de administración de KANBAN.
+
+    @params request: Objeto HttpRequest, contiene los datos de la solicitud.
+    @params pk: Clave primaria del contenido a actualizar.
+    
+    @returns HttpResponseRedirect: Redirige a la vista de administración de KANBAN.
+    """
     contenido = get_object_or_404(Contenido, pk=pk)
     contenido.es_destacado = not contenido.es_destacado
     contenido.save()
@@ -1697,14 +1770,27 @@ def ver_estadisticas_todos_autores(request):
     return render(request, 'admin/estadisticas.html', context)
 
 def exportar_excel(request):
-    # Obtén los datos de compras del modelo
-    compras = HistorialCompra.objects.all()
+    """
+    @function exportar_excel
+    @description Exporta el historial de compras del usuario autenticado a un archivo Excel (.xlsx).
+                 La información se organiza en un DataFrame de Pandas y se convierte en un archivo descargable
+                 con las columnas: "Compra N°", "Suscripción a", "Precio" y "Fecha de Transacción".
+                 
+    @params request: Objeto HttpRequest, contiene los datos de la solicitud.
+
+    @returns HttpResponse: Respuesta con el archivo Excel generado como archivo adjunto.
+    """
+    if not request.user.is_authenticated:
+        return HttpResponse("No autorizado", status=401)
+
+    # Filtra las compras solo para el usuario autenticado
+    compras = HistorialCompra.objects.filter(usuario=request.user)
 
     # Organiza los datos en una lista de diccionarios para fácil conversión a DataFrame
     data = [{
         "Compra N°": i + 1,
-        "Suscripción a": compra.categoria.nombre,
-        "Precio": f"{compra.categoria.precio} GS",
+        "Suscripción a": compra.categoria.nombre if compra.categoria else "Sin categoría",
+        "Precio": f"{compra.categoria.precio} GS" if compra.categoria and compra.categoria.precio is not None else "N/A",
         "Fecha de Transacción": compra.fecha_transaccion.strftime("%d %b %Y %H:%M")
     } for i, compra in enumerate(compras)]
 
@@ -1718,3 +1804,6 @@ def exportar_excel(request):
         df.to_excel(writer, index=False, sheet_name='Historial de Compras')
 
     return response
+
+
+
