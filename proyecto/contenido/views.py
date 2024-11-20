@@ -1489,6 +1489,7 @@ def ver_estadisticas(request):
     likes = [c.likes for c in contenidos]
     unlikes = [c.unlikes for c in contenidos]
     visualizaciones = [c.cant_visualiz_conte for c in contenidos]
+    comparticiones_contenidos = [c.total_comparticiones() for c in contenidos]
 
     # Calcular popularidad (promedio de estrellas)
     popularidad = [
@@ -1533,6 +1534,7 @@ def ver_estadisticas(request):
         'selected_category': selected_category,
         'start_date': start_date,
         'end_date': end_date,
+        'comparticiones_contenidos': comparticiones_contenidos,
     }
 
     return render(request, 'autor/estadisticas.html', context)
@@ -1694,6 +1696,8 @@ def ver_estadisticas_todos_autores(request):
     Muestra las estadísticas de todos los autores para el administrador.
     Permite filtrar por mes, año, categorías y autor.
     """
+    from django.db.models import Sum
+
     # Lista de meses y años para los filtros
     months = list(range(1, 13))  # Del 1 al 12
     current_year = datetime.now().year
@@ -1719,25 +1723,32 @@ def ver_estadisticas_todos_autores(request):
         contenidos = contenidos.filter(autor__id=int(selected_author))
 
     # Obtener los datos de estadísticas
-    autores_estadisticas = contenidos.values('autor__id', 'autor__username')\
-        .annotate(total_visualizaciones=Sum('cant_visualiz_conte'),
-                  total_likes=Sum('likes'),
-                  total_unlikes=Sum('unlikes'))
+    autores_estadisticas = (
+        contenidos.values('autor__id', 'autor__username')
+        .annotate(
+            total_visualizaciones=Sum('cant_visualiz_conte'),
+            total_likes=Sum('likes'),
+            total_unlikes=Sum('unlikes')
+        )
+    )
 
-    # Autor con más visualizaciones, más likes y más unlikes
-    autor_mas_visualizaciones = autores_estadisticas.order_by('-total_visualizaciones').first()
-    autor_mas_likes = autores_estadisticas.order_by('-total_likes').first()
-    autor_mas_unlikes = autores_estadisticas.order_by('-total_unlikes').first()
-
-    # Extraer los contenidos de cada autor para los gráficos
+    # Construir manualmente las estadísticas avanzadas
     autores_contenidos = []
     for autor in autores_estadisticas:
         contenidos_autor = contenidos.filter(autor__id=autor['autor__id'])
+        
         titulos = [c.titulo_conte for c in contenidos_autor]
         likes = [c.likes for c in contenidos_autor]
         unlikes = [c.unlikes for c in contenidos_autor]
         visualizaciones = [c.cant_visualiz_conte for c in contenidos_autor]
         mejor_contenido = contenidos_autor.order_by('-likes').first()
+        popularidad = [
+            Rating.objects.filter(contenido=c).aggregate(Avg('estrellas'))['estrellas__avg'] or 0
+            for c in contenidos_autor
+        ]
+        comparticiones = [
+            c.total_comparticiones() for c in contenidos_autor
+        ]  # total_comparticiones() debe ser un método de `Contenido`.
 
         autores_contenidos.append({
             'autor': autor['autor__username'],
@@ -1748,8 +1759,15 @@ def ver_estadisticas_todos_autores(request):
             'likes': likes,
             'unlikes': unlikes,
             'visualizaciones': visualizaciones,
-            'mejor_contenido': mejor_contenido
+            'mejor_contenido': mejor_contenido,
+            'popularidad': popularidad,
+            'comparticiones': comparticiones,
         })
+
+    # Autor con más visualizaciones, más likes y más unlikes
+    autor_mas_visualizaciones = max(autores_contenidos, key=lambda x: x['total_visualizaciones'], default=None)
+    autor_mas_likes = max(autores_contenidos, key=lambda x: x['total_likes'], default=None)
+    autor_mas_unlikes = max(autores_contenidos, key=lambda x: x['total_unlikes'], default=None)
 
     # Preparar datos para la plantilla
     context = {
@@ -1804,6 +1822,38 @@ def exportar_excel(request):
         df.to_excel(writer, index=False, sheet_name='Historial de Compras')
 
     return response
+
+@login_required
+def registrar_comparticion(request, id_conte):
+    '''
+    @function registrar_comparticion
+    @description Registra una compartición del contenido en la modalidad seleccionada por el usuario.
+    @param {HttpRequest} request - La solicitud HTTP recibida.
+    @param {int} id_conte - El ID del contenido que se compartió.
+    @route {POST} /contenido/<id_conte>/compartir/
+    @returns {JsonResponse} Responde con el estado de la operación y el total de comparticiones actualizadas.
+    '''
+    if request.method == 'POST':
+        modalidad = request.POST.get('modalidad')  # Modalidad: facebook, x, whatsapp, copiar_enlace, instagram
+        contenido = get_object_or_404(Contenido, id_conte=id_conte)
+
+        if modalidad in ['facebook', 'x', 'whatsapp', 'copiar_enlace', 'instagram']:
+            # Incrementar el contador correspondiente
+            if modalidad == 'facebook':
+                contenido.comparticiones_facebook += 1
+            elif modalidad == 'x':
+                contenido.comparticiones_x += 1
+            elif modalidad == 'whatsapp':
+                contenido.comparticiones_whatsapp += 1
+            elif modalidad == 'copiar_enlace':
+                contenido.comparticiones_copiar_enlace += 1
+            elif modalidad == 'instagram':
+                contenido.comparticiones_instagram += 1
+
+            contenido.save()
+            return JsonResponse({'status': 'ok', 'total_comparticiones': contenido.total_comparticiones()})
+    
+    return JsonResponse({'status': 'error'}, status=400)
 
 
 

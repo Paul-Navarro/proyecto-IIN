@@ -134,26 +134,22 @@
         <div class="share-content">
             <h3>Comparte este contenido</h3>
             <div class="share-icons">
-                <!-- Facebook -->
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}" target="_blank" class="share-icon facebook">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}" target="_blank" class="share-icon facebook" onclick="registrarComparticion('facebook')">
                     <i class="fab fa-facebook-square"></i> Facebook
                 </a>
-                
-                <!-- X  -->
-                <a href="https://x.com/intent/tweet?url={{ share_url }}&text={{ contenido.titulo_conte }}" target="_blank" class="share-icon x" style="display: inline-flex; align-items: center; text-decoration: none; background-color: #e0e0e0; padding: 5px 10px; border-radius: 8px; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);">
-                    <span style="display: inline-block; background-color: black; color: white; padding: 5px 8px; border-radius: 5px; font-weight: bold; margin-right: 5px;">X</span>
-                    <span style="color: #333; font-weight: bold;">Twitter</span>
+                <a href="https://x.com/intent/tweet?url={{ share_url }}&text={{ contenido.titulo_conte }}" target="_blank" class="share-icon x" onclick="registrarComparticion('x')">
+                    <i class="fab fa-twitter-square"></i> X
                 </a>
-                
-                <!-- WhatsApp -->
-                <a href="https://api.whatsapp.com/send?text={{ share_url }}" target="_blank" class="share-icon whatsapp">
+                <a href="https://api.whatsapp.com/send?text={{ share_url }}" target="_blank" class="share-icon whatsapp" onclick="registrarComparticion('whatsapp')">
                     <i class="fab fa-whatsapp-square"></i> WhatsApp
                 </a>
-                
-                <!-- Copiar enlace -->
-                <button onclick="copyLink('{{ share_url }}')" class="share-icon copy">
+                <a href="https://www.instagram.com/?url={{ share_url }}" target="_blank" class="share-icon instagram" onclick="registrarComparticion('instagram')">
+                    <i class="fab fa-instagram-square"></i> Instagram
+                </a>
+                <button onclick="registrarComparticion('copiar_enlace'); copyLink('{{ share_url }}')" class="share-icon copy">
                     <i class="fas fa-copy"></i> Copiar enlace
                 </button>
+                
             </div>
         </div>
         
@@ -250,6 +246,24 @@
                     alert('Error al copiar el enlace: ' + err);
                 });
             }
+            function registrarComparticion(modalidad) {
+                const contentId = "{{ contenido.id_conte }}";
+                fetch(`/contenido/${contentId}/compartir/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: new URLSearchParams({ modalidad })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        console.log(`Compartición registrada. Total comparticiones: ${data.total_comparticiones}`);
+                    }
+                });
+            }
+
         </script>
         
 

@@ -98,6 +98,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <h5>Comparticiones por Contenido</h5>
+                    <canvas id="comparticionesChart{{ forloop.counter }}"></canvas>
+                </div>
+                
             </div>
             <!-- Tarjeta del contenido más popular -->
             <div class="card text-white bg-primary mt-4">
@@ -123,6 +128,15 @@
                     <canvas id="visualizacionesChart{{ forloop.counter }}"></canvas>
                 </div>
             </div>
+            <div class="col-md-6">
+                <h5>Unlikes por Contenido</h5>
+                <canvas id="unlikesChart{{ forloop.counter }}"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h5>Popularidad (Promedio de Estrellas)</h5>
+                <canvas id="popularidadChart{{ forloop.counter }}"></canvas>
+            </div>
+            
         </div>
         {% endfor %}
     </div>
@@ -194,6 +208,116 @@
         options: {
             responsive: true,
             maintainAspectRatio: false
+        }
+    });
+    {% endfor %}
+    {% for autor in autores_contenidos %}
+    const comparticionesCtx{{ forloop.counter }} = document.getElementById('comparticionesChart{{ forloop.counter }}').getContext('2d');
+    new Chart(comparticionesCtx{{ forloop.counter }}, {
+        type: 'bar',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                label: 'Comparticiones',
+                data: {{ autor.comparticiones|safe }},
+                backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 } }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
+                }
+            }
+        }
+    });
+    {% endfor %}
+    {% for autor in autores_contenidos %}
+    // Gráfico de barras para Unlikes por Contenido
+    const unlikesCtx{{ forloop.counter }} = document.getElementById('unlikesChart{{ forloop.counter }}').getContext('2d');
+    new Chart(unlikesCtx{{ forloop.counter }}, {
+        type: 'bar',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                label: 'Unlikes',
+                data: {{ autor.unlikes|safe }},
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 } }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
+                }
+            }
+        }
+    });
+
+    // Gráfico de torta para Popularidad (Promedio de Estrellas)
+    const popularidadCtx{{ forloop.counter }} = document.getElementById('popularidadChart{{ forloop.counter }}').getContext('2d');
+    new Chart(popularidadCtx{{ forloop.counter }}, {
+        type: 'pie',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                data: {{ autor.popularidad|safe }},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
+                }
+            }
         }
     });
     {% endfor %}

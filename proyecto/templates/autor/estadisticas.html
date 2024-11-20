@@ -128,6 +128,50 @@
                 </div>
             </div>
         </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Comparticiones por Contenido</h5>
+                <canvas id="comparticionesChart"></canvas>
+            </div>
+        </div>
+        
+        <script>
+            // Gráfico de barras para comparticiones por contenido
+            const comparticionesCtx = document.getElementById('comparticionesChart').getContext('2d');
+            new Chart(comparticionesCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ titulos_contenidos|safe }},
+                    datasets: [{
+                        label: 'Comparticiones',
+                        data: {{ comparticiones_contenidos|safe }},
+                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { font: { size: 10 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
+                        }
+                    }
+                }
+            });
+        </script>
+        
 
         <!-- Botones de acciones -->
         <div class="text-center mt-4 no-print">
