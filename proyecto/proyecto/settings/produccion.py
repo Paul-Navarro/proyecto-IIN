@@ -175,3 +175,13 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+#pasarela de pago stripe
+
+#keys de la cuenta
+STRIPE_TEST_PUBLIC_KEY = 'pk_test_51Q2vVqHgGd0NSdDUyHvjPNnMVJMnU0aJr99r1H9ieaSQVJ8v2Hy4YE1SuGVXLBvmYuhtsr9AuOxVzL14GamULDV800cA7xb7tF'
+STRIPE_TEST_SECRET_KEY = 'sk_test_51Q2vVqHgGd0NSdDU0Z6C88f88yR9lcB4h5tWPlYmdvf8hidhkuMNwQ989Vo8HlQo16NtpVeq9J5UgGVUJQFXZz4A007crMVl5X'
+

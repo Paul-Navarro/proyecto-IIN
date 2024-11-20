@@ -108,7 +108,7 @@ with open(index_rst_path, 'w') as index_file:
     print("Contenido de index.rst modificado correctamente.")
 
 # 8. Construir la documentación en HTML usando make.bat
-subprocess.run(['make.bat', 'html'])
+subprocess.run(['make', 'html'])#.bat
 
 # Asegurarse de que no haya una carpeta 'docs' duplicada después de la construcción de la documentación
 eliminar_docs_duplicado()
