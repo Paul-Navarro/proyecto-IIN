@@ -1507,6 +1507,10 @@ def ver_estadisticas(request):
         .order_by('-total_likes')[:5]
     )
 
+    categorias_contenido = Contenido.objects.filter(autor=request.user).values(
+        'categoria__nombre'
+    ).annotate(cantidad=Count('id_conte')).order_by('-cantidad')
+
     # Mejor mes basado en likes
     mejor_mes = (
         contenidos.annotate(month=TruncMonth('fecha_publicacion'))
@@ -1535,6 +1539,7 @@ def ver_estadisticas(request):
         'start_date': start_date,
         'end_date': end_date,
         'comparticiones_contenidos': comparticiones_contenidos,
+        'categorias_contenido': list(categorias_contenido),
     }
 
     return render(request, 'autor/estadisticas.html', context)
@@ -1732,7 +1737,7 @@ def ver_estadisticas_todos_autores(request):
         )
     )
 
-    # Construir manualmente las estadísticas avanzadas
+    
     autores_contenidos = []
     for autor in autores_estadisticas:
         contenidos_autor = contenidos.filter(autor__id=autor['autor__id'])
@@ -1748,8 +1753,8 @@ def ver_estadisticas_todos_autores(request):
         ]
         comparticiones = [
             c.total_comparticiones() for c in contenidos_autor
-        ]  # total_comparticiones() debe ser un método de `Contenido`.
-
+        ]  
+        
         autores_contenidos.append({
             'autor': autor['autor__username'],
             'total_visualizaciones': autor['total_visualizaciones'],
@@ -1764,6 +1769,9 @@ def ver_estadisticas_todos_autores(request):
             'comparticiones': comparticiones,
         })
 
+    categorias_contenido = contenidos.values('categoria__nombre').annotate(
+        cantidad=Count('id_conte')
+    ).order_by('-cantidad')
     # Autor con más visualizaciones, más likes y más unlikes
     autor_mas_visualizaciones = max(autores_contenidos, key=lambda x: x['total_visualizaciones'], default=None)
     autor_mas_likes = max(autores_contenidos, key=lambda x: x['total_likes'], default=None)
@@ -1779,6 +1787,7 @@ def ver_estadisticas_todos_autores(request):
         'months': months,
         'years': years,
         'categorias': categorias,
+        'categorias_contenido': list(categorias_contenido),
         'selected_month': selected_month,
         'selected_year': selected_year,
         'selected_category': selected_category,

@@ -6,7 +6,8 @@
     <title>{{ contenido.titulo_conte }}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/contenido_detail.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 <body>
     <header class="header">
@@ -137,14 +138,22 @@
                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}" target="_blank" class="share-icon facebook" onclick="registrarComparticion('facebook')">
                     <i class="fab fa-facebook-square"></i> Facebook
                 </a>
-                <a href="https://x.com/intent/tweet?url={{ share_url }}&text={{ contenido.titulo_conte }}" target="_blank" class="share-icon x" onclick="registrarComparticion('x')">
-                    <i class="fab fa-twitter-square"></i> X
+                <a href="https://x.com/intent/tweet?url={{ share_url }}&text={{ contenido.titulo_conte }}" 
+                    target="_blank" 
+                    class="share-icon x" 
+                    onclick="registrarComparticion('x')">
+                        <i class="fab fa-x-twitter"></i> X
                 </a>
+
+
                 <a href="https://api.whatsapp.com/send?text={{ share_url }}" target="_blank" class="share-icon whatsapp" onclick="registrarComparticion('whatsapp')">
                     <i class="fab fa-whatsapp-square"></i> WhatsApp
                 </a>
-                <a href="https://www.instagram.com/?url={{ share_url }}" target="_blank" class="share-icon instagram" onclick="registrarComparticion('instagram')">
-                    <i class="fab fa-instagram-square"></i> Instagram
+                <a href="https://www.instagram.com/?url={{ share_url }}" 
+                    target="_blank" 
+                    class="share-icon instagram" 
+                    onclick="registrarComparticion('instagram')">
+                        <i class="fab fa-instagram"></i> Instagram
                 </a>
                 <button onclick="registrarComparticion('copiar_enlace'); copyLink('{{ share_url }}')" class="share-icon copy">
                     <i class="fas fa-copy"></i> Copiar enlace
@@ -180,25 +189,42 @@
         
             .share-icon {
                 text-decoration: none;
-                font-size: 0.9em;
+                font-size: 1em;
                 padding: 10px 15px;
                 border-radius: 5px;
-                color: #fff;
+                color: white;
                 display: flex;
                 align-items: center;
+                justify-content: center;
                 transition: background-color 0.3s ease;
             }
-        
+
+            
             .share-icon i {
-                margin-right: 8px;
-                font-size: 1.2em;
+                margin-right: 8px; /* Espaciado entre ícono y texto */
+                font-size: 1.5em; /* Tamaño del ícono */
             }
+            .share-icon.x {
+                background-color: #000; /* Fondo negro */
+                color: #fff; /* Texto blanco */
+                font-size: 1.5em; /* Tamaño del texto/logo */
+                font-weight: bold; /* Peso del texto para asemejarse al logo */
+                padding: 10px 15px; /* Espaciado interno */
+                
+                display: flex; /* Flex para centrar contenido */
+                justify-content: center; /* Centrar horizontalmente */
+                align-items: center; /* Centrar verticalmente */
+                text-decoration: none; /* Sin subrayado */
+                margin-right: 8px; /* Espaciado entre ícono y texto */
+                font-size: 1.5em;
         
-            /* Colores para cada red social */
+            }
             .facebook { background-color: #3b5998; }
             .twitter { background-color: #1da1f2; }
             .whatsapp { background-color: #25d366; }
+            .instagram { background-color: #E4405F; }
             .copy { background-color: #333; }
+        
         
             /* Efecto hover */
             .share-icon:hover {

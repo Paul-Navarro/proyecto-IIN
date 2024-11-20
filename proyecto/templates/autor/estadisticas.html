@@ -130,10 +130,65 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Comparticiones por Contenido</h5>
+                <h5 class="card-title">Veces compartidas por Contenido</h5>
                 <canvas id="comparticionesChart"></canvas>
             </div>
         </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Contenido por Categoría</h5>
+                <canvas id="categoriaChart"></canvas>
+            </div>
+        </div>
+        
+        <script>
+            const categoriasData = {{ categorias_contenido|safe }};
+            const categoriasLabels = categoriasData.map(item => item.categoria__nombre);
+            const categoriasCounts = categoriasData.map(item => item.cantidad);
+        
+            const categoriaCtx = document.getElementById('categoriaChart').getContext('2d');
+            new Chart(categoriaCtx, {
+                type: 'pie',
+                data: {
+                    labels: categoriasLabels,
+                    datasets: [{
+                        data: categoriasCounts,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { size: 10 },
+                                boxWidth: 10,
+                                padding: 5
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+        
         
         <script>
             // Gráfico de barras para comparticiones por contenido
