@@ -51,7 +51,11 @@ class Contenido(models.Model):
     autopublicar_conte = models.BooleanField(default=False)
     vigencia_conte = models.BooleanField(default=False)
     es_destacado = models.BooleanField(default=False)
-    
+    comparticiones_facebook = models.PositiveIntegerField(default=0)
+    comparticiones_x = models.PositiveIntegerField(default=0)
+    comparticiones_whatsapp = models.PositiveIntegerField(default=0)
+    comparticiones_copiar_enlace = models.PositiveIntegerField(default=0)
+    comparticiones_instagram = models.PositiveIntegerField(default=0)
 
     # Relación con el autor del contenido
     autor = models.ForeignKey(
@@ -190,7 +194,20 @@ class Contenido(models.Model):
                 print(f"Versión {version_num} creada y asignada como la versión actual: {self.version_actual}")
             else:
                 print("No se detectaron cambios significativos, no se crea una nueva versión")
-
+    
+    def total_comparticiones(self):
+        '''
+        @method total_comparticiones
+        @description Retorna el total de comparticiones en todas las modalidades.
+        @returns {int} Total de comparticiones.
+        '''
+        return (
+            self.comparticiones_facebook +
+            self.comparticiones_x +
+            self.comparticiones_whatsapp +
+            self.comparticiones_copiar_enlace +
+            self.comparticiones_instagram
+        )
 
 
     

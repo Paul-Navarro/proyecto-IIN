@@ -8,27 +8,75 @@
 
     <!-- Cargar CSS de Bootstrap para diseño responsivo -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Cargar Tailwind y Flowbite -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.3/flowbite.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Cargar Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% load static %} <!-- Cargar la biblioteca estática de Django -->
     <link rel="stylesheet" href="{% static 'css/estadistica_autor.css' %}">
-
     
+    <!-- Estilo personalizado para hacer más atractivo -->
+    <style>
+        body {
+            background: linear-gradient(to bottom, #f0f4f8, #d9e2ec);
+            color: #333;
+            font-family: 'Inter', sans-serif;
+        }
+        .card-title {
+            color: #1a202c;
+        }
+        .rounded-lg {
+            border-radius: 1.25rem;
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #3182ce;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2c5282;
+        }
+        .chart-container {
+            position: relative;
+            height: 500px;
+            max-height: 500px;
+            background: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1, h5 {
+            text-align: center;
+        }
+        .grid {
+            gap: 2.5rem;
+        }
+        .chart-container h5 {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .overflow-hidden {
+            overflow: hidden;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-gray-100">
 
-<div class="container estadisticas-container">
+<div class="container mx-auto p-6">
     <div class="printable-area">
-        <h1 class="mb-4">Estadísticas de tus Contenidos</h1>
+        <h1 class="text-4xl font-extrabold mb-8">Estadísticas de tus Contenidos</h1>
 
         <!-- Filtros -->
-        <form method="get" class="mb-4 no-print">
-            <div class="row">
-                <div class="col-md-3">
-                    <label for="month">Mes:</label>
-                    <select class="form-control" name="month" id="month">
+        <form method="get" class="mb-8 no-print bg-white p-6 rounded-lg shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label for="month" class="block font-medium text-gray-700">Mes:</label>
+                    <select class="form-control border-gray-300 rounded-md" name="month" id="month">
                         <option value="all">Todos</option>
                         <option value="1">Enero</option>
                         <option value="2">Febrero</option>
@@ -44,100 +92,195 @@
                         <option value="12">Diciembre</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label for="year">Año:</label>
-                    <select class="form-control" name="year" id="year">
+                <div>
+                    <label for="year" class="block font-medium text-gray-700">Año:</label>
+                    <select class="form-control border-gray-300 rounded-md" name="year" id="year">
                         <option value="all">Todos</option>
                         {% for year in years %}
                             <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label for="category">Categoría:</label>
-                    <select class="form-control" name="category" id="category">
+                <div>
+                    <label for="category" class="block font-medium text-gray-700">Categoría:</label>
+                    <select class="form-control border-gray-300 rounded-md" name="category" id="category">
                         <option value="all">Todas</option>
                         {% for categoria in categorias %}
                             <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3 mt-2">
-                    <label for="start_date">Desde:</label>
-                    <input type="date" class="form-control" name="start_date" id="start_date" value="{{ start_date }}">
+                <div>
+                    <label for="start_date" class="block font-medium text-gray-700">Desde:</label>
+                    <input type="date" class="form-control border-gray-300 rounded-md" name="start_date" id="start_date" value="{{ start_date }}">
                 </div>
-                <div class="col-md-3 mt-2">
-                    <label for="end_date">Hasta:</label>
-                    <input type="date" class="form-control" name="end_date" id="end_date" value="{{ end_date }}">
+                <div>
+                    <label for="end_date" class="block font-medium text-gray-700">Hasta:</label>
+                    <input type="date" class="form-control border-gray-300 rounded-md" name="end_date" id="end_date" value="{{ end_date }}">
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
+            <button type="submit" class="btn btn-primary mt-6 w-full md:w-auto">Aplicar Filtros</button>
         </form>
 
         <!-- Tarjetas con estadísticas generales y gráficos en una cuadrícula -->
-        <div class="grid-container">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <h5 class="card-title">Total de Visualizaciones</h5>
-                    <p class="card-text">{{ total_visualizaciones }}</p>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-r from-blue-500 to-teal-400 text-white p-6 rounded-lg shadow-lg">
+                <h5 class="text-lg font-bold mb-4">Total de Visualizaciones</h5>
+                <p class="text-4xl font-extrabold">{{ total_visualizaciones }}</p>
             </div>
 
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title">Categorías Más Relevantes</h5>
-                    <ul>
-                        {% for categoria in categorias_relevantes %}
-                            <li>{{ categoria.categoria__nombre }}: {{ categoria.total_likes }} Likes</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+            <div class="bg-gradient-to-r from-green-500 to-emerald-400 text-white p-6 rounded-lg shadow-lg">
+                <h5 class="text-lg font-bold mb-4">Categorías Más Relevantes</h5>
+                <ul class="list-disc ml-5">
+                    {% for categoria in categorias_relevantes %}
+                        <li>{{ categoria.categoria__nombre }}: {{ categoria.total_likes }} Likes</li>
+                    {% endfor %}
+                </ul>
             </div>
 
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Mejor Mes</h5>
-                    <p class="card-text">
-                        {% if mejor_mes %}
-                            {{ mejor_mes|date:"F Y" }}
-                        {% else %}
-                            No hay datos disponibles
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Likes y Unlikes por Contenido</h5>
-                    <canvas id="likesChart"></canvas>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Popularidad de Contenidos (Promedio de Estrellas)</h5>
-                    <canvas id="popularidadChart"></canvas>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Visualizaciones por Contenido</h5>
-                    <canvas id="visualizacionesChart"></canvas>
-                </div>
+            <div class="bg-gradient-to-r from-yellow-500 to-orange-400 text-white p-6 rounded-lg shadow-lg">
+                <h5 class="text-lg font-bold mb-4">Mejor Mes</h5>
+                <p class="text-2xl font-semibold">
+                    {% if mejor_mes %}
+                        {{ mejor_mes|date:"F Y" }}
+                    {% else %}
+                        No hay datos disponibles
+                    {% endif %}
+                </p>
             </div>
         </div>
 
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            <div class="chart-container overflow-hidden">
+                <h5 class="text-lg font-bold">Likes y Unlikes por Contenido</h5>
+                <canvas id="likesChart" class="w-full h-full"></canvas>
+            </div>
+
+            <div class="chart-container overflow-hidden">
+                <h5 class="text-lg font-bold">Popularidad de Contenidos (Promedio de Estrellas)</h5>
+                <div style="height: 80%; width: 80%; margin: 0 auto;">
+                    <canvas id="popularidadChart" class="w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container overflow-hidden">
+                <h5 class="text-lg font-bold">Visualizaciones por Contenido</h5>
+                <canvas id="visualizacionesChart" class="w-full h-full"></canvas>
+            </div>
+        </div>
+        <div class="chart-container mt-10 overflow-hidden">
+            <h5 class="text-lg font-bold">Veces Compartido por Contenido</h5>
+            <canvas id="comparticionesChart" class="w-full h-full"></canvas>
+        </div>
+        <div class="chart-container mt-10 overflow-hidden">
+            <h5 class="text-lg font-bold">Contenido por Categoría</h5>
+            <canvas id="categoriaChart" class="w-full h-full"></canvas>
+        </div>
+        
+        <script>
+            const categoriasData = {{ categorias_contenido|safe }};
+            const categoriasLabels = categoriasData.map(item => item.categoria__nombre);
+            const categoriasCounts = categoriasData.map(item => item.cantidad);
+        
+            const categoriaCtx = document.getElementById('categoriaChart').getContext('2d');
+            new Chart(categoriaCtx, {
+                type: 'pie',
+                data: {
+                    labels: categoriasLabels,
+                    datasets: [{
+                        data: categoriasCounts,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { size: 12 },
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Contenido por Categoría'
+                        }
+                    }
+                }
+            });
+        </script>
+        
+        <script>
+            // Gráfico de barras para Compartido por contenido
+            const comparticionesCtx = document.getElementById('comparticionesChart').getContext('2d');
+            new Chart(comparticionesCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ titulos_contenidos|safe }},
+                    datasets: [{
+                        label: 'Compartido',
+                        data: {{ comparticiones_contenidos|safe }},
+                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { font: { size: 12 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { font: { size: 12 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 12 }, boxWidth: 12, padding: 10 }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Veces Compartido por Contenido'
+                        }
+                    }
+                }
+            });
+        </script>
+        
+
         <!-- Botones de acciones -->
-        <div class="text-center mt-4 no-print">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#successModal" id="sendReportButton">
+        <div class="text-center mt-10 no-print">
+            <button class="btn btn-primary py-3 px-5 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out" data-toggle="modal" data-target="#successModal" id="sendReportButton">
                 <i class="fas fa-envelope"></i> Enviar Informe por Correo
             </button>
-            <a href="{% url 'autor_dashboard' %}" class="btn btn-secondary">
+            <a href="{% url 'autor_dashboard' %}" class="btn btn-secondary py-3 px-5 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
                 <i class="fas fa-arrow-left"></i> Volver al Panel
             </a>
-            <button class="btn btn-dark" onclick="window.print()">
+            <button class="btn btn-dark py-3 px-5 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out" onclick="window.print()">
                 <i class="fas fa-file-pdf"></i> Imprimir en PDF
             </button>
         </div>
@@ -194,17 +337,21 @@
             maintainAspectRatio: false,
             scales: {
                 x: {
-                    ticks: { font: { size: 10 } }
+                    ticks: { font: { size: 12 } }
                 },
                 y: {
                     beginAtZero: true,
-                    ticks: { font: { size: 10 } }
+                    ticks: { font: { size: 12 } }
                 }
             },
             plugins: {
                 legend: {
                     position: 'top',
-                    labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
+                    labels: { font: { size: 12 }, boxWidth: 12, padding: 10 }
+                },
+                title: {
+                    display: true,
+                    text: 'Likes y Unlikes por Contenido'
                 }
             }
         }
@@ -243,7 +390,11 @@
             plugins: {
                 legend: {
                     position: 'top',
-                    labels: { font: { size: 10 }, boxWidth: 10, padding: 5 }
+                    labels: { font: { size: 12 }, boxWidth: 12, padding: 10 }
+                },
+                title: {
+                    display: true,
+                    text: 'Popularidad de Contenidos'
                 }
             }
         }
@@ -268,20 +419,25 @@
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { ticks: { font: { size: 10 } } },
-                y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                x: { ticks: { font: { size: 12 } } },
+                y: { beginAtZero: true, ticks: { font: { size: 12 } } }
             },
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Visualizaciones por Contenido'
+                }
             }
         }
     });
 </script>
 
-<!-- Bootstrap y JQuery -->
+<!-- Bootstrap, JQuery y Flowbite -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.3/flowbite.min.js"></script>
 
 </body>
 </html>

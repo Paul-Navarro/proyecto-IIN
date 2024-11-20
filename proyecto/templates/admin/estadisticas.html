@@ -14,21 +14,117 @@
     {% load static %} <!-- Cargar la biblioteca estática de Django -->
     <link rel="stylesheet" href="{% static 'css/estadistica_admin.css' %}">
 
-    
+    <style>
+        body {
+            background-color: #f9f9f9;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .estadisticas-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
+
+        .btn {
+            border-radius: 30px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .slide {
+            display: none;
+        }
+
+        .active-slide {
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+        }
+
+        .card-text {
+            font-size: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        #estadisticasSlides {
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background-color: #5c67f2;
+            border-color: #5c67f2;
+        }
+
+        .btn-secondary {
+            background-color: #a6a9fa;
+            border-color: #a6a9fa;
+        }
+
+        .text-center button {
+            width: 150px;
+            margin: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .card-text {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+            }
+
+            .text-center button {
+                width: 100px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="container estadisticas-container">
-    <h1 class="mb-4">Estadísticas de Todos los Autores</h1>
+    <h1 class="mb-4 text-center">Estadísticas de Todos los Autores</h1>
 
     <!-- Botón para volver al panel del administrador -->
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mb-3">Volver al Panel de Administración</a>
+    <div class="text-center">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mb-3">Volver al Panel de Administración</a>
+    </div>
 
     <!-- Filtros -->
     <form method="get" class="mb-4">
-        <div class="row">
-            <div class="col-md-3">
+        <div class="row justify-content-center">
+            <div class="col-md-3 mb-3">
                 <label for="month">Mes:</label>
                 <select class="form-control" name="month" id="month">
                     <option value="all">Todos</option>
@@ -37,7 +133,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 mb-3">
                 <label for="year">Año:</label>
                 <select class="form-control" name="year" id="year">
                     <option value="all">Todos</option>
@@ -46,7 +142,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 mb-3">
                 <label for="category">Categoría:</label>
                 <select class="form-control" name="category" id="category">
                     <option value="all">Todas</option>
@@ -55,53 +151,56 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 mb-3">
                 <label for="author">Autor:</label>
                 <select class="form-control" name="author" id="author">
                     <option value="all">Todos</option>
                     {% for estadistica in autores_estadisticas %}
-                        <option value="{{ estadistica.autor__id }}" {% if estadistica.autor__id == selected_author %}selected{% endif %}>{{ estadistica.autor__username }}</option>
+                        <option value="{{ estadistica.autor_id }}" {% if estadistica.autorid == selected_author %}selected{% endif %}>{{ estadistica.autor_username }}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
+        </div>
     </form>
 
     <!-- Slider de gráficos -->
     <div id="estadisticasSlides">
         {% for autor in autores_contenidos %}
         <div class="slide {% if forloop.first %}active-slide{% endif %}" id="slide{{ forloop.counter }}">
-            <h3>Estadísticas de {{ autor.autor }}</h3>
-            <div class="row">
-                <div class="col-md-4">
+            <h3 class="text-center">Estadísticas de {{ autor.autor }}</h3>
+            <div class="row justify-content-center">
+                <div class="col-md-3 mb-3">
                     <div class="card text-white bg-info">
-                        <div class="card-body">
+                        <div class="card-body text-center">
                             <h5 class="card-title">Total Visualizaciones</h5>
                             <p class="card-text">{{ autor.total_visualizaciones }} visualizaciones</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3 mb-3">
                     <div class="card text-white bg-success">
-                        <div class="card-body">
+                        <div class="card-body text-center">
                             <h5 class="card-title">Total Likes</h5>
                             <p class="card-text">{{ autor.total_likes }} likes</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3 mb-3">
                     <div class="card text-white bg-warning">
-                        <div class="card-body">
+                        <div class="card-body text-center">
                             <h5 class="card-title">Total Unlikes</h5>
                             <p class="card-text">{{ autor.total_unlikes }} unlikes</p>
                         </div>
                     </div>
                 </div>
             </div>
+
             <!-- Tarjeta del contenido más popular -->
             <div class="card text-white bg-primary mt-4">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <h5 class="card-title">Contenido Más Popular</h5>
                     <p class="card-text">
                         {% if autor.mejor_contenido %}
@@ -112,16 +211,27 @@
                     </p>
                 </div>
             </div>
+
             <!-- Gráficos -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <h5>Likes por Contenido</h5>
-                    <canvas id="likesChart{{ forloop.counter }}"></canvas>
-                </div>
-                <div class="col-md-6">
-                    <h5>Visualizaciones por Contenido</h5>
-                    <canvas id="visualizacionesChart{{ forloop.counter }}"></canvas>
-                </div>
+            <div class="chart-container">
+                <h5 class="text-center">Likes por Contenido</h5>
+                <canvas id="likesChart{{ forloop.counter }}"></canvas>
+            </div>
+            <div class="chart-container">
+                <h5 class="text-center">Visualizaciones por Contenido</h5>
+                <canvas id="visualizacionesChart{{ forloop.counter }}"></canvas>
+            </div>
+            <div class="chart-container">
+                <h5 class="text-center">Comparticiones por Contenido</h5>
+                <canvas id="comparticionesChart{{ forloop.counter }}"></canvas>
+            </div>
+            <div class="chart-container">
+                <h5 class="text-center">Unlikes por Contenido</h5>
+                <canvas id="unlikesChart{{ forloop.counter }}"></canvas>
+            </div>
+            <div class="chart-container">
+                <h5 class="text-center">Popularidad (Promedio de Estrellas)</h5>
+                <canvas id="popularidadChart{{ forloop.counter }}"></canvas>
             </div>
         </div>
         {% endfor %}
@@ -196,8 +306,79 @@
             maintainAspectRatio: false
         }
     });
+
+    const comparticionesCtx{{ forloop.counter }} = document.getElementById('comparticionesChart{{ forloop.counter }}').getContext('2d');
+    new Chart(comparticionesCtx{{ forloop.counter }}, {
+        type: 'bar',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                label: 'Comparticiones',
+                data: {{ autor.comparticiones|safe }},
+                backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    const unlikesCtx{{ forloop.counter }} = document.getElementById('unlikesChart{{ forloop.counter }}').getContext('2d');
+    new Chart(unlikesCtx{{ forloop.counter }}, {
+        type: 'bar',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                label: 'Unlikes',
+                data: {{ autor.unlikes|safe }},
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    const popularidadCtx{{ forloop.counter }} = document.getElementById('popularidadChart{{ forloop.counter }}').getContext('2d');
+    new Chart(popularidadCtx{{ forloop.counter }}, {
+        type: 'pie',
+        data: {
+            labels: {{ autor.titulos|safe }},
+            datasets: [{
+                data: {{ autor.popularidad|safe }},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
     {% endfor %}
 </script>
 
 </body>
+
 </html>

@@ -83,6 +83,8 @@ urlpatterns = [
     path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
 
     path('ventas/descargar/', views.descargar_ventas_excel, name='descargar_ventas_excel'),
+
+    path('<int:id_conte>/compartir/', views.registrar_comparticion, name='registrar_comparticion'),
 ]
 
 '''
