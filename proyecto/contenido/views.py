@@ -762,7 +762,7 @@ def comprar_suscripcion(request):
         request.session.save()
 
         # Crear una sesión de Stripe Checkout y pasar los IDs de categorías en los metadatos
-        dominio = "http://localhost:8000"
+        dominio = "http://localhost"
         try:
             session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
