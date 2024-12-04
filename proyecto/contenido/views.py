@@ -1045,9 +1045,18 @@ def historial_compras_view(request):
         historial_compras = HistorialCompra.objects.filter(usuario=usuario).order_by('-fecha_transaccion')
         total_compras = sum([compra.categoria.precio for compra in historial_compras if compra.categoria and compra.categoria.precio is not None])
 
+        # Monto total por categoría
+        compras_por_categoria = historial_compras.values('categoria__nombre').annotate(total_gastado=Sum('categoria__precio')).order_by('-total_gastado')
+        
+        # Datos para los gráficos
+        categorias = [compra['categoria__nombre'] for compra in compras_por_categoria]
+        montos = [compra['total_gastado'] for compra in compras_por_categoria]
+        
         context = {
             'historial_compras': historial_compras,
-            'total_compras': total_compras
+            'total_compras': total_compras,
+            'categorias': categorias,
+            'montos': montos,
         }
 
         return render(request, 'home/historial_compras.html', context)

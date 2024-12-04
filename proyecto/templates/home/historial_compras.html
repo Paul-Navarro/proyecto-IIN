@@ -7,6 +7,36 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/historial_compras.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Cargar Chart.js -->
+    <style>
+        /* Estilo adicional para mejorar la presentación de los gráficos */
+        .estadisticas {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .grafico-container {
+            width: 48%;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        canvas {
+            max-width: 100% !important;
+            height: auto;
+            margin: 0 auto;
+        }
+        .grafico-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .grafico-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
@@ -21,7 +51,6 @@
 
     <div class="contenedor">
         <main>
-            <!-- Filtro de fecha -->
             <div class="filtro-fecha">
                 <label for="fecha-desde">Fecha desde:</label>
                 <input type="date" id="fecha-desde" name="fecha-desde">
@@ -75,14 +104,26 @@
             </div>
 
             <div id="total-compras" class="total-compras">
-                <i class="fas fa-coins"></i> <!-- Ícono de Font Awesome -->
+                <i class="fas fa-coins"></i>
                 <strong>Total de Compras: </strong> {{ total_compras }} GS
             </div>
-            
+
+            <!-- Gráficos -->
+            <div class="estadisticas">
+                <div class="grafico-container">
+                    <div class="grafico-title">Monto Gastado por Categoría</div>
+                    <div class="grafico-subtitle">Total gastado por cada categoría en Gs</div>
+                    <canvas id="graficoBarras"></canvas> <!-- Gráfico de barras -->
+                </div>
+                <div class="grafico-container">
+                    <div class="grafico-title">Distribución de Compras por Categoría</div>
+                    <div class="grafico-subtitle">Porcentaje de compras en cada categoría</div>
+                    <canvas id="graficoTorta"></canvas> <!-- Gráfico de torta -->
+                </div>
+            </div>
             
         </main>
     </div>
-    
 
     <!-- Modal de Detalles -->
     <div id="modalDetalle" class="modal">
@@ -90,7 +131,6 @@
             <span class="close-btn" onclick="cerrarModal()">&times;</span>
             <h2>Detalles de la Compra</h2>
             <div id="detalleContenido">
-                <!-- Contenido dinámico de los detalles de la compra -->
                 <p><strong>Compra N°:</strong> <span id="detalleCompraNumero"></span></p>
                 <p><strong>Suscripción a:</strong> <span id="detalleSuscripcion"></span></p>
                 <p><strong>Precio:</strong> <span id="detallePrecio"></span> GS</p>
@@ -100,6 +140,13 @@
     </div>
 
     <script>
+        let graficoBarras, graficoTorta; // Declaración global de las gráficas
+
+        // Inicializar los gráficos al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            actualizarGraficos();  // Inicializa con todos los datos sin filtrar
+        });
+
         function verDetalle(id) {
             const compraNumero = document.querySelector(`#item${id} .compra-item p`).textContent;
             const suscripcion = document.querySelector(`#item${id} .compra-item:nth-child(2) p`).textContent;
@@ -127,23 +174,124 @@
                 return;
             }
     
-            // Convertir las fechas a objetos Date para comparar
             const desde = new Date(fechaDesde);
             const hasta = new Date(fechaHasta);
     
-            // Obtener todas las filas de compras
             const filas = document.querySelectorAll('.compra-row');
     
             filas.forEach(fila => {
-                // Obtener la fecha de la fila
                 const fechaTexto = fila.querySelector('.compra-fecha').textContent;
                 const fechaCompra = new Date(fechaTexto);
     
-                // Mostrar u ocultar la fila según el rango de fechas
                 if (fechaCompra >= desde && fechaCompra <= hasta) {
                     fila.style.display = 'flex';
                 } else {
                     fila.style.display = 'none';
+                }
+            });
+
+            // Actualizar los gráficos con los datos filtrados
+            actualizarGraficos();
+        }
+
+        // Función para actualizar los gráficos
+        function actualizarGraficos() {
+            const filas = document.querySelectorAll('.compra-row');
+            const categorias = {};
+            const montos = {};
+
+            filas.forEach(fila => {
+                if (fila.style.display !== 'none') {  // Solo procesar las filas visibles
+                    const categoria = fila.querySelector('.compra-item:nth-child(2) p').textContent;
+                    const precio = parseFloat(fila.querySelector('.compra-item:nth-child(3) p').textContent.replace(' GS', '').trim());
+
+                    if (!categorias[categoria]) {
+                        categorias[categoria] = 0;
+                    }
+                    categorias[categoria] += precio;
+
+                    if (!montos[categoria]) {
+                        montos[categoria] = 0;
+                    }
+                    montos[categoria] += precio;
+                }
+            });
+
+            // Actualizar gráfico de barras
+            const ctxBarras = document.getElementById('graficoBarras').getContext('2d');
+            if (graficoBarras) {
+                graficoBarras.destroy();
+            }
+
+            graficoBarras = new Chart(ctxBarras, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categorias),
+                    datasets: [{
+                        label: 'Monto Total por Categoría (GS)',
+                        data: Object.values(categorias),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.raw + ' GS';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' GS';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Actualizar gráfico de torta
+            const ctxTorta = document.getElementById('graficoTorta').getContext('2d');
+            if (graficoTorta) {
+                graficoTorta.destroy();
+            }
+
+            graficoTorta = new Chart(ctxTorta, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(montos),
+                    datasets: [{
+                        data: Object.values(montos),
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.raw + ' GS';
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }

@@ -367,7 +367,7 @@ def create_user(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'Usuario creado exitosamente.')
+            #messages.success(request, 'Usuario creado exitosamente.')
             return redirect('user_list')
     else:
         form = CustomUserCreationForm()
@@ -391,7 +391,7 @@ def edit_user(request, user_id):
         form = CustomUserChangeForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Usuario actualizado exitosamente.')
+            #messages.success(request, 'Usuario actualizado exitosamente.')
             return redirect('user_list')
     else:
         form = CustomUserChangeForm(instance=user)
@@ -421,7 +421,7 @@ def editar_perfil(request):
             form = UserProfileChangeForm(request.POST, request.FILES, instance=user)
             if form.is_valid():
                 form.save()
-                messages.success(request, 'Información personal actualizada exitosamente.')
+                #messages.success(request, 'Información personal actualizada exitosamente.')
                 return redirect('editar_perfil')
             else:
                 messages.error(request, 'Hubo un error al actualizar la información personal.')
@@ -432,7 +432,7 @@ def editar_perfil(request):
             if password_form.is_valid():
                 user = password_form.save()
                 update_session_auth_hash(request, user)  # Prevents logout after password change
-                messages.success(request, 'Contraseña cambiada exitosamente.')
+                #messages.success(request, 'Contraseña cambiada exitosamente.')
                 return redirect('editar_perfil')
             else:
                 messages.error(request, 'Hubo un error al cambiar la contraseña. Por favor, revisa los campos.')
@@ -463,7 +463,7 @@ def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         user.delete()
-        messages.success(request, 'Usuario eliminado exitosamente.')
+        #messages.success(request, 'Usuario eliminado exitosamente.')
         return redirect('user_list')
     return render(request, 'admin/users/delete_user.html', {'user': user})
 
