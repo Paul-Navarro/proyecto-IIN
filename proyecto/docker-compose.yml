@@ -29,7 +29,7 @@ services:
     ports:
       - "9080:80"
     volumes:
-      - ./data:/var/www/html/upload
+      - ./data:/var/www/html/upload/imagenes_contenido
     environment:
       - ALLOW_ALL=1
     restart: always
