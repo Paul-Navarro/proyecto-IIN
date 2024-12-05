@@ -269,113 +269,166 @@
     // Script para los gráficos
     {% for autor in autores_contenidos %}
     const likesCtx{{ forloop.counter }} = document.getElementById('likesChart{{ forloop.counter }}').getContext('2d');
-    new Chart(likesCtx{{ forloop.counter }}, {
-        type: 'bar',
-        data: {
-            labels: {{ autor.titulos|safe }},
-            datasets: [{
-                label: 'Likes',
-                data: {{ autor.likes|safe }},
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
+new Chart(likesCtx{{ forloop.counter }}, {
+    type: 'bar',
+    data: {
+        labels: Array.from({ length: {{ autor.titulos|length }} }, (_, i) => `Contenido ${i + 1}`), // Etiquetas numeradas
+        datasets: [{
+            label: 'Likes',
+            data: {{ autor.likes|safe }},
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItem) {
+                        const index = tooltipItem[0].dataIndex;
+                        return {{ autor.titulos|safe }}[index]; // Muestra el título real
+                    }
+                }
+            }
         }
-    });
+    }
+});
 
-    const visualizacionesCtx{{ forloop.counter }} = document.getElementById('visualizacionesChart{{ forloop.counter }}').getContext('2d');
-    new Chart(visualizacionesCtx{{ forloop.counter }}, {
-        type: 'line',
-        data: {
-            labels: {{ autor.titulos|safe }},
-            datasets: [{
-                label: 'Visualizaciones',
-                data: {{ autor.visualizaciones|safe }},
-                backgroundColor: 'rgba(75, 192, 192, 0.4)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
 
-    const comparticionesCtx{{ forloop.counter }} = document.getElementById('comparticionesChart{{ forloop.counter }}').getContext('2d');
-    new Chart(comparticionesCtx{{ forloop.counter }}, {
-        type: 'bar',
-        data: {
-            labels: {{ autor.titulos|safe }},
-            datasets: [{
-                label: 'Comparticiones',
-                data: {{ autor.comparticiones|safe }},
-                backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                borderColor: 'rgba(153, 102, 255, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
+const visualizacionesCtx{{ forloop.counter }} = document.getElementById('visualizacionesChart{{ forloop.counter }}').getContext('2d');
+new Chart(visualizacionesCtx{{ forloop.counter }}, {
+    type: 'line',
+    data: {
+        labels: Array.from({ length: {{ autor.titulos|length }} }, (_, i) => `Contenido ${i + 1}`), // Etiquetas numeradas
+        datasets: [{
+            label: 'Visualizaciones',
+            data: {{ autor.visualizaciones|safe }},
+            backgroundColor: 'rgba(75, 192, 192, 0.4)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItem) {
+                        const index = tooltipItem[0].dataIndex;
+                        return {{ autor.titulos|safe }}[index]; // Muestra el título real
+                    }
+                }
+            }
         }
-    });
+    }
+});
 
-    const unlikesCtx{{ forloop.counter }} = document.getElementById('unlikesChart{{ forloop.counter }}').getContext('2d');
-    new Chart(unlikesCtx{{ forloop.counter }}, {
-        type: 'bar',
-        data: {
-            labels: {{ autor.titulos|safe }},
-            datasets: [{
-                label: 'Unlikes',
-                data: {{ autor.unlikes|safe }},
-                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
 
-    const popularidadCtx{{ forloop.counter }} = document.getElementById('popularidadChart{{ forloop.counter }}').getContext('2d');
-    new Chart(popularidadCtx{{ forloop.counter }}, {
-        type: 'pie',
-        data: {
-            labels: {{ autor.titulos|safe }},
-            datasets: [{
-                data: {{ autor.popularidad|safe }},
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(255, 159, 64, 0.6)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
+const comparticionesCtx{{ forloop.counter }} = document.getElementById('comparticionesChart{{ forloop.counter }}').getContext('2d');
+new Chart(comparticionesCtx{{ forloop.counter }}, {
+    type: 'bar',
+    data: {
+        labels: Array.from({ length: {{ autor.titulos|length }} }, (_, i) => `Contenido ${i + 1}`), // Etiquetas numeradas
+        datasets: [{
+            label: 'Comparticiones',
+            data: {{ autor.comparticiones|safe }},
+            backgroundColor: 'rgba(153, 102, 255, 0.6)',
+            borderColor: 'rgba(153, 102, 255, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItem) {
+                        const index = tooltipItem[0].dataIndex;
+                        return {{ autor.titulos|safe }}[index]; // Muestra el título real
+                    }
+                }
+            }
         }
-    });
+    }
+});
+
+const unlikesCtx{{ forloop.counter }} = document.getElementById('unlikesChart{{ forloop.counter }}').getContext('2d');
+new Chart(unlikesCtx{{ forloop.counter }}, {
+    type: 'bar',
+    data: {
+        labels: Array.from({ length: {{ autor.titulos|length }} }, (_, i) => `Contenido ${i + 1}`), // Etiquetas numeradas
+        datasets: [{
+            label: 'Unlikes',
+            data: {{ autor.unlikes|safe }},
+            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItem) {
+                        const index = tooltipItem[0].dataIndex;
+                        return {{ autor.titulos|safe }}[index]; // Muestra el título real
+                    }
+                }
+            }
+        }
+    }
+});
+
+const popularidadCtx{{ forloop.counter }} = document.getElementById('popularidadChart{{ forloop.counter }}').getContext('2d');
+new Chart(popularidadCtx{{ forloop.counter }}, {
+    type: 'pie',
+    data: {
+        labels: Array.from({ length: {{ autor.titulos|length }} }, (_, i) => `Contenido ${i + 1}`), // Etiquetas numeradas
+        datasets: [{
+            data: {{ autor.popularidad|safe }},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItem) {
+                        const index = tooltipItem[0].dataIndex;
+                        return {{ autor.titulos|safe }}[index]; // Muestra el título real
+                    }
+                }
+            }
+        }
+    }
+});
+
     {% endfor %}
 </script>
 
