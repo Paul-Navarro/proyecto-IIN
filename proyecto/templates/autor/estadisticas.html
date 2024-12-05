@@ -232,11 +232,15 @@
         
         <script>
             // Gráfico de barras para Compartido por contenido
-            const comparticionesCtx = document.getElementById('comparticionesChart').getContext('2d');
-            new Chart(comparticionesCtx, {
+            // Gráfico de barras para Veces Compartido por Contenido
+            const comparticionesCtx1 = document.getElementById('comparticionesChart').getContext('2d');
+            const numContenidos1 = {{ titulos_contenidos|length }}; // Número de contenidos
+            const etiquetasNumeradas1 = Array.from({ length: numContenidos1 }, (_, i) => `Contenido ${i + 1}`); // Crea la lista de "Contenido N"
+
+            new Chart(comparticionesCtx1, {
                 type: 'bar',
                 data: {
-                    labels: {{ titulos_contenidos|safe }},
+                    labels: etiquetasNumeradas1, // Aquí usamos las etiquetas numeradas
                     datasets: [{
                         label: 'Compartido',
                         data: {{ comparticiones_contenidos|safe }},
@@ -250,7 +254,12 @@
                     maintainAspectRatio: false,
                     scales: {
                         x: {
-                            ticks: { font: { size: 12 } }
+                            ticks: {
+                                font: { size: 10 }, // Ajusta el tamaño de la fuente
+                                maxRotation: 45, // Reduce la rotación si es necesario
+                                minRotation: 0,  // Asegura que no se rote demasiado
+                                padding: 10       // Ajusta el espacio entre las etiquetas
+                            }
                         },
                         y: {
                             beginAtZero: true,
@@ -262,6 +271,14 @@
                             position: 'top',
                             labels: { font: { size: 12 }, boxWidth: 12, padding: 10 }
                         },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItem) {
+                                    const index = tooltipItem[0].dataIndex;
+                                    return {{ titulos_contenidos|safe }}[index]; // Mostrar el título real al pasar el mouse
+                                }
+                            }
+                        },
                         title: {
                             display: true,
                             text: 'Veces Compartido por Contenido'
@@ -269,6 +286,7 @@
                     }
                 }
             });
+
         </script>
         
 
@@ -310,52 +328,69 @@
 <!-- Scripts para los gráficos -->
 <script>
     // Gráfico de barras para Likes y Unlikes
-    const likesCtx = document.getElementById('likesChart').getContext('2d');
-    new Chart(likesCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ titulos_contenidos|safe }},
-            datasets: [
-                {
-                    label: 'Likes',
-                    data: {{ likes_contenidos|safe }},
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Unlikes',
-                    data: {{ unlikes_contenidos|safe }},
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    ticks: { font: { size: 12 } }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: { font: { size: 12 } }
+const likesCtx = document.getElementById('likesChart').getContext('2d');
+const numContenidos = {{ titulos_contenidos|length }}; // Número de contenidos
+const etiquetasNumeradas = Array.from({ length: numContenidos }, (_, i) => `Contenido ${i + 1}`); // Crea la lista de "Contenido N"
+
+new Chart(likesCtx, {
+    type: 'bar',
+    data: {
+        labels: etiquetasNumeradas, // Aquí usamos las etiquetas numeradas
+        datasets: [
+            {
+                label: 'Likes',
+                data: {{ likes_contenidos|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Unlikes',
+                data: {{ unlikes_contenidos|safe }},
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                ticks: {
+                    font: { size: 10 }, // Ajusta el tamaño de la fuente
+                    maxRotation: 45, // Reduce la rotación si es necesario
+                    minRotation: 0,  // Asegura que no se rote demasiado
+                    padding: 10       // Ajusta el espacio entre las etiquetas
                 }
             },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: { font: { size: 12 }, boxWidth: 12, padding: 10 }
-                },
-                title: {
-                    display: true,
-                    text: 'Likes y Unlikes por Contenido'
+            y: {
+                beginAtZero: true,
+                ticks: { font: { size: 12 } }
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: { font: { size: 12 }, boxWidth: 12, padding: 10 }
+            },
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItem) {
+                        const index = tooltipItem[0].dataIndex;
+                        return {{ titulos_contenidos|safe }}[index]; // Mostrar el título real al pasar el mouse
+                    }
                 }
+            },
+            title: {
+                display: true,
+                text: 'Likes y Unlikes por Contenido'
             }
         }
-    });
+    }
+});
+
 
     // Gráfico de torta para Popularidad
     const popularidadCtx = document.getElementById('popularidadChart').getContext('2d');
@@ -390,7 +425,7 @@
             plugins: {
                 legend: {
                     position: 'top',
-                    labels: { font: { size: 12 }, boxWidth: 12, padding: 10 }
+                    labels: { font: { size: 8 }, boxWidth: 12, padding: 10 }
                 },
                 title: {
                     display: true,
@@ -401,36 +436,56 @@
     });
 
     // Gráfico de líneas para Visualizaciones
-    const visualizacionesCtx = document.getElementById('visualizacionesChart').getContext('2d');
-    new Chart(visualizacionesCtx, {
-        type: 'line',
-        data: {
-            labels: {{ titulos_contenidos|safe }},
-            datasets: [{
-                label: 'Visualizaciones',
-                data: {{ visualizaciones_contenidos|safe }},
-                backgroundColor: 'rgba(75, 192, 192, 0.4)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { ticks: { font: { size: 12 } } },
-                y: { beginAtZero: true, ticks: { font: { size: 12 } } }
-            },
-            plugins: {
-                legend: { display: false },
-                title: {
-                    display: true,
-                    text: 'Visualizaciones por Contenido'
+const visualizacionesCtx = document.getElementById('visualizacionesChart').getContext('2d');
+
+new Chart(visualizacionesCtx, {
+    type: 'line',
+    data: {
+        labels: etiquetasNumeradas, // Aquí usamos las etiquetas numeradas
+        datasets: [{
+            label: 'Visualizaciones',
+            data: {{ visualizaciones_contenidos|safe }},
+            backgroundColor: 'rgba(75, 192, 192, 0.4)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                ticks: {
+                    font: { size: 10 }, // Ajusta el tamaño de la fuente
+                    maxRotation: 45, // Reduce la rotación si es necesario
+                    minRotation: 0,  // Asegura que no se rote demasiado
+                    padding: 10       // Ajusta el espacio entre las etiquetas
                 }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: { font: { size: 12 } }
+            }
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItem) {
+                        const index = tooltipItem[0].dataIndex;
+                        return {{ titulos_contenidos|safe }}[index]; // Mostrar el título real al pasar el mouse
+                    }
+                }
+            },
+            title: {
+                display: true,
+                text: 'Visualizaciones por Contenido'
             }
         }
-    });
+    }
+});
+
 </script>
 
 <!-- Bootstrap, JQuery y Flowbite -->
