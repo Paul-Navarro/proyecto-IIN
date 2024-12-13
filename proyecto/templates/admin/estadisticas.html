@@ -156,10 +156,10 @@
                 <select class="form-control" name="author" id="author">
                     <option value="all">Todos</option>
                     {% for estadistica in autores_estadisticas %}
-                        <option value="{{ estadistica.autor_id }}" {% if estadistica.autorid == selected_author %}selected{% endif %}>{{ estadistica.autor_username }}</option>
+                        <option value="{{ estadistica.autor__id }}" {% if estadistica.autor__id|stringformat:"s" == selected_author %}selected{% endif %}>{{ estadistica.autor__username }}</option>
                     {% endfor %}
                 </select>
-            </div>
+            </div>            
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
