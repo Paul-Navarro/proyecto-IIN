@@ -1,3 +1,4 @@
+import time
 from django.forms import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -431,4 +432,237 @@ class MoreUserTests(TestCase):
         self.user.roles.add(role)
         self.assertTrue(self.user.roles.filter(name='RoleForUserTest').exists())
 
+from django.test import TestCase
+from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
+from django.utils.timezone import now
+from categorias.models import Categoria
+from contenido.models import Contenido, Tag, Rating, Suscripcion, Favorito, CambioEstado, VersionContenido
+from users.models import CustomUser as User, Role
+
+class CategoriaTestCase(TestCase):
+    def setUp(self):
+        self.categoria1 = Categoria.objects.create(nombre="Categoria A", tipo_contenido="Texto", descripcion="Descripcion A")
+
+    def test_categoria_actualizacion_fecha(self):
+        # Introducir un pequeño retraso para garantizar que las fechas cambien
+        time.sleep(0.01)
+        self.categoria1.descripcion = "Nueva Descripcion"
+        self.categoria1.save()
+        self.assertGreater(self.categoria1.fecha_actualizacion, self.categoria1.fecha_creacion)
+    def test_categoria_codigo_autogenerado(self):
+        self.assertIsNotNone(self.categoria1.codigo)
     
+    def test_categoria_unique_nombre(self):
+        with self.assertRaises(IntegrityError):
+            Categoria.objects.create(nombre="Categoria A", tipo_contenido="Texto", descripcion="Descripcion duplicada")
+    
+class ContenidoTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", email="test@example.com", password="password123")
+        self.categoria = Categoria.objects.create(nombre="Categoria Test", tipo_contenido="Texto", descripcion="Descripcion")
+        self.contenido = Contenido.objects.create(
+            titulo_conte="Test Contenido", tipo_conte="Texto", texto_conte="Contenido de prueba",
+            estado_conte="PUBLICADO", fecha_conte="2023-01-01", autor=self.user, categoria=self.categoria
+        )
+
+    def test_contenido_total_comparticiones(self):
+        self.contenido.comparticiones_facebook = 10
+        self.contenido.comparticiones_x = 5
+        self.contenido.save()
+        self.assertEqual(self.contenido.total_comparticiones(), 15)
+
+    def test_contenido_autopublicar(self):
+        self.contenido.fecha_publicacion = now()
+        self.contenido.autopublicar()
+        self.assertTrue(self.contenido.autopublicar_conte)
+
+    def test_contenido_version_creation(self):
+        self.contenido.texto_conte = "Nuevo contenido"
+        self.contenido.save()
+        self.assertEqual(self.contenido.versiones.count(), 2)
+
+class RatingTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="user1", email="user1@example.com", password="password123")
+        self.categoria = Categoria.objects.create(nombre="Categoria Test", tipo_contenido="Texto", descripcion="Descripcion")
+        self.contenido = Contenido.objects.create(
+            titulo_conte="Contenido para rating", tipo_conte="Texto", texto_conte="Contenido para prueba de rating",
+            estado_conte="PUBLICADO", fecha_conte="2023-01-01", autor=self.user, categoria=self.categoria
+        )
+
+    def test_rating_creation(self):
+        rating = Rating.objects.create(usuario=self.user, contenido=self.contenido, estrellas=5)
+        self.assertEqual(rating.estrellas, 5)
+
+    def test_rating_unique(self):
+        Rating.objects.create(usuario=self.user, contenido=self.contenido, estrellas=4)
+        with self.assertRaises(IntegrityError):
+            Rating.objects.create(usuario=self.user, contenido=self.contenido, estrellas=3)
+
+class FavoritoTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="user2", email="user2@example.com", password="password123")
+        self.contenido = Contenido.objects.create(
+            titulo_conte="Contenido Favorito", tipo_conte="Texto", texto_conte="Contenido favorito",
+            estado_conte="PUBLICADO", fecha_conte="2023-01-01", autor=self.user
+        )
+
+    def test_favorito_creation(self):
+        favorito = Favorito.objects.create(usuario=self.user, contenido=self.contenido)
+        self.assertTrue(Favorito.objects.filter(usuario=self.user, contenido=self.contenido).exists())
+
+    def test_favorito_unique(self):
+        Favorito.objects.create(usuario=self.user, contenido=self.contenido)
+        with self.assertRaises(IntegrityError):
+            Favorito.objects.create(usuario=self.user, contenido=self.contenido)
+
+
+from django.test import TestCase
+from django.utils.timezone import now
+from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
+from categorias.models import Categoria
+from contenido.models import Contenido, Tag, Rating, Favorito, Suscripcion, VersionContenido
+from users.models import CustomUser as User
+
+class AdditionalCategoriaTests(TestCase):
+    def setUp(self):
+        self.categoria = Categoria.objects.create(nombre="Categoria X", tipo_contenido="Texto", descripcion="Descripcion X")
+
+    def test_categoria_precio_null(self):
+        self.assertIsNone(self.categoria.precio)
+
+    def test_categoria_precio_positive(self):
+        self.categoria.precio = 100
+        self.categoria.save()
+        self.assertGreater(self.categoria.precio, 0)
+
+    def test_categoria_tipo_contenido(self):
+        self.assertEqual(self.categoria.tipo_contenido, "Texto")
+
+    def test_categoria_unique_codigo_on_save(self):
+        categoria2 = Categoria.objects.create(nombre="Categoria Y", tipo_contenido="Video", descripcion="Descripcion Y")
+        self.assertNotEqual(self.categoria.codigo, categoria2.codigo)
+
+class AdditionalContenidoTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="user1", email="user1@example.com", password="password123")
+        self.categoria = Categoria.objects.create(nombre="Categoria Test", tipo_contenido="Texto", descripcion="Descripcion")
+        self.contenido = Contenido.objects.create(
+            titulo_conte="Test Contenido", tipo_conte="Texto", texto_conte="Contenido inicial",
+            estado_conte="PUBLICADO", fecha_conte="2023-01-01", autor=self.user, categoria=self.categoria
+        )
+
+    def test_contenido_default_values(self):
+        self.assertEqual(self.contenido.likes, 0)
+        self.assertEqual(self.contenido.unlikes, 0)
+        self.assertFalse(self.contenido.vigencia_conte)
+
+    def test_contenido_vigencia_update(self):
+        self.contenido.vigencia_conte = True
+        self.contenido.save()
+        self.assertTrue(self.contenido.vigencia_conte)
+
+    def test_contenido_tags(self):
+        tag1 = Tag.objects.create(nombre="Tag 1")
+        tag2 = Tag.objects.create(nombre="Tag 2")
+        self.contenido.tags.add(tag1, tag2)
+        self.assertEqual(self.contenido.tags.count(), 2)
+
+    def test_contenido_version_creation_on_edit(self):
+        self.contenido.texto_conte = "Contenido actualizado"
+        self.contenido.save()
+        self.assertEqual(self.contenido.versiones.count(), 2)
+
+    def test_contenido_no_duplicate_version_on_no_changes(self):
+        self.contenido.save()
+        self.assertEqual(self.contenido.versiones.count(), 1)
+
+    def test_contenido_comparticiones(self):
+        self.contenido.comparticiones_whatsapp = 10
+        self.contenido.comparticiones_instagram = 15
+        self.contenido.save()
+        self.assertEqual(self.contenido.total_comparticiones(), 25)
+
+class AdditionalUserTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="user1", email="user1@example.com", password="password123")
+
+    def test_user_email_validation(self):
+        # Cambiado para validar explícitamente el correo
+        invalid_email = "invalid-email"
+        try:
+            validate_email(invalid_email)
+            self.fail("ValidationError no fue lanzado para un correo inválido")
+        except ValidationError:
+            pass  # El test pasa si se lanza ValidationError
+
+    def test_user_roles_addition(self):
+        # Verifica si ya existe el rol antes de crearlo
+        role_name = "Editor"
+        role, created = Role.objects.get_or_create(name=role_name)
+        self.user.roles.add(role)
+        self.assertTrue(self.user.roles.filter(name=role_name).exists())
+    
+class AdditionalTagTests(TestCase):
+    def setUp(self):
+        self.tag = Tag.objects.create(nombre="Etiqueta 1")
+
+    def test_tag_creation(self):
+        self.assertEqual(self.tag.nombre, "Etiqueta 1")
+
+    def test_tag_unique_name(self):
+        with self.assertRaises(IntegrityError):
+            Tag.objects.create(nombre="Etiqueta 1")
+
+class AdditionalFavoritoTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="user3", email="user3@example.com", password="password123")
+        self.contenido = Contenido.objects.create(
+            titulo_conte="Contenido Favorito", tipo_conte="Texto", texto_conte="Contenido favorito",
+            estado_conte="PUBLICADO", fecha_conte="2023-01-01", autor=self.user
+        )
+
+    def test_favorito_creation(self):
+        favorito = Favorito.objects.create(usuario=self.user, contenido=self.contenido)
+        self.assertTrue(Favorito.objects.filter(usuario=self.user, contenido=self.contenido).exists())
+
+    def test_favorito_duplicate(self):
+        Favorito.objects.create(usuario=self.user, contenido=self.contenido)
+        with self.assertRaises(IntegrityError):
+            Favorito.objects.create(usuario=self.user, contenido=self.contenido)
+
+class AdditionalRatingTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="user4", email="user4@example.com", password="password123")
+        self.categoria = Categoria.objects.create(nombre="Categoria para Rating", tipo_contenido="Texto", descripcion="Descripcion")
+        self.contenido = Contenido.objects.create(
+            titulo_conte="Contenido para Rating", tipo_conte="Texto", texto_conte="Texto de prueba",
+            estado_conte="PUBLICADO", fecha_conte="2023-01-01", autor=self.user, categoria=self.categoria
+        )
+
+    def test_rating_out_of_range(self):
+        # Guardar un rating con un valor fuera del rango válido
+        rating = Rating.objects.create(usuario=self.user, contenido=self.contenido, estrellas=10)
+        self.assertEqual(rating.estrellas, 10)  # Aseguramos que se guarda
+
+    def test_rating_valid_value(self):
+        # Guardar un rating con un valor dentro del rango válido
+        rating = Rating.objects.create(usuario=self.user, contenido=self.contenido, estrellas=5)
+        self.assertEqual(rating.estrellas, 5)
+
+
+class AdditionalSuscripcionTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="user5", email="user5@example.com", password="password123")
+        self.categoria = Categoria.objects.create(nombre="Categoria Suscripcion", tipo_contenido="Texto", descripcion="Descripcion")
+
+    def test_suscripcion_creation(self):
+        suscripcion = Suscripcion.objects.create(usuario=self.user, categoria=self.categoria)
+        self.assertTrue(Suscripcion.objects.filter(usuario=self.user, categoria=self.categoria).exists())
+
+    def test_suscripcion_duplicate(self):
+        Suscripcion.objects.create(usuario=self.user, categoria=self.categoria)
+        with self.assertRaises(IntegrityError):
+            Suscripcion.objects.create(usuario=self.user, categoria=self.categoria)
