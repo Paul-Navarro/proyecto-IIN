@@ -548,21 +548,10 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    {% if not suscrito %}
-                    <!-- Mostrar mensaje si no está suscrito -->
                     <div class="no-content">
-                        <h3>¡Debes suscribirte!</h3>
-                        <p>No tienes acceso a esta categoría. Por favor, suscríbete para disfrutar del contenido.</p>
-                        <a href="{% url 'suscripciones' %}" class="btn btn-primary">Ir a suscripciones</a>
+                        <h3>¡Ups! No hay contenido aquí.</h3>
+                        <p>Vuelve más tarde para ver actualizaciones o usa los filtros para explorar otros contenidos.</p>
                     </div>
-                    {% else %}
-                        <!-- Mostrar mensaje cuando no hay contenido -->
-                        <div class="no-content">
-                            <h3>¡Ups! No hay contenido aquí.</h3>
-                            <p>Vuelve más tarde para ver actualizaciones o usa los filtros para explorar otros contenidos.</p>
-                        </div>
-                    {% endif %}
-            
                 {% endif %}
             </div>
             
