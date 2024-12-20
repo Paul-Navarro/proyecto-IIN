@@ -105,7 +105,7 @@
     <div class="cuerpo">
         <!-- Listado lateral izquierdo -->
         <aside class="lateral_izq">
-            <!--no tiene que estar acá, tiene que estar en el HOME.css-->
+            
             <button id = "btn_suscripcion" class = "boton_suscripcion">suscripciones</button>
             <style>
                 .boton_suscripcion{
@@ -370,8 +370,16 @@
                         </div>
 
                         <div class="btn-container">
-                            <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
-                        </div>        
+                            {% if contenido.requiere_suscripcion %}
+                                <button class="btn btn-primary" onclick="mostrarModal()">
+                                    Leer más
+                                </button>
+                            {% else %}
+                                <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                            {% endif %}
+                        </div>
+                        
+                        </div>     
                     </div>
                 </div>
             {% endfor %}
@@ -465,8 +473,15 @@
                     
                                     <!-- Enlace para leer más -->
                                     <div class="btn-container">
-                                        <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                                        {% if contenido.requiere_suscripcion %}
+                                            <button class="btn btn-primary" onclick="mostrarModal()">
+                                                Leer más
+                                            </button>
+                                        {% else %}
+                                            <a href="{% url 'contenido_detail' contenido.id_conte %}" class="btn btn-primary">Leer más</a>
+                                        {% endif %}
                                     </div>
+                                    
                                     {% if user.is_authenticated %}
                                         <button class="favorito-btn" id="favorito-btn-{{ contenido.id_conte }}" onclick="toggleFavorito({{ contenido.id_conte }})">
                                             <i class="fas fa-heart"></i>
@@ -588,6 +603,16 @@
             
             
         </aside>
+
+        <!-- Modal de Suscripción -->
+        <div id="modalSuscripcion" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Contenido Restringido</h2>
+                <p>Debes suscribirte para acceder a este contenido.</p>
+                <button id="btnIrSuscripcion" class="btn">Ir a Suscripciones</button>
+            </div>
+        </div>
         
     </div>
 
@@ -756,6 +781,36 @@
 
 
     </script>       
+
+    <script>
+        // Obtener elementos del DOM
+        const modal = document.getElementById('modalSuscripcion');
+        const closeModal = document.querySelector('.modal .close');
+        const btnIrSuscripcion = document.getElementById('btnIrSuscripcion');
+    
+        // Función para mostrar el modal
+        function mostrarModal() {
+            modal.style.display = 'block';
+        }
+    
+        // Cerrar modal al hacer clic en el botón de cierre
+        closeModal.onclick = function() {
+            modal.style.display = 'none';
+        };
+    
+        // Cerrar modal al hacer clic fuera de la ventana modal
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    
+        // Redirigir a la página de suscripciones
+        btnIrSuscripcion.onclick = function() {
+            window.location.href = "{% url 'suscripciones' %}";
+        };
+    </script>
+    
 </body>
 
 </html>

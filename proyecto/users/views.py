@@ -66,14 +66,11 @@ def home(request):
     if request.user.is_authenticated:
         suscripciones_usuario = request.user.suscripcion_set.all().values_list('categoria_id', flat=True)
 
-        # Filtramos las categorías a las que el usuario está suscrito, y además añadimos las categorías públicas
-        categorias_accesibles = Categoria.objects.filter(
-            Q(es_pagada=False, para_suscriptores=False) |  # Categorías públicas
-            Q(id__in=suscripciones_usuario)  # Categorías a las que está suscrito
-        )
+        # Incluimos todas las categorías (públicas y privadas)
+        categorias_accesibles = Categoria.objects.all()
     else:
-        # Si el usuario no está autenticado, solo mostramos las categorías públicas
-        categorias_accesibles = Categoria.objects.filter(es_pagada=False, para_suscriptores=False)
+        # Si el usuario no está autenticado, incluimos todas las categorías
+        categorias_accesibles = Categoria.objects.all()
 
     # Filtrar los contenidos de las categorías accesibles
     contenidos = Contenido.objects.filter(categoria__in=categorias_accesibles, estado_conte='PUBLICADO', autopublicar_conte=True, vigencia_conte=False, es_destacado=False).order_by('-fecha_publicacion')
@@ -92,15 +89,6 @@ def home(request):
         favoritos = Favorito.objects.filter(usuario=request.user).values_list('contenido', flat=True)
         contenidos = contenidos.filter(id_conte__in=favoritos)
 
-     # Calcular el promedio de calificaciones para cada contenido
-    for contenido in contenidos:
-        promedio_calificacion = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg']
-        contenido.promedio_calificacion = promedio_calificacion if promedio_calificacion else 0  # Asignar 0 si no tiene calificaciones
-
-        # Verificar si el usuario está autenticado y si el contenido está en favoritos
-        contenido.es_favorito = contenido.favoritos.filter(usuario=request.user).exists() if request.user.is_authenticated else False
-
-    
 
     # Filtrar por categoría si está presente en la solicitud
     categoria_id = request.GET.get('categoria')
@@ -163,6 +151,21 @@ def home(request):
     if user.is_authenticated:
         notificaciones = Notificacion.objects.filter(usuario=user, leida=False)
         notificaciones_no_leidas = notificaciones.count()
+        
+    for contenido in contenidos:
+        if contenido.categoria.es_pagada or contenido.categoria.para_suscriptores:
+            if request.user.is_authenticated and contenido.categoria.id in suscripciones_usuario:
+                contenido.requiere_suscripcion = False  
+            else:
+                contenido.requiere_suscripcion = True   
+        else:
+            contenido.requiere_suscripcion = False  
+        
+        promedio_calificacion = Rating.objects.filter(contenido=contenido).aggregate(Avg('estrellas'))['estrellas__avg']
+        contenido.promedio_calificacion = promedio_calificacion if promedio_calificacion else 0  
+
+        contenido.es_favorito = contenido.favoritos.filter(usuario=request.user).exists() if request.user.is_authenticated else False
+
 
     # Contexto para pasar a la plantilla
     context = {
